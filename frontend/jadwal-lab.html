@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jadwal Lab Business Analytics</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/cssadmin.css">
+
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            background-color: var(--light-bg);
+            padding: 0;
+            box-sizing: border-box;
+            width: 100%;
+            margin: 0;
+        }
+
+        /* Container utama di bawah header */
+        .container.schedule-page {
+            width: 100%;
+            max-width: 1200px;
+            padding: 0 20px 50px 20px;
+            margin-top: 30px;
+        }
+
+        /* Card untuk menampung tabel */
+        .schedule-card {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 25px;
+            /* Jarak antar hari */
+            overflow-x: auto;
+            /* Agar tabel responsif */
+        }
+
+        .schedule-card h3 {
+            color: var(--primary-blue);
+            margin-top: 0;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        /* Table Styling (Re-use dari status/riwayat) */
+        .schedule-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .schedule-table th,
+        .schedule-table td {
+            padding: 16px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .schedule-table th {
+            background-color: #f1f1f1;
+            /* Header tabel netral */
+            color: var(--dark-grey);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.9em;
+        }
+
+        .schedule-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .schedule-table .available {
+            color: #4CAF50;
+            /* Hijau untuk Ketersediaan */
+            font-weight: 600;
+        }
+
+        .schedule-table .booked {
+            color: #E91E63;
+            /* Merah/Pink untuk Terpakai */
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header-status-blue">
+        <h1><i class="fas fa-calendar-alt"></i> Jadwal Pemanfaatan Lab Business Analytics</h1>
+        <p>Lihat ketersediaan Lab Business Analytics untuk merencanakan pengajuan peminjaman Anda.</p>
+    </div>
+
+    <div class="container schedule-page">
+
+        <div class="schedule-card">
+            <h3>Senin, 02 Desember 2025</h3>
+            <table class="schedule-table">
+                <thead>
+                    <tr>
+                        <th>Waktu</th>
+                        <th>Status</th>
+                        <th>Keperluan/Mata Kuliah</th>
+                        <th>Peminjam</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>08:00 - 10:00</td>
+                        <td><span class="booked">Terpakai</span></td>
+                        <td>Perkuliahan: Data Mining</td>
+                        <td>Dr. Erna Cahyani</td>
+                    </tr>
+                    <tr>
+                        <td>10:00 - 12:00</td>
+                        <td><span class="available">Tersedia</span></td>
+                        <td>-</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>13:00 - 15:00</td>
+                        <td><span class="booked">Terpakai</span></td>
+                        <td>Riset Mahasiswa (Bimbingan)</td>
+                        <td>Sdr. Rian Hidayat</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="schedule-card">
+            <h3>Selasa, 03 Desember 2025</h3>
+            <table class="schedule-table">
+                <thead>
+                    <tr>
+                        <th>Waktu</th>
+                        <th>Status</th>
+                        <th>Keperluan/Mata Kuliah</th>
+                        <th>Peminjam</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>08:00 - 12:00</td>
+                        <td><span class="available">Tersedia</span></td>
+                        <td>-</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>14:00 - 16:00</td>
+                        <td><span class="booked">Terpakai</span></td>
+                        <td>Rapat Koordinator Lab</td>
+                        <td>Admin Lab</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+    <a href="index.html" class="back-link-home">
+        <i class="fas fa-home" style="margin-right: 8px;"></i> Kembali ke Halaman Utama
+    </a>
+
+</body>
+
+</html>
