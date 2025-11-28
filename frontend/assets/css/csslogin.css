@@ -1,0 +1,436 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+/* Reset dan Base Styling */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background: #f6f6f6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    font-family: 'Poppins', sans-serif;
+    height: 100vh;
+    margin: 0;
+}
+
+/* --- Container Utama --- */
+.container {
+    background-color: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25),
+        0 10px 10px rgba(0, 0, 0, 0.22);
+    position: relative;
+    overflow: hidden;
+    width: 768px;
+    max-width: 100%;
+    min-height: 500px;
+}
+
+/* --- Styling Form --- */
+.form-container {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    transition: all 0.6s ease-in-out;
+}
+
+.form-container form {
+    background-color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 0 50px;
+    height: 100%;
+    text-align: center;
+}
+
+.form-container h1 {
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.form-container span {
+    font-size: 12px;
+    color: #888;
+    margin-top: 5px;
+    margin-bottom: 15px;
+}
+
+/* Input Fields */
+.form-container input {
+    background-color: #eee;
+    border: none;
+    padding: 12px 15px;
+    margin: 8px 0;
+    width: 100%;
+    border-radius: 8px;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Links and Buttons */
+.form-container a {
+    color: #333;
+    font-size: 14px;
+    text-decoration: none;
+    margin: 15px 0;
+}
+
+.form-container button {
+    background-color: #4A90E2;
+    /* Warna biru */
+    color: #FFFFFF;
+    border: 1px solid #4A90E2;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 12px 45px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: transform 80ms ease-in;
+    margin-top: 10px;
+    cursor: pointer;
+}
+
+.form-container button:active {
+    /* Tombol tidak mengecil */
+    transform: scale(1.0);
+
+    /* Ganti warna latar belakang saat ditekan */
+    background-color: #387ac0;
+    /* Warna biru yang sedikit lebih gelap */
+    border-color: #387ac0;
+}
+
+/* Social Icons */
+.social-container {
+    margin: 20px 0;
+}
+
+.social-container a {
+    border: 1px solid #DDDDDD;
+    border-radius: 50%;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 5px;
+    height: 40px;
+    width: 40px;
+    font-weight: 600;
+    color: #4A90E2;
+    transition: background-color 0.3s;
+}
+
+.social-container a:hover {
+    background-color: #f6f6f6;
+}
+
+.social-container a.social {
+    color: #333;
+    /* Warna teks ikon */
+    border: 1px solid #DDDDDD;
+    border-radius: 50%;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 5px;
+    height: 40px;
+    width: 40px;
+    font-size: 1.2em;
+    text-decoration: none;
+    transition: border-color 0.3s;
+}
+
+.social-container a.social:hover {
+    border-color: #4A90E2;
+    /* Border berubah biru saat hover */
+}
+
+/* Login/Sign In Form */
+.sign-in-container {
+    left: 0;
+    width: 50%;
+    z-index: 2;
+}
+
+/* Register/Sign Up Form */
+.sign-up-container {
+    left: 0;
+    width: 50%;
+    opacity: 0;
+    z-index: 1;
+}
+
+/* --- Overlay Panel --- */
+.overlay-container {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 50%;
+    height: 100%;
+    overflow: hidden;
+    transition: transform 0.6s ease-in-out;
+    z-index: 100;
+}
+
+.overlay {
+    background: #4A90E2;
+    background: linear-gradient(to right, #4A90E2, #75BBF7);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: 0 0;
+    color: #FFFFFF;
+    position: relative;
+    left: -100%;
+    height: 100%;
+    width: 200%;
+    transform: translateX(0);
+    transition: transform 0.6s ease-in-out;
+}
+
+.overlay-panel {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 0 40px;
+    text-align: center;
+    top: 0;
+    height: 100%;
+    width: 50%;
+    transform: translateX(0);
+    transition: transform 0.6s ease-in-out;
+}
+
+.overlay-panel h1 {
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.overlay-panel p {
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 20px;
+    letter-spacing: 0.5px;
+    margin: 10px 0 20px;
+}
+
+/* PERBAIKAN STYLING TOMBOL GHOST UNTUK OVERLAY PANEL */
+.overlay-panel button.ghost {
+    /* Seting Transparan dan Garis Tepi Putih */
+    background-color: transparent;
+    border: 1px solid #FFFFFF;
+    color: #FFFFFF;
+    /* Teks berwarna putih */
+
+    /* Menjaga konsistensi tampilan tombol */
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 12px 45px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    cursor: pointer;
+}
+
+/* Efek Hover (opsional, membuat tombol sedikit lebih terlihat) */
+.overlay-panel button.ghost:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    /* Sedikit latar belakang putih transparan */
+    border-color: #FFFFFF;
+}
+
+/* Tombol tidak mengecil saat ditekan */
+.form-container button:active {
+    transform: scale(1.0);
+    background-color: #387ac0;
+    border-color: #387ac0;
+}
+
+.overlay-left {
+    transform: translateX(-20%);
+}
+
+.overlay-right {
+    right: 0;
+    transform: translateX(0);
+}
+
+/* ======================================= */
+/* --- Efek Sliding (TOGGLE CLASS) --- */
+/* ======================================= */
+
+/* Saat class 'right-panel-active' ditambahkan ke container */
+.container.right-panel-active .sign-in-container {
+    transform: translateX(100%);
+    /* Geser form Login ke kanan */
+}
+
+.container.right-panel-active .sign-up-container {
+    transform: translateX(100%);
+    /* Geser form Register ke posisi tengah */
+    opacity: 1;
+    z-index: 5;
+}
+
+.container.right-panel-active .overlay-container {
+    transform: translateX(-100%);
+    /* Geser Overlay container ke kiri */
+}
+
+.container.right-panel-active .overlay {
+    transform: translateX(50%);
+    /* Geser background gradient ke kanan */
+}
+
+.container.right-panel-active .overlay-left {
+    transform: translateX(0);
+    /* Geser teks 'Selamat Datang Kembali' ke tengah */
+}
+
+.container.right-panel-active .overlay-right {
+    transform: translateX(20%);
+    /* Geser teks 'Hai Teman' keluar */
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+    /* Akan disembunyikan/ditampilkan oleh JS atau class */
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+}
+
+.modal-content h2 {
+    color: var(--primary-blue);
+    margin-top: 0;
+}
+
+.modal-content p {
+    margin-bottom: 25px;
+    color: var(--dark-grey);
+}
+
+.modal-actions button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+    margin: 0 10px;
+    transition: background-color 0.3s;
+}
+
+.btn-modal-cancel {
+    background-color: #ccc;
+    color: var(--dark-grey);
+}
+
+.btn-modal-confirm {
+    background-color: var(--primary-blue);
+    color: #fff;
+}
+
+/* Pastikan kode ini ada di dashboard.css */
+
+/* Header Halaman Status - Background Biru */
+.header-status-blue {
+    background-color: var(--primary-blue);
+    color: #fff;
+    padding: 30px 20px;
+    text-align: center;
+    margin-bottom: 30px;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.header-status-blue h1 {
+    font-size: 2.5em;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #fff;
+}
+
+/* ... dan styling lainnya untuk .header-status-blue ... */
+
+/* Tombol kembali ke form */
+.back-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: fit-content;
+    margin: 20px auto 10px auto;
+    /* Margin atas dan bawah agar tidak terlalu mepet header/form */
+    padding: 10px 20px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    color: var(--primary-blue);
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.back-link:hover {
+    background-color: var(--primary-blue);
+    color: #fff;
+    border-color: var(--primary-blue);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(74, 144, 226, 0.2);
+}
+
+/* ... dan styling lainnya untuk .back-link ... */
+
+
+
+
+/* Styling untuk Tombol Kembali ke Halaman Utama */
+.back-link-home {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    /* Lebar proporsional dan terpusat */
+    width: 90%;
+    max-width: 400px;
+    margin: 20px auto 30px auto;
+
+    padding: 10px 20px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    color: var(--primary-blue);
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.back-link-home i {
+    margin-right: 10px;
+    font-size: 1.1em;
+}

@@ -1,0 +1,792 @@
+/* Warna Utama yang Konsisten */
+:root {
+    --primary-blue: #4A90E2;
+    /* Biru Utama (dari login.html) */
+    --light-blue: #75BBF7;
+    /* Biru Muda */
+    --dark-grey: #333;
+    --light-bg: #f4f6f9;
+    --font: 'Poppins', sans-serif;
+}
+
+/* Base Styling */
+body {
+    font-family: var(--font);
+    margin: 0;
+    padding: 0;
+    background-color: var(--light-bg);
+    display: flex;
+}
+
+/* ================== SIDEBAR (NAVIGASI) ================== */
+.sidebar {
+    width: 250px;
+    background-color: var(--primary-blue);
+    color: #fff;
+    height: 100vh;
+    position: fixed;
+    padding-top: 20px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.logo-area {
+    text-align: center;
+    padding: 20px 0;
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.sidebar nav a {
+    display: block;
+    padding: 15px 25px;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 400;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.sidebar nav a:hover,
+.sidebar nav a.active {
+    background-color: var(--light-blue);
+    color: var(--dark-grey);
+}
+
+.sidebar nav a i {
+    margin-right: 10px;
+    font-size: 1.1em;
+}
+
+/* ================== MAIN CONTENT ================== */
+.main-content {
+    margin-left: 250px;
+    padding: 40px;
+    width: calc(100% - 250px);
+    flex-grow: 1;
+    /* Memastikan konten mengisi sisa ruang */
+}
+
+header h1 {
+    color: var(--dark-grey);
+    margin-bottom: 30px;
+    font-weight: 600;
+}
+
+/* ================== STATS GRID ================== */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+.stat-card {
+    background-color: #fff;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.3s;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+}
+
+.stat-card.blue {
+    background: linear-gradient(135deg, var(--primary-blue), #387ac0);
+}
+
+.stat-card.yellow {
+    background: linear-gradient(135deg, #FFC107, #FFA000);
+}
+
+.stat-card.green {
+    background: linear-gradient(135deg, #28A745, #1e7e34);
+}
+
+.stat-card h2 {
+    font-size: 2.5em;
+    margin: 0;
+    font-weight: 700;
+}
+
+.stat-card p {
+    margin: 5px 0 0;
+    font-size: 1em;
+    opacity: 0.8;
+}
+
+.stat-card i {
+    font-size: 2em;
+    align-self: flex-end;
+    opacity: 0.7;
+}
+
+/* ================== DATA TABLE & BUTTONS ================== */
+.data-section {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.data-section h2 {
+    color: var(--dark-grey);
+    margin-top: 0;
+    margin-bottom: 20px;
+    border-bottom: 2px solid var(--primary-blue);
+    padding-bottom: 10px;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    margin-top: 15px;
+}
+
+.data-table th,
+.data-table td {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.data-table th {
+    background-color: var(--light-bg);
+    color: var(--dark-grey);
+    font-weight: 600;
+}
+
+/* Status Badges */
+.status {
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 0.85em;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.status.pending {
+    background-color: #ffc10744;
+    color: #FFA000;
+}
+
+.status.approved {
+    background-color: #28A74544;
+    color: #1e7e34;
+}
+
+.status.rejected {
+    background-color: #dc354544;
+    color: #dc3545;
+}
+
+
+/* Tombol Aksi */
+.btn-action {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.3s;
+    margin-right: 5px;
+}
+
+.btn-action.approve {
+    background-color: #28A745;
+    color: #fff;
+}
+
+.btn-action.reject {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+.btn-action.edit {
+    background-color: orange;
+    color: #fff;
+}
+
+.btn-action.delete {
+    background-color: red;
+    color: #fff;
+}
+
+.btn-action.create-new {
+    background-color: var(--primary-blue);
+    color: #fff;
+    margin-bottom: 15px;
+}
+
+.btn-action.create-new i {
+    margin-right: 5px;
+}
+
+/* ================== MODAL STYLING (POPUP LOGOUT) ================== */
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+    /* Disembunyikan secara default, perlu JS minimal */
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+}
+
+.modal-actions {
+    margin-top: 20px;
+}
+
+.btn-modal-cancel {
+    background-color: #ccc;
+    color: var(--dark-grey);
+}
+
+.btn-modal-confirm {
+    background-color: var(--primary-blue);
+    color: #fff;
+}
+
+.modal-actions button {
+    /* PENTING: Tambahkan atau pastikan border: none; */
+    border: none;
+
+    /* PENTING: Tambahkan sudut melengkung */
+    border-radius: 8px;
+
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1em;
+    padding: 12px 25px;
+    /* Tetap pertahankan padding yang bagus */
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    min-width: 100px;
+}
+
+/* Styling Tombol Batal */
+.btn-modal-cancel {
+    background-color: #E0E0E0;
+    color: #555;
+    /* Sudut melengkung sudah diwarisi dari .modal-actions button */
+}
+
+/* Styling Tombol Konfirmasi Logout */
+.btn-modal-confirm {
+    background-color: var(--primary-blue);
+    color: #fff;
+    /* Sudut melengkung sudah diwarisi dari .modal-actions button */
+}
+
+/* Efek Hover */
+.btn-modal-cancel:hover {
+    background-color: #CCCCCC;
+    transform: translateY(-2px);
+}
+
+.btn-modal-confirm:hover {
+    background-color: #387ac0;
+    transform: translateY(-2px);
+}
+
+/* ================== FORM CARD STYLING (MODIFIED) ================== */
+
+/* Pastikan ini tetap ada */
+.form-card {
+    background-color: #fff;
+    padding: 30px 50px;
+    /* Padding horizontal lebih besar */
+    border-radius: 12px;
+    /* Lebih rounded */
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    /* Bayangan lebih halus */
+    max-width: 900px;
+    /* Lebar maksimum lebih besar */
+    margin: 0 auto;
+    position: relative;
+    /* Untuk efek garis */
+    overflow: hidden;
+    /* Penting untuk efek pseudo-element */
+}
+
+/* Efek garis biru di atas card (opsional, tapi menarik) */
+.form-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 8px;
+    /* Tebal garis */
+    background-color: var(--primary-blue);
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+
+/* Header di dalam Form Card */
+.form-card header {
+    text-align: center;
+    margin-bottom: 35px;
+    /* Jarak bawah lebih lega */
+    padding-top: 15px;
+    /* Memberi ruang dari garis biru */
+}
+
+.form-card header h1 {
+    color: var(--dark-grey);
+    /* Ubah warna agar kontras dengan latar putih */
+    font-weight: 700;
+    font-size: 2.2em;
+    /* Ukuran font lebih besar */
+    margin-bottom: 8px;
+    /* Jarak judul dengan sub-judul */
+}
+
+.form-card header p {
+    color: #777;
+    /* Warna abu-abu yang lebih lembut */
+    font-size: 1.05em;
+    line-height: 1.6;
+}
+
+.form-card header i {
+    color: var(--primary-blue);
+    /* Warna ikon sesuai tema */
+    margin-right: 12px;
+    /* Jarak ikon dengan teks */
+    font-size: 1.8em;
+    /* Ukuran ikon sedikit lebih besar */
+}
+
+
+/* ================== FORM GROUP STYLING (MODIFIED) ================== */
+.form-group {
+    margin-bottom: 25px;
+    /* Jarak antar grup form lebih lega */
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--dark-grey);
+    font-size: 0.95em;
+    /* Ukuran label sedikit lebih kecil tapi lebih tebal */
+}
+
+.form-group input[type="text"],
+.form-group input[type="date"],
+.form-group input[type="time"],
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 13px;
+    /* Padding lebih besar */
+    border: 1px solid #dcdcdc;
+    /* Warna border lebih soft */
+    border-radius: 8px;
+    /* Lebih rounded */
+    font-family: var(--font);
+    font-size: 1em;
+    color: #444;
+    /* Warna teks input */
+    background-color: #fcfcfc;
+    /* Latar belakang input sedikit beda */
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+/* Styling untuk input yang readonly (seperti nama dosen) */
+.form-group input[readonly] {
+    background-color: #f0f0f0;
+    /* Latar belakang abu-abu */
+    color: #666;
+    /* Teks abu-abu */
+    cursor: not-allowed;
+    /* Kursor "tidak boleh" */
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 120px;
+    /* Tinggi textarea lebih besar */
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    border-color: var(--primary-blue);
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(74, 144, 226, 0.15);
+    /* Efek fokus lebih halus */
+}
+
+/* Styling untuk select dropdown arrow */
+.form-group select {
+    -webkit-appearance: none;
+    /* Hapus default arrow di Webkit */
+    -moz-appearance: none;
+    /* Hapus default arrow di Firefox */
+    appearance: none;
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%234A90E2%22%20d%3D%22M287%2069.1c-3.2-3.2-8.4-3.2-11.6%200L146.2%20202.6%2016.1%2069.1c-3.2-3.2-8.4-3.2-11.6%200-3.2%203.2-3.2%208.4%200%2011.6l130.1%20130.1c1.6%201.6%203.6%202.4%205.8%202.4s4.2-.8%205.8-2.4l130.1-130.1c3.2-3.2%203.2-8.4%200-11.6z%22%2F%3E%3C%2Fsvg%3E');
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    /* Pindahkan ikon ke kanan */
+    background-size: 15px 15px;
+    padding-right: 40px;
+    /* Ruang untuk ikon */
+}
+
+
+/* ================== TOMBOL SUBMIT (MODIFIED) ================== */
+.btn-submit {
+    background-color: var(--primary-blue);
+    color: #fff;
+    padding: 15px 30px;
+    /* Padding lebih besar */
+    border: none;
+    border-radius: 8px;
+    /* Lebih rounded */
+    font-weight: 700;
+    /* Lebih tebal */
+    font-size: 1.1em;
+    /* Ukuran font lebih besar */
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    display: block;
+    width: 100%;
+    margin-top: 40px;
+    /* Jarak atas lebih lega */
+    box-shadow: 0 4px 10px rgba(74, 144, 226, 0.3);
+    /* Bayangan lembut */
+}
+
+.btn-submit:hover {
+    background-color: #387ac0;
+    transform: translateY(-2px);
+    /* Sedikit efek naik saat hover */
+    box-shadow: 0 6px 15px rgba(74, 144, 226, 0.4);
+}
+
+.btn-submit i {
+    margin-right: 10px;
+}
+
+/* ================== MODAL PILIHAN AKSI (Revisi Final) ================== */
+
+/* Z-Index PENTING: Pastikan ini sangat tinggi agar tidak tertutup konten lain */
+.action-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(246, 245, 245, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    opacity: 1;
+}
+
+.action-modal-content {
+    background-color: #fff;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    max-width: 600px;
+    width: 90%;
+}
+
+.action-modal-content h2 {
+    color: var(--dark-grey);
+    font-size: 2em;
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+.action-modal-content p {
+    color: #666;
+    margin-bottom: 30px;
+    font-size: 1.1em;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+}
+
+.action-btn {
+    flex: 1;
+    padding: 20px;
+    /* Ubah dari border menjadi background agar lebih mudah terlihat */
+    background-color: #fff;
+    border: 2px solid var(--primary-blue);
+    /* Border tetap ada untuk kontras */
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1.1em;
+    transition: all 0.3s;
+    color: var(--primary-blue);
+    text-decoration: none;
+    display: block;
+}
+
+.action-btn:hover {
+    background-color: var(--primary-blue);
+    color: #fff;
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(74, 144, 226, 0.3);
+}
+
+.action-btn i {
+    display: block;
+    font-size: 2.5em;
+    margin-bottom: 10px;
+}
+
+/* PENTING: Class untuk menyembunyikan form secara paksa saat loading */
+.is-hidden {
+    display: none !important;
+}
+
+/* ================== Status & Riwayat Dosen Styling (Revisi) ================== */
+
+/* Container Utama Halaman Status */
+.container.status-page {
+    padding: 0;
+    /* Hapus padding agar header bisa full width */
+}
+
+/* Header Halaman Status - Background Biru */
+.header-status-blue {
+    background-color: var(--primary-blue);
+    /* Warna biru utama */
+    color: #fff;
+    padding: 30px 20px;
+    text-align: center;
+    margin-bottom: 20px;
+    border-bottom-left-radius: 15px;
+    /* Sudut melengkung di bawah */
+    border-bottom-right-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    margin-top: -25px;
+    width: 100%;
+}
+
+.header-status-blue h1 {
+    font-size: 2.5em;
+    /* Ukuran judul lebih besar */
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #fff;
+    /* Warna teks putih */
+}
+
+.header-status-blue p {
+    font-size: 1.1em;
+    opacity: 0.9;
+    color: #f0f8ff;
+    /* Warna teks lebih terang */
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.header-status-blue i {
+    color: #fff;
+    /* Ikon juga putih */
+    margin-right: 15px;
+    font-size: 1.8em;
+}
+
+/* Card untuk menampung tabel (modified) */
+.status-card {
+    background-color: #fff;
+    padding: 30px;
+    /* Padding lebih besar */
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    /* Bayangan lebih dalam */
+    overflow-x: auto;
+    margin: 0 20px;
+    /* Margin samping agar tidak terlalu mepet */
+}
+
+/* Table Styling (modified) */
+.status-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.status-table th,
+.status-table td {
+    padding: 16px;
+    /* Padding lebih besar */
+    text-align: left;
+    border-bottom: 1px solid #e0e0e0;
+    /* Garis border lebih lembut */
+}
+
+.status-table th {
+    background-color: var(--light-blue);
+    /* Header tabel biru muda */
+    color: #fff;
+    /* Warna teks putih */
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.95em;
+    /* Ukuran font sedikit lebih besar */
+    border-top: 1px solid var(--light-blue);
+    /* Tambah border atas */
+}
+
+.status-table thead tr:first-child th:first-child {
+    border-top-left-radius: 8px;
+    /* Sudut melengkung di header */
+}
+
+.status-table thead tr:first-child th:last-child {
+    border-top-right-radius: 8px;
+}
+
+
+.status-table tr:hover {
+    background-color: #f5f9ff;
+    /* Warna hover lebih kebiruan */
+}
+
+/* Status Badge Styling (modified for blue tone) */
+.badge {
+    display: inline-block;
+    padding: 7px 12px;
+    /* Padding lebih besar */
+    border-radius: 20px;
+    /* Lebih rounded (pill-shaped) */
+    font-weight: 700;
+    /* Lebih tebal */
+    font-size: 0.8em;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.badge.pending {
+    background-color: #fff3e0;
+    /* Kuning soft */
+    color: #ff9800;
+    /* Oranye gelap */
+}
+
+.badge.approved {
+    background-color: #e8f5e9;
+    /* Hijau soft */
+    color: #43a047;
+    /* Hijau gelap */
+}
+
+.badge.rejected {
+    background-color: #ffebee;
+    /* Merah soft */
+    color: #e53935;
+    /* Merah gelap */
+}
+
+.badge.finished {
+    background-color: #e3f2fd;
+    /* Biru soft */
+    color: #2196f3;
+    /* Biru gelap */
+}
+
+/* Tombol kembali ke form (modified) */
+.back-link {
+    display: flex;
+    /* Menggunakan flex untuk ikon dan teks */
+    align-items: center;
+    justify-content: center;
+    /* Tengah secara horizontal */
+    width: fit-content;
+    /* Sesuai lebar konten */
+    margin: 20px auto 30px auto;
+    /* Tengah di bawah header */
+    padding: 10px 20px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    color: var(--primary-blue);
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.back-link:hover {
+    background-color: var(--primary-blue);
+    color: #fff;
+    border-color: var(--primary-blue);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(74, 144, 226, 0.2);
+}
+
+.back-link i {
+    margin-right: 10px;
+    font-size: 1.1em;
+}
+
+/* Tombol kembali ke home (modified) */
+.back-link-home {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    /* GANTI INI DARI width: 100%; */
+    width: 90%;
+    max-width: 400px;
+    /* Batasi lebar agar proporsional */
+
+    /* PUSATKAN: Mengatur jarak atas/bawah dan memusatkan horizontal */
+    margin: 20px auto 30px auto;
+
+    padding: 10px 20px;
+    background-color: var(--light-blue);
+    border: 1px solid var(--light-blue);
+    border-radius: 8px;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.back-link-home:hover {
+    background-color: var(--primary-blue);
+    color: #fff;
+    border-color: var(--primary-blue);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(74, 144, 226, 0.2);
+}
+
+.back-link-home i {
+    margin-right: 10px;
+    font-size: 1.1em;
+}
