@@ -19,8 +19,10 @@ if ($username === "" || $password === "") {
     exit;
 }
 
+// Koneksi database akan mencoba terhubung. 
+// Jika gagal, database.php akan menangkap error
 $db = new Database();
-$conn = $db->getConnection();
+$conn = $db->getConnection(); 
 
 $sql = "SELECT user_id, username, password_hash, role, display_name 
         FROM users 
@@ -29,7 +31,7 @@ $sql = "SELECT user_id, username, password_hash, role, display_name
 
 $stmt = $conn->prepare($sql);
 $stmt->execute(['u' => $username]);
-$user = $stmt->fetch();
+$user = $stmt->fetch(PDO::FETCH_ASSOC); // Pastikan mengambil data dalam bentuk array asosiatif
 
 // Username tidak ditemukan
 if (!$user) {
