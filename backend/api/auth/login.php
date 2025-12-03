@@ -2,13 +2,11 @@
 header("Content-Type: application/json");
 session_start();
 
-require_once "../../config/database.php";
+require_once __DIR__ . "/../../config/database.php";
 
-// Ambil JSON body
-$payload = json_decode(file_get_contents("php://input"), true);
-
-$username = trim($payload['username'] ?? "");
-$password = trim($payload['password'] ?? "");
+// Ambil POST body
+$username = trim($_POST['username'] ?? "");
+$password = trim($_POST['password'] ?? "");
 
 // Validasi awal
 if ($username === "" || $password === "") {
@@ -19,19 +17,17 @@ if ($username === "" || $password === "") {
     exit;
 }
 
-// Koneksi database akan mencoba terhubung. 
-// Jika gagal, database.php akan menangkap error
-$db = new Database();
-$conn = $db->getConnection(); 
+// Koneksi database menggunakan Singleton
+$conn = Database::getInstance();
 
-$sql = "SELECT user_id, username, password_hash, role, display_name 
+$sql = "SELECT user_id, username, password_hash, role, email, display_name 
         FROM users 
         WHERE username = :u
         LIMIT 1";
 
 $stmt = $conn->prepare($sql);
 $stmt->execute(['u' => $username]);
-$user = $stmt->fetch(PDO::FETCH_ASSOC); // Pastikan mengambil data dalam bentuk array asosiatif
+$user = $stmt->fetch(PDO::FETCH_ASSOC); // mengambil data dalam bentuk array asosiatif
 
 // Username tidak ditemukan
 if (!$user) {
@@ -55,6 +51,8 @@ if (!password_verify($password, $user["password_hash"])) {
 $_SESSION["user_id"] = $user["user_id"];
 $_SESSION["role"] = $user["role"];
 $_SESSION["username"] = $user["username"];
+$_SESSION["display_name"] = $user["display_name"];
+$_SESSION["email"] = $user["email"];
 
 // Output JSON ke frontend
 echo json_encode([
@@ -67,3 +65,4 @@ echo json_encode([
         "role" => $user["role"]
     ]
 ]);
+?>

@@ -15,7 +15,7 @@ function require_login_json() {
 //Cek apakah user adalah admin
 function require_admin() {
     require_login_json();
-    if ($_SESSION['user_id']['role'] !== 'admin') {
+    if ($_SESSION['role'] !== 'admin') {
         echo json_encode([
             'status' => 'error',
             'message' => 'Forbidden! admin only'
@@ -27,7 +27,7 @@ function require_admin() {
 //require_role(['admin', 'dosen']) untuk publikasi
 function require_role($roles = ['admin', 'dosen']) {
     require_login_json();
-    if (!in_array($_SESSION['user_id']['role'], $roles)) {
+    if (!in_array($_SESSION['role'], $roles)) {
         echo json_encode([
             'status' => 'error',
             'message' => 'Forbidden role only for admin and dosen'
@@ -35,3 +35,16 @@ function require_role($roles = ['admin', 'dosen']) {
         exit;
     }
 }
+
+//require_role(['admin', 'mahasiswa']) untuk data mahasiswa
+function require_role2($roles = ['admin', 'mahasiswa']) {
+    require_login_json();
+    if (!in_array($_SESSION['role'], $roles)) {
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'Forbidden role only for admin or mahasiswa'
+        ]);
+        exit;
+    }
+}
+?>

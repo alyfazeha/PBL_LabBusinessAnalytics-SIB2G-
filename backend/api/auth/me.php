@@ -22,3 +22,4 @@ echo json_encode([
         "email" => $_SESSION["email"]
     ]
 ]);
+?>

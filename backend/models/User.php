@@ -1,5 +1,6 @@
 <?php
-require_once __DIR__ . "/../config/Database.php";
+header("Content-Type: application/json");
+require_once __DIR__ . "/../config/database.php";
 
 class User
 {
@@ -92,3 +93,4 @@ class User
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 }
+?>

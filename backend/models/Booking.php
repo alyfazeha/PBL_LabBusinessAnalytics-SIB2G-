@@ -114,3 +114,4 @@ class Booking
         return $stmt->fetchColumn();
     }
 }
+?>
