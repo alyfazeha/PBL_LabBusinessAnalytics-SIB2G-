@@ -2,7 +2,7 @@
 header("Content-Type: application/json");
 require_once __DIR__ . "/../models/Mahasiswa.php";
 require_once __DIR__ . "/../config/auth.php";
-require_admin();
+require_role2(['admin', 'mahasiswa']);
 
 $nim = trim($_POST['nim'] ?? "");
 $user_id = trim($_POST['user_id'] ?? ""); // FK dari tabel user
