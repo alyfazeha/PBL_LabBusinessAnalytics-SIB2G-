@@ -1,5 +1,7 @@
 <?php
 require_once __DIR__ . "/../models/Publikasi.php";
+require_once __DIR__ . "/../config/auth.php";
+require_admin();
 
 $id = $_POST['publikasi_id'] ?? null;
 $status = $_POST['status'] ?? null; // published / rejected

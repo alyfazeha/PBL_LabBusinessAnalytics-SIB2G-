@@ -1,5 +1,7 @@
 <?php
 require_once __DIR__ . "/BookingController.php";
+require_once __DIR__ . "/../config/auth.php";
+require_admin();
 session_start();
 
 $controller = new BookingController();

@@ -1,9 +1,37 @@
 <?php
 session_start();
 
-function require_login() {
+//Cek apakah user sudah login
+function require_login_json() {
     if (!isset($_SESSION['user_id'])) {
-        header("Location: ../login.php");
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'Unauthorized: login required'
+        ]);
+        exit;
+    }
+}
+
+//Cek apakah user adalah admin
+function require_admin() {
+    require_login_json();
+    if ($_SESSION['user_id']['role'] !== 'admin') {
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'Forbidden! admin only'
+        ]);
+        exit;
+    }
+}
+
+//require_role(['admin', 'dosen']) untuk publikasi
+function require_role($roles = ['admin', 'dosen']) {
+    require_login_json();
+    if (!in_array($_SESSION['user_id']['role'], $roles)) {
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'Forbidden role only for admin and dosen'
+        ]);
         exit;
     }
 }
