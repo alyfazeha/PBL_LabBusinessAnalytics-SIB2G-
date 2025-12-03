@@ -10,6 +10,7 @@ class Database {
     public function getConnection() {
         $this->conn = null;
 
+    public function getConnection() {        
         try {
             $dsn = "pgsql:host={$this->host};port={$this->port};dbname={$this->db_name}";
             $this->conn = new PDO($dsn, $this->username, $this->password);
@@ -19,7 +20,6 @@ class Database {
 
             // Mengembalikan dalam bentuk associative array
             $this->conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-
         } catch(PDOException $e) {
             http_response_code(500);
             echo json_encode([
@@ -27,10 +27,8 @@ class Database {
                 "message" => "Database connection failed",
                 "error" => $e->getMessage()
             ]);
-            exit;
+            exit; // Tetap menggunakan exit karena ini adalah error fatal
         }
-
         return $this->conn;
     }
 }
-?>
