@@ -99,9 +99,35 @@
             logoutModal.style.display = 'none';
         });
 
-        confirmLogoutBtn.addEventListener('click', () => {
-            window.location.href = 'index.html';
+        // ... (Skrip yang sudah ada di admin.html)
+
+        confirmLogoutBtn.addEventListener('click', async () => {
+            // Path ke PHP: dari frontend/ ke backend/api/auth/logout.php
+            const url = '../backend/api/auth/logout.php';
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    // Logout berhasil di server
+                    logoutModal.style.display = 'none';
+                    window.location.href = 'index.html'; // Redirect ke halaman utama
+                } else {
+                    // Jika ada masalah logout di server, tetap redirect agar user tidak terjebak
+                    window.location.href = 'index.html';
+                }
+
+            } catch (error) {
+                // Jika terjadi error jaringan/server, tetap redirect
+                console.error('Logout Error:', error);
+                window.location.href = 'index.html';
+            }
         });
+
+        // ... (Skrip yang sudah ada di admin.html)
 
         window.addEventListener('click', (e) => {
             if (e.target === logoutModal) {
