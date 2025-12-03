@@ -1,6 +1,8 @@
 <?php
 require_once __DIR__ . "/../config/database.php";
 require_once __DIR__ . "/../models/BlockedDate.php";
+require_once __DIR__ . "/../config/auth.php";
+require_admin();
 
 session_start();
 
