@@ -107,3 +107,4 @@ class Dosen
         return $stmt->execute([':nidn' => $nidn]);
     }
 }
+?>

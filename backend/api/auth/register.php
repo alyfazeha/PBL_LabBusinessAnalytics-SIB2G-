@@ -50,3 +50,4 @@ echo json_encode([
     "success" => $success,
     "message" => $success ? "Registrasi berhasil." : "Registrasi gagal."
 ]);
+?>

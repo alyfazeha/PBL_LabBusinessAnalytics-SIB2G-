@@ -78,3 +78,4 @@ class Mahasiswa
         return $stmt->execute([':nim' => $nim]);
     }
 }
+?>

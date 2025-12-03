@@ -19,3 +19,4 @@ echo json_encode([
     'success' => $success,
     'message' => $success ? 'User deleted' : 'Failed to delete user'
 ]);
+?>

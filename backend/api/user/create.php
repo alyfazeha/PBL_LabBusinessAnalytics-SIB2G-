@@ -38,3 +38,4 @@ echo json_encode([
     'success' => $success,
     'message' => $success ? 'User created' : 'Failed to create user'
 ]);
+?>

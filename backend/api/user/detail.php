@@ -17,3 +17,4 @@ if (!$user_id) {
 $user = $userModel->find($user_id);
 
 echo json_encode($user);
+?>

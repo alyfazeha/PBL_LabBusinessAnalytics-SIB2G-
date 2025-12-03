@@ -10,3 +10,4 @@ $userModel = new User();
 $users = $userModel->all();
 
 echo json_encode($users);
+?>

@@ -35,3 +35,16 @@ function require_role($roles = ['admin', 'dosen']) {
         exit;
     }
 }
+
+//require_role(['admin', 'mahasiswa']) untuk data mahasiswa
+function require_role2($roles = ['admin', 'mahasiswa']) {
+    require_login_json();
+    if (!in_array($_SESSION['role'], $roles)) {
+        echo json_encode([
+            'status' => 'error',
+            'message' => 'Forbidden role only for admin or mahasiswa'
+        ]);
+        exit;
+    }
+}
+?>
