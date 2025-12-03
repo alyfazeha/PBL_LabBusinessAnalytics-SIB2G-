@@ -14,8 +14,9 @@
 <body>
 
     <div class="container" id="container">
+
         <div class="form-container sign-up-container">
-            <form action="#">
+            <form id="registerForm">
                 <h1>Buat Akun</h1>
                 <div class="social-container">
                     <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
@@ -23,15 +24,21 @@
                     <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
                 </div>
                 <span>atau gunakan email Anda untuk registrasi</span>
-                <input type="text" placeholder="Nama" />
-                <input type="email" placeholder="Email" />
-                <input type="password" placeholder="Kata Sandi" />
-                <button>Daftar</button>
+                <input type="text" placeholder="Nama Tampilan (Opsional)" name="display_name" />
+                <input type="text" placeholder="Username" name="username" required />
+                <input type="email" placeholder="Email (Opsional)" name="email" />
+                <input type="password" placeholder="Kata Sandi" name="password" required />
+                <select name="role" required>
+                    <option value="" disabled selected>Pilih Role</option>
+                    <option value="dosen">Dosen</option>
+                    <option value="mahasiswa">Mahasiswa</option>
+                </select>
+                <button type="submit">Daftar</button>
             </form>
         </div>
 
         <div class="form-container sign-in-container">
-            <form action="admin.html" method="POST">
+            <form id="loginForm">
                 <h1>Masuk</h1>
                 <div class="social-container">
                     <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
@@ -39,8 +46,8 @@
                     <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
                 </div>
                 <span>atau gunakan akun Anda</span>
-                <input type="email" placeholder="Email" name="username" />
-                <input type="password" placeholder="Kata Sandi" name="password" />
+                <input type="text" placeholder="Username" name="username" required />
+                <input type="password" placeholder="Kata Sandi" name="password" required />
                 <a href="#">Lupa Kata Sandi?</a>
                 <button type="submit">Masuk</button>
             </form>
@@ -66,7 +73,10 @@
         const signUpButton = document.getElementById('signUp');
         const signInButton = document.getElementById('signIn');
         const container = document.getElementById('container');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
 
+        // Logic pindah panel
         signUpButton.addEventListener('click', () => {
             container.classList.add("right-panel-active");
         });
@@ -74,6 +84,95 @@
         signInButton.addEventListener('click', () => {
             container.classList.remove("right-panel-active");
         });
+
+        /**
+         * Fungsi untuk menampilkan notifikasi sederhana
+         */
+        function showNotification(message, isSuccess) {
+            alert((isSuccess ? "Sukses: " : "Error: ") + message);
+        }
+
+        // --- LOGIC LOGIN ---
+        if (loginForm) {
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const formData = new FormData(loginForm);
+                // Path ke PHP: dari frontend/ ke backend/api/auth/login.php
+                const url = '../backend/api/auth/login.php';
+
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        body: formData,
+                    });
+
+                    if (response.status !== 200) {
+                        // Jika ada kesalahan server (404/500), tampilkan pesan
+                        showNotification(`Error: Gagal terhubung ke server. (Status: ${response.status})`, false);
+                        return;
+                    }
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        showNotification(result.message, true);
+
+                        // LOGIKA PENGALIHAN BERDASARKAN ROLE
+                        if (result.data.role === 'admin') {
+                            window.location.href = 'admin.html'; // Pindah ke admin.html (di folder frontend/)
+                        } else {
+                            window.location.href = 'index.html'; // Pindah ke index.html (di folder frontend/)
+                        }
+
+                    } else {
+                        showNotification(result.message, false);
+                    }
+
+                } catch (error) {
+                    showNotification("Error: Terjadi kesalahan jaringan. Cek server Anda.", false);
+                    console.error('Fetch Error:', error);
+                }
+            });
+        }
+
+        // --- LOGIC REGISTER ---
+        if (registerForm) {
+            registerForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const formData = new FormData(registerForm);
+                // Path ke PHP: dari frontend/ ke backend/api/auth/register.php
+                const url = '../backend/api/auth/register.php';
+
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        body: formData,
+                    });
+
+                    if (response.status !== 200) {
+                        showNotification(`Error: Gagal terhubung ke server. (Status: ${response.status})`, false);
+                        return;
+                    }
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        showNotification(result.message + " Silakan masuk.", true);
+                        // Pindah ke form login setelah sukses register
+                        container.classList.remove("right-panel-active");
+
+                    } else {
+                        showNotification(result.message, false);
+                    }
+
+                } catch (error) {
+                    showNotification("Error: Terjadi kesalahan jaringan. Cek server Anda.", false);
+                    console.error('Fetch Error:', error);
+                }
+            });
+        }
     </script>
 
 </body>
