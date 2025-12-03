@@ -1,4 +1,5 @@
 <?php
+header("Content-Type: application/json");
 //Menampilkan data user berdasarkan ID
 require_once __DIR__ . "/../models/User.php";
 require_once __DIR__ . "/../config/auth.php";

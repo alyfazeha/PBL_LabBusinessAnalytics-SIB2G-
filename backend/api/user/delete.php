@@ -1,4 +1,5 @@
 <?php
+header("Content-Type: application/json");
 require_once __DIR__ . "/../models/User.php";
 require_once __DIR__ . "/../config/auth.php";
 require_admin();
