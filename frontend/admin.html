@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Utama | Admin</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/cssadmin.css">
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <div class="logo-area">
+            <h3>Lab Admin</h3>
+        </div>
+        <nav>
+            <a href="admin.html" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="peminjaman.html"><i class="fas fa-calendar-alt"></i> Peminjaman</a>
+            <a href="konten.html"><i class="fas fa-newspaper"></i> Berita & Konten</a>
+            <a href="pengguna.html"><i class="fas fa-users"></i> Pengguna</a>
+            <a href="#" id="logoutTrigger"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <header>
+            <h1>Selamat Datang, Admin!</h1>
+        </header>
+
+        <div class="stats-grid">
+            <div class="stat-card blue">
+                <i class="fas fa-calendar-check"></i>
+                <h2>120</h2>
+                <p>Total Peminjaman</p>
+            </div>
+            <div class="stat-card yellow">
+                <i class="fas fa-hourglass-half"></i>
+                <h2>15</h2>
+                <p>Menunggu Persetujuan</p>
+            </div>
+            <div class="stat-card green">
+                <i class="fas fa-user-tie"></i>
+                <h2>450</h2>
+                <p>Total Pengguna</p>
+            </div>
+        </div>
+
+        <div class="data-section">
+            <h2>Daftar Peminjaman Terbaru</h2>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Peminjam</th>
+                        <th>Tanggal</th>
+                        <th>Status</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>101</td>
+                        <td>Andy Wiratama</td>
+                        <td>2025-11-28</td>
+                        <td><span class="status pending">Pending</span></td>
+                        <td><button class="btn-action approve">Approve</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="logoutModal" class="modal-overlay">
+        <div class="modal-content">
+            <h2>Konfirmasi Logout</h2>
+            <p>Apakah Anda yakin ingin keluar dari sesi administrator?</p>
+            <div class="modal-actions">
+                <button id="cancelLogout" class="btn-modal-cancel">Batal</button>
+                <button id="confirmLogout" class="btn-modal-confirm">Ya, Logout</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const logoutTrigger = document.getElementById('logoutTrigger');
+        const logoutModal = document.getElementById('logoutModal');
+        const cancelLogoutBtn = document.getElementById('cancelLogout');
+        const confirmLogoutBtn = document.getElementById('confirmLogout');
+
+        logoutTrigger.addEventListener('click', (e) => {
+            e.preventDefault();
+            logoutModal.style.display = 'flex';
+        });
+
+        cancelLogoutBtn.addEventListener('click', () => {
+            logoutModal.style.display = 'none';
+        });
+
+        confirmLogoutBtn.addEventListener('click', () => {
+            window.location.href = 'index.html';
+        });
+
+        window.addEventListener('click', (e) => {
+            if (e.target === logoutModal) {
+                logoutModal.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pengguna | Admin</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/cssadmin.css">
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <div class="logo-area">
+            <h3>Lab Admin</h3>
+        </div>
+        <nav>
+            <a href="admin.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="peminjaman.html"><i class="fas fa-calendar-alt"></i> Peminjaman</a>
+            <a href="konten.html"><i class="fas fa-newspaper"></i> Berita & Konten</a>
+            <a href="pengguna.html" class="active"><i class="fas fa-users"></i> Pengguna</a>
+            <a href="#" id="logoutTrigger"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <header>
+            <h1>Kelola Pengguna</h1>
+        </header>
+
+        <div class="data-section">
+            <button class="btn-action create-new"><i class="fas fa-plus"></i> Tambah Pengguna Baru</button>
+            <table class="data-table">
+                <h2>Semua Akun Sistem</h2>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nama</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>A001</td>
+                        <td>Bagas Setiawan</td>
+                        <td>bagas.s@admin.ac.id</td>
+                        <td>Admin</td>
+                        <td>
+                            <button class="btn-action edit">Edit</button>
+                            <button class="btn-action delete">Hapus</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>D005</td>
+                        <td>Dr. Erna Cahyani</td>
+                        <td>erna.c@dosen.ac.id</td>
+                        <td>Dosen</td>
+                        <td>
+                            <button class="btn-action edit">Edit</button>
+                            <button class="btn-action delete">Hapus</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>M123</td>
+                        <td>Fahmi Hidayat</td>
+                        <td>fahmi@mahasiswa.ac.id</td>
+                        <td>Mahasiswa</td>
+                        <td>
+                            <button class="btn-action edit">Edit</button>
+                            <button class="btn-action delete">Hapus</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</body>
+
+</html>

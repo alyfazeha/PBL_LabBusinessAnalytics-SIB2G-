@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Peminjaman Lab | Dosen</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/cssadmin.css">
+
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: var(--light-bg);
+            box-sizing: border-box;
+        }
+
+        .main-container {
+            width: 100%;
+            /* Form disembunyikan secara default */
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="actionModal" class="action-modal-overlay">
+        <div class="action-modal-content">
+            <h2>Pilih Aksi Peminjaman</h2>
+            <p>Silakan pilih tindakan yang ingin Anda lakukan di Lab Business Analytics.</p>
+
+            <div class="action-buttons">
+                <button id="triggerForm" class="action-btn">
+                    <i class="fas fa-file-signature"></i>
+                    Ajukan Permintaan Baru
+                </button>
+
+                <button id="triggerStatus" class="action-btn">
+                    <i class="fas fa-search"></i>
+                    Cek Status & Riwayat
+                </button>
+            </div>
+            <a href="index.html" class="back-link-home" style="">
+                <i class=" fas fa-arrow-left"></i> Kembali ke Halaman Utama
+            </a>
+        </div>
+    </div>
+
+    <div class="main-container is-hidden " id="formContainer">
+
+        <div class="header-status-blue">
+            <h1><i class="fas fa-calendar-plus"></i> Formulir Pengajuan Peminjaman Lab</h1>
+            <p>Isi formulir ini dengan detail lengkap untuk mengajukan peminjaman Lab Business Analytics.</p>
+        </div>
+
+        <div class="container">
+            <a href="peminjaman-dosen.html" class="back-link" style="margin-top: 30px;">
+                <i class="fas fa-arrow-left"></i> Kembali ke Pilihan Aksi
+            </a>
+
+            <div class="form-card">
+
+                <form action="#" method="POST">
+
+                    <div class="form-group">
+                        <label for="namaDosen">Nama Lengkap Dosen</label>
+                        <input type="text" id="namaDosen" name="namaDosen" value="Dr. Erna Cahyani, M.Kom." required
+                            readonly>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="nip">NIP/Nomor Identitas</label>
+                        <input type="text" id="nip" name="nip" value="198701232010011002" required readonly>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="keperluan">Keperluan Peminjaman</label>
+                        <select id="keperluan" name="keperluan" required>
+                            <option value="">-- Pilih Keperluan --</option>
+                            <option value="Perkuliahan">Kegiatan Perkuliahan (Sebutkan Mata Kuliah)</option>
+                            <option value="Riset">Riset/Penelitian</option>
+                            <option value="Rapat">Rapat Internal/Seminar</option>
+                            <option value="Lainnya">Lainnya</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="detailKeperluan">Detail Keperluan (Mata Kuliah, Topik, atau Deskripsi
+                            Singkat)</label>
+                        <textarea id="detailKeperluan" name="detailKeperluan" required
+                            placeholder="Contoh: Mata Kuliah Data Mining, untuk sesi praktikum clustering."></textarea>
+                    </div>
+
+                    <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                        <div class="form-group" style="flex: 1; min-width: 150px;">
+                            <label for="tanggalPinjam">Tanggal Pinjam</label>
+                            <input type="date" id="tanggalPinjam" name="tanggalPinjam" required>
+                        </div>
+
+                        <div class="form-group" style="flex: 1; min-width: 120px;">
+                            <label for="jamMulai">Waktu Mulai</label>
+                            <input type="time" id="jamMulai" name="jamMulai" required>
+                        </div>
+
+                        <div class="form-group" style="flex: 1; min-width: 120px;">
+                            <label for="jamSelesai">Waktu Selesai</label>
+                            <input type="time" id="jamSelesai" name="jamSelesai" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="jumlahPeserta">Estimasi Jumlah Peserta/Mahasiswa</label>
+                        <input type="text" id="jumlahPeserta" name="jumlahPeserta" placeholder="Contoh: 30" required>
+                    </div>
+
+                    <button type="submit" class="btn-submit">
+                        <i class="fas fa-paper-plane"></i>
+                        Kirim Permintaan Peminjaman
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <script>
+            const actionModal = document.getElementById('actionModal');
+            const triggerForm = document.getElementById('triggerForm');
+            const triggerStatus = document.getElementById('triggerStatus'); // Ambil ID tombol Status baru
+            const formContainer = document.getElementById('formContainer');
+
+            // STATE AWAL: Pastikan Form Sembunyi
+            formContainer.classList.add('is-hidden');
+
+            // 1. Logika Ajukan Permintaan Baru (Menampilkan Form)
+            triggerForm.addEventListener('click', (e) => {
+                e.preventDefault();
+                actionModal.style.display = 'none';
+                formContainer.classList.remove('is-hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+
+            // 2. Logika Cek Status & Riwayat (Redirect ke halaman baru)
+            triggerStatus.addEventListener('click', () => {
+                // Lakukan pengalihan ke halaman status
+                window.location.href = 'status-peminjaman-dosen.html';
+            });
+
+        </script>
+
+</body>
+
+</html>

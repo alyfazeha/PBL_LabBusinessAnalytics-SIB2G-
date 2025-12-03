@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Peminjaman | Admin</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/cssadmin.css">
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <div class="logo-area">
+            <h3>Lab Admin</h3>
+        </div>
+        <nav>
+            <a href="admin.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="peminjaman.html" class="active"><i class="fas fa-calendar-alt"></i> Peminjaman</a>
+            <a href="konten.html"><i class="fas fa-newspaper"></i> Berita & Konten</a>
+            <a href="pengguna.html"><i class="fas fa-users"></i> Pengguna</a>
+            <a href="#" id="logoutTrigger"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <header>
+            <h1>Kelola Peminjaman</h1>
+        </header>
+
+        <div class="data-section">
+            <button class="btn-action create-new"><i class="fas fa-plus"></i> Block Tanggal Khusus</button>
+
+            <table class="data-table">
+                <h2>Semua Permintaan Peminjaman</h2>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Peminjam</th>
+                        <th>Tanggal Pinjam</th>
+                        <th>Keperluan</th>
+                        <th>Status</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>103</td>
+                        <td>Cindy Lestari</td>
+                        <td>2025-12-05 (14:00)</td>
+                        <td>Seminar Internal</td>
+                        <td><span class="status pending">Pending</span></td>
+                        <td>
+                            <button class="btn-action approve">Approve</button>
+                            <button class="btn-action reject">Reject</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>102</td>
+                        <td>Dewi Maharani</td>
+                        <td>2025-12-01 (09:00)</td>
+                        <td>Rapat Dosen</td>
+                        <td><span class="status rejected">Rejected</span></td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>101</td>
+                        <td>Andy Wiratama</td>
+                        <td>2025-11-28 (10:00)</td>
+                        <td>Riset Skripsi</td>
+                        <td><span class="status approved">Approved</span></td>
+                        <td>-</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</body>
+
+</html>
