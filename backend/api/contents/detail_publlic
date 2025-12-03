@@ -1,27 +1,23 @@
 <?php
-require_once __DIR__ . "/../config/auth.php";
 require_once __DIR__ . "/../models/Content.php";
 
-// ✅ admin boleh akses
-require_role(['admin']);
-
-if (!isset($_GET['content_id'])) {
+if (!isset($_GET['slug'])) {
     echo json_encode([
         'status' => false,
-        'message' => 'content_id wajib diisi'
+        'message' => 'slug wajib diisi'
     ]);
     exit;
 }
 
-$content_id = (int) $_GET['content_id'];
+$slug = $_GET['slug'];
 
 $model = new Content();
-$data = $model->find($content_id);
+$data = $model->findPublicBySlug($slug);
 
 if (!$data) {
     echo json_encode([
         'status' => false,
-        'message' => 'Konten tidak ditemukan'
+        'message' => 'Konten tidak ditemukan atau belum dipublish'
     ]);
     exit;
 }

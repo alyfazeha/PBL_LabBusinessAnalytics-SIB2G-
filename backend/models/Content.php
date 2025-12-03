@@ -11,18 +11,21 @@ class Content
         $this->db = Database::getInstance();
     }
 
-    // ✅ Ambil semua konten
+    // ===========================
+    // ✅ ADMIN / DASHBOARD
+    // ===========================
+
     public function all()
     {
         $sql = "SELECT c.*, cc.name AS category_name
                 FROM contents c
-                LEFT JOIN content_categories cc ON c.category_id = cc.category_id
+                LEFT JOIN content_categories cc 
+                ON c.category_id = cc.category_id
                 ORDER BY c.created_at DESC";
 
         return $this->db->query($sql)->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // ✅ Ambil detail konten
     public function find($content_id)
     {
         $sql = "SELECT * FROM contents WHERE content_id = :id";
@@ -31,7 +34,6 @@ class Content
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    // ✅ Create konten
     public function create($data)
     {
         $sql = "INSERT INTO contents 
@@ -51,7 +53,6 @@ class Content
         ]);
     }
 
-    // ✅ Update konten
     public function update($content_id, $data)
     {
         $sql = "UPDATE contents SET
@@ -74,7 +75,6 @@ class Content
         ]);
     }
 
-    // ✅ Publish / Unpublish
     public function publish($content_id, $status)
     {
         $sql = "UPDATE contents 
@@ -92,11 +92,41 @@ class Content
         ]);
     }
 
-    // ✅ Delete
     public function delete($content_id)
     {
         $sql = "DELETE FROM contents WHERE content_id = :id";
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([':id' => $content_id]);
+    }
+
+    // ===========================
+    // ✅ PUBLIK (FRONTEND)
+    // ===========================
+
+    public function allPublic()
+    {
+        $sql = "SELECT c.*, cc.name AS category_name
+                FROM contents c
+                LEFT JOIN content_categories cc 
+                ON c.category_id = cc.category_id
+                WHERE c.is_published = true
+                ORDER BY c.published_at DESC";
+
+        return $this->db->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function findPublicBySlug($slug)
+    {
+        $sql = "SELECT c.*, cc.name AS category_name
+                FROM contents c
+                LEFT JOIN content_categories cc 
+                ON c.category_id = cc.category_id
+                WHERE c.slug = :slug 
+                AND c.is_published = true
+                LIMIT 1";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':slug' => $slug]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 }

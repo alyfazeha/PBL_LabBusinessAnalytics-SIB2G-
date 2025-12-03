@@ -1,11 +1,8 @@
 <?php
-require_once __DIR__ . "/../config/auth.php";
 require_once __DIR__ . "/../models/Content.php";
 
-require_role(['admin']);
-
 $model = new Content();
-$data = $model->all();
+$data = $model->getPublished(); // hanya konten published
 
 echo json_encode([
     'status' => true,
