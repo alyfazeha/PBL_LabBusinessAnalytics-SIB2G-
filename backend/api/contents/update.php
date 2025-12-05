@@ -1,42 +1,61 @@
 <?php
-require_once __DIR__ . "/../config/auth.php";
+header('Content-Type: application/json');
+require_once __DIR__ . "/../config/koneksi.php";
 require_once __DIR__ . "/../models/Content.php";
+require_once __DIR__ . "/../config/auth.php";
 
-// ✅ hanya admin yang boleh edit
-require_admin();
+require_role(['admin']);
 
-$model = new Content();
-
-// ✅ validasi ID
-if (!isset($_POST['content_id'])) {
-    echo json_encode([
-        'status' => false,
-        'message' => 'content_id wajib diisi'
-    ]);
-    exit;
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    exit(json_encode(['status' => 'error', 'message' => 'Method Not Allowed']));
 }
 
-$content_id = (int) $_POST['content_id'];
+$id = $_POST['content_id'] ?? $_POST['id'] ?? null;
+if (!$id) {
+    http_response_code(400);
+    exit(json_encode(['status' => 'error', 'message' => 'ID Content Required']));
+}
 
-// ✅ siapkan data aman (boleh sebagian)
+// Ambil data lama
+$model = new Content();
+$oldData = $model->getById($id);
+
+if (!$oldData) {
+    http_response_code(404);
+    exit(json_encode(['status' => 'error', 'message' => 'Data tidak ditemukan']));
+}
+
+// --- LOGIC UPDATE IMAGE (URL) ---
+$inputImage = $_POST['featured_image'] ?? null;
+
+// Jika input diisi, pakai yang baru. Jika kosong, pakai yang lama.
+$finalImage = !empty($inputImage) ? $inputImage : $oldData['featured_image'];
+// --------------------------------
+
+// Logic Update Lainnya
+$title = $_POST['title'] ?? $oldData['title'];
+$slug = $_POST['slug'] ?? $oldData['slug'];
+
+if (isset($_POST['title']) && empty($_POST['slug'])) {
+     $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $title)));
+}
+
 $data = [
-    'title' => $_POST['title'] ?? '',
-    'excerpt' => $_POST['excerpt'] ?? '',
-    'body' => $_POST['body'] ?? '',
-    'category_id' => $_POST['category_id'] ?? null,
-    'featured_image' => $_POST['featured_image'] ?? null
+    'title' => $title,
+    'slug'  => $slug,
+    'excerpt' => $_POST['excerpt'] ?? $oldData['excerpt'],
+    'body'    => $_POST['body'] ?? $oldData['body'],
+    'category_id' => $_POST['category_id'] ?? $oldData['category_id'],
+    'featured_image' => $finalImage // Update URL
 ];
 
-$updated = $model->update($content_id, $data);
+$update = $model->update($id, $data);
 
-if ($updated) {
-    echo json_encode([
-        'status' => true,
-        'message' => 'Konten berhasil diperbarui'
-    ]);
+if ($update) {
+    echo json_encode(['status' => 'success', 'message' => 'Berita berhasil diupdate']);
 } else {
-    echo json_encode([
-        'status' => false,
-        'message' => 'Gagal memperbarui konten'
-    ]);
+    http_response_code(500);
+    echo json_encode(['status' => 'error', 'message' => 'Gagal update']);
 }
+?>

@@ -1,33 +1,30 @@
 <?php
-require_once __DIR__ . "/../config/auth.php";
+header('Content-Type: application/json');
+require_once __DIR__ . "/../config/koneksi.php";
 require_once __DIR__ . "/../models/Content.php";
+require_once __DIR__ . "/../config/auth.php";
 
-// ✅ hanya admin yang boleh hapus
-require_admin();
+require_role(['admin']);
+
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    exit(json_encode(['status' => 'error', 'message' => 'Method Not Allowed']));
+}
+
+$id = $_POST['content_id'] ?? null;
+
+if (!$id) {
+    http_response_code(400);
+    exit(json_encode(['status' => 'error', 'message' => 'ID Required']));
+}
 
 $model = new Content();
+$delete = $model->delete($id);
 
-// ✅ validasi wajib ada ID
-if (!isset($_POST['content_id'])) {
-    echo json_encode([
-        'status' => false,
-        'message' => 'content_id wajib diisi'
-    ]);
-    exit;
-}
-
-$content_id = (int) $_POST['content_id'];
-
-$deleted = $model->delete($content_id);
-
-if ($deleted) {
-    echo json_encode([
-        'status' => true,
-        'message' => 'Konten berhasil dihapus'
-    ]);
+if ($delete) {
+    echo json_encode(['status' => 'success', 'message' => 'Berita berhasil dihapus']);
 } else {
-    echo json_encode([
-        'status' => false,
-        'message' => 'Gagal menghapus konten'
-    ]);
+    http_response_code(500);
+    echo json_encode(['status' => 'error', 'message' => 'Gagal menghapus']);
 }
+?>

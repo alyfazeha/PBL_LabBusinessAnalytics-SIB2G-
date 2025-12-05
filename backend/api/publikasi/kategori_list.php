@@ -1,13 +1,13 @@
 <?php
+// File: publikasi/kategori_list.php
 header('Content-Type: application/json');
 require_once __DIR__ . "/../config/koneksi.php";
-require_once __DIR__ . "/../models/Content.php";
-require_once __DIR__ . "/../config/auth.php";
 
-// Proteksi: Hanya Admin
-require_role(['admin']);
+// PANGGIL FILE YANG BENAR
+require_once __DIR__ . "/../models/PublikasiCategory.php"; 
 
-$model = new Content();
+// PANGGIL CLASS YANG BENAR
+$model = new PublikasiCategory(); 
 $data = $model->getAll();
 
 echo json_encode(['status' => 'success', 'data' => $data]);

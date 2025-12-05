@@ -1,132 +1,122 @@
 <?php
-require_once __DIR__ . "/../config/Database.php";
-
-class Content
-{
+class Content {
     private $db;
-    private $table = "contents";
 
-    public function __construct()
-    {
-        $this->db = Database::getInstance();
+    public function __construct() {
+        global $koneksi;
+        $this->db = $koneksi;
     }
 
-    // ===========================
-    // ✅ ADMIN / DASHBOARD
-    // ===========================
+    // ==========================================
+    // BAGIAN 1: PUBLIC
+    // ==========================================
 
-    public function all()
-    {
-        $sql = "SELECT c.*, cc.name AS category_name
-                FROM contents c
-                LEFT JOIN content_categories cc 
-                ON c.category_id = cc.category_id
-                ORDER BY c.created_at DESC";
+    // 1. AMBIL YANG PUBLISHED SAJA (Untuk list_public.php)
+    public function getPublishedOnly() {
+        // Kolom status diganti jadi 'is_published' (Boolean)
+        $query = "SELECT c.*, k.nama as category_name
+                  FROM contents c
+                  LEFT JOIN content_categories k ON c.category_id = k.category_id
+                  WHERE c.is_published = TRUE  
+                  ORDER BY c.created_at DESC";
 
-        return $this->db->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+        $result = pg_query($this->db, $query);
+        $data = [];
+        while ($row = pg_fetch_assoc($result)) {
+            $data[] = $row;
+        }
+        return $data;
     }
 
-    public function find($content_id)
-    {
-        $sql = "SELECT * FROM contents WHERE content_id = :id";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([':id' => $content_id]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+    // 2. AMBIL BY SLUG
+    public function getBySlug($slug) {
+        $query = "SELECT c.*, k.nama as category_name
+                  FROM contents c
+                  LEFT JOIN content_categories k ON c.category_id = k.category_id
+                  WHERE c.slug = $1 AND c.is_published = TRUE"; 
+        $result = pg_query_params($this->db, $query, [$slug]);
+        return pg_fetch_assoc($result);
     }
 
-    public function create($data)
-    {
-        $sql = "INSERT INTO contents 
-                (slug, title, excerpt, body, category_id, featured_image, admin_id)
-                VALUES 
-                (:slug, :title, :excerpt, :body, :category_id, :featured_image, :admin_id)";
+    // ==========================================
+    // BAGIAN 2: ADMIN
+    // ==========================================
 
-        $stmt = $this->db->prepare($sql);
-        return $stmt->execute([
-            ':slug' => $data['slug'],
-            ':title' => $data['title'],
-            ':excerpt' => $data['excerpt'],
-            ':body' => $data['body'],
-            ':category_id' => $data['category_id'],
-            ':featured_image' => $data['featured_image'],
-            ':admin_id' => $data['admin_id']
-        ]);
+    // 3. AMBIL SEMUA
+    public function getAll() {
+        $query = "SELECT c.*, k.nama as category_name
+                  FROM contents c
+                  LEFT JOIN content_categories k ON c.category_id = k.category_id
+                  ORDER BY c.created_at DESC";
+
+        $result = pg_query($this->db, $query);
+        $data = [];
+        while ($row = pg_fetch_assoc($result)) {
+            $data[] = $row;
+        }
+        return $data;
     }
 
-    public function update($content_id, $data)
-    {
-        $sql = "UPDATE contents SET
-                title = :title,
-                excerpt = :excerpt,
-                body = :body,
-                category_id = :category_id,
-                featured_image = :featured_image,
-                updated_at = NOW()
-                WHERE content_id = :id";
-
-        $stmt = $this->db->prepare($sql);
-        return $stmt->execute([
-            ':title' => $data['title'],
-            ':excerpt' => $data['excerpt'],
-            ':body' => $data['body'],
-            ':category_id' => $data['category_id'],
-            ':featured_image' => $data['featured_image'],
-            ':id' => $content_id
-        ]);
+    // 4. AMBIL BY ID (Perbaikan: id -> content_id)
+    public function getById($id) {
+        $query = "SELECT * FROM contents WHERE content_id = $1";
+        $result = pg_query_params($this->db, $query, [$id]);
+        return pg_fetch_assoc($result);
     }
 
-    public function publish($content_id, $status)
-    {
-        $sql = "UPDATE contents 
-                SET is_published = :status,
-                    published_at = CASE 
-                        WHEN :status = true THEN NOW()
-                        ELSE NULL
-                    END
-                WHERE content_id = :id";
+    // 5. CREATE (Perbaikan: insert is_published & admin_id)
+    public function create($data) {
+        // Default is_published = FALSE (Pending)
+        // Kita set admin_id = 1 dulu (atau ambil dari session jika ada)
+        $query = "INSERT INTO contents (title, slug, excerpt, body, category_id, featured_image, is_published, created_at, updated_at, admin_id) 
+                  VALUES ($1, $2, $3, $4, $5, $6, FALSE, NOW(), NOW(), 1) RETURNING content_id";
+        
+        $params = [
+            $data['title'],
+            $data['slug'],
+            $data['excerpt'],
+            $data['body'],
+            $data['category_id'],
+            $data['featured_image']
+        ];
 
-        $stmt = $this->db->prepare($sql);
-        return $stmt->execute([
-            ':status' => $status,
-            ':id' => $content_id
-        ]);
+        $result = pg_query_params($this->db, $query, $params);
+        if ($result) {
+            $row = pg_fetch_assoc($result);
+            return $row['content_id']; // Return content_id
+        }
+        return false;
     }
 
-    public function delete($content_id)
-    {
-        $sql = "DELETE FROM contents WHERE content_id = :id";
-        $stmt = $this->db->prepare($sql);
-        return $stmt->execute([':id' => $content_id]);
+    // 6. UPDATE (Perbaikan: id -> content_id)
+    public function update($id, $data) {
+        $query = "UPDATE contents 
+                  SET title=$1, slug=$2, excerpt=$3, body=$4, category_id=$5, featured_image=$6, updated_at=NOW()
+                  WHERE content_id=$7";
+        
+        $params = [
+            $data['title'], $data['slug'], $data['excerpt'], 
+            $data['body'], $data['category_id'], $data['featured_image'],
+            $id
+        ];
+        
+        return pg_query_params($this->db, $query, $params);
     }
 
-    // ===========================
-    // ✅ PUBLIK (FRONTEND)
-    // ===========================
-
-    public function allPublic()
-    {
-        $sql = "SELECT c.*, cc.name AS category_name
-                FROM contents c
-                LEFT JOIN content_categories cc 
-                ON c.category_id = cc.category_id
-                WHERE c.is_published = true
-                ORDER BY c.published_at DESC";
-
-        return $this->db->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+    // 7. UPDATE STATUS PUBLISH (Perbaikan: status -> is_published)
+    public function updateStatus($id, $is_published) {
+        // $is_published harus TRUE/FALSE
+        $query = "UPDATE contents SET is_published = $1, published_at = NOW(), updated_at = NOW() WHERE content_id = $2";
+        // Convert ke string 'true'/'false' untuk PostgreSQL
+        $val = $is_published ? 'true' : 'false';
+        $result = pg_query_params($this->db, $query, [$val, $id]);
+        return ($result && pg_affected_rows($result) > 0);
     }
 
-    public function findPublicBySlug($slug)
-    {
-        $sql = "SELECT c.*, cc.name AS category_name
-                FROM contents c
-                LEFT JOIN content_categories cc 
-                ON c.category_id = cc.category_id
-                WHERE c.slug = :slug 
-                AND c.is_published = true
-                LIMIT 1";
-
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([':slug' => $slug]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+    // 8. DELETE (Perbaikan: id -> content_id)
+    public function delete($id) {
+        $query = "DELETE FROM contents WHERE content_id = $1";
+        return pg_query_params($this->db, $query, [$id]);
     }
 }
+?>

@@ -1,32 +1,24 @@
 <?php
-require_once __DIR__ . "/../config/auth.php";
+header('Content-Type: application/json');
+require_once __DIR__ . "/../config/koneksi.php";
 require_once __DIR__ . "/../models/Content.php";
 
-// ✅ admin boleh akses
-require_role(['admin']);
-
-if (!isset($_GET['content_id'])) {
-    echo json_encode([
-        'status' => false,
-        'message' => 'content_id wajib diisi'
-    ]);
-    exit;
-}
-
-$content_id = (int) $_GET['content_id'];
+$slug = $_GET['slug'] ?? null;
+$id   = $_GET['id'] ?? null;
 
 $model = new Content();
-$data = $model->find($content_id);
+$data = null;
 
-if (!$data) {
-    echo json_encode([
-        'status' => false,
-        'message' => 'Konten tidak ditemukan'
-    ]);
-    exit;
+if ($slug) {
+    $data = $model->getBySlug($slug);
+} elseif ($id) {
+    $data = $model->getById($id);
 }
 
-echo json_encode([
-    'status' => true,
-    'data' => $data
-]);
+if ($data) {
+    echo json_encode(['status' => 'success', 'data' => $data]);
+} else {
+    http_response_code(404);
+    echo json_encode(['status' => 'error', 'message' => 'Berita tidak ditemukan']);
+}
+?>

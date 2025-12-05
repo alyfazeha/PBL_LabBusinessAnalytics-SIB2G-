@@ -1,33 +1,35 @@
 <?php
+header('Content-Type: application/json');
 require_once __DIR__ . "/../config/auth.php";
 require_once __DIR__ . "/../models/Content.php";
 
-require_admin(); // ✅ hanya admin boleh publish
+require_role(['admin']); 
 
 $model = new Content();
 
-// ✅ VALIDASI INPUT
 if (!isset($_POST['content_id'], $_POST['status'])) {
-    echo json_encode([
-        'status' => false,
-        'message' => 'content_id dan status wajib diisi'
-    ]);
+    http_response_code(400); 
+    echo json_encode(['status' => false, 'message' => 'content_id dan status wajib diisi']);
     exit;
 }
 
 $content_id = (int) $_POST['content_id'];
-$status     = $_POST['status'] === 'true' || $_POST['status'] == 1;
+$input_status = $_POST['status'];
 
-$result = $model->publish($content_id, $status);
+// Logika Boolean:
+// Kalau dikirim "true", "1", atau "published" -> Maka TRUE. Selain itu FALSE.
+$is_published = ($input_status === 'true' || $input_status == 1 || $input_status === 'published');
+
+// Update Status
+$result = $model->updateStatus($content_id, $is_published);
 
 if ($result) {
     echo json_encode([
         'status' => true,
-        'message' => $status ? 'Konten berhasil dipublish' : 'Konten berhasil diunpublish'
+        'message' => "Konten berhasil diubah menjadi " . ($is_published ? 'Published' : 'Pending')
     ]);
 } else {
-    echo json_encode([
-        'status' => false,
-        'message' => 'Gagal mengubah status konten'
-    ]);
+    http_response_code(500);
+    echo json_encode(['status' => false, 'message' => 'Gagal mengubah status konten']);
 }
+?>
