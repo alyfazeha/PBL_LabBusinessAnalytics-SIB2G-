@@ -22,6 +22,68 @@
   <link rel="stylesheet" href="assets/css/animated.css">
   <link rel="stylesheet" href="assets/css/owl.css">
 
+  <style>
+    /* Tambahan CSS sederhana untuk Card Dosen Member */
+    .member-card {
+      text-align: center;
+      padding: 20px;
+      margin-bottom: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+      background-color: #fff;
+      /* Pastikan background putih */
+      height: 100%;
+      /* Agar tinggi card seragam */
+    }
+
+    .member-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .member-card img {
+      width: 120px;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 50%;
+      margin-bottom: 15px;
+      border: 4px solid #f33f3f;
+      /* Sesuaikan warna border */
+    }
+
+    .member-card h5 {
+      font-weight: 700;
+      color: #1e1e1e;
+      margin-bottom: 5px;
+      font-size: 1.25rem;
+    }
+
+    .member-card p {
+      color: #777;
+      font-size: 0.9rem;
+      margin-bottom: 0;
+    }
+
+    /* Tambahan CSS untuk Gallery */
+    .gallery-item {
+      overflow: hidden;
+      border-radius: 8px;
+      margin-bottom: 30px;
+    }
+
+    .gallery-item img {
+      width: 100%;
+      height: 250px;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+
+    .gallery-item img:hover {
+      transform: scale(1.05);
+    }
+  </style>
+
 </head>
 
 <body>
@@ -52,6 +114,8 @@
             <ul class="nav">
               <li class="scroll-to-section"><a href="#top" class="active">Beranda</a></li>
               <li class="scroll-to-section"><a href="#services">Profile Lab</a></li>
+              <li class="scroll-to-section"><a href="#gallery">Gallery</a></li>
+              <li class="scroll-to-section"><a href="#dosen-member">Dosen Member</a></li>
               <li class="scroll-to-section"><a href="#">Kegiatan</a></li>
               <li class="scroll-to-section"><a href="jadwal-lab.html">Jadwal</a></li>
               <li class="scroll-to-section"><a href="peminjaman-dosen.html">Peminjaman</a></li>
@@ -77,7 +141,6 @@
     </div>
 
     <section class="popupBody">
-      <!-- Social Login -->
       <div class="social_login">
         <div class="">
           <a href="#" class="social_box fb">
@@ -102,7 +165,6 @@
         </div>
       </div>
 
-      <!-- Username & Password Login form -->
       <div class="user_login">
         <form>
           <label>Email / Username</label>
@@ -128,7 +190,6 @@
         <a href="#" class="forgot_password">Forgot password?</a>
       </div>
 
-      <!-- Register Form -->
       <div class="user_register">
         <form>
           <label>Full Name</label>
@@ -176,14 +237,6 @@
                       berbasis data. Tujuannya adalah meningkatkan kualitas pembelajaran dan menghasilkan lulusan yang
                       kompeten di bidang analisis serta perancangan bisnis.</p>
                   </div>
-                  <!-- <div class="col-lg-12">
-                    <div class="white-button first-button scroll-to-section">
-                      <a href="#contact">Free Quote <i class="fab fa-apple"></i></a>
-                    </div>
-                    <div class="white-button scroll-to-section">
-                      <a href="#contact">Free Quote <i class="fab fa-google-play"></i></a>
-                    </div>
-                  </div> -->
                 </div>
               </div>
             </div>
@@ -310,54 +363,155 @@
         </div>
       </div>
     </div>
-  </div>
-  <div class="container" style="padding-top: 50px;">
-    <div class="row">
-      <div class="col-lg-3">
-        <div class="service-item first-service">
-          <div class="icon"></div>
-          <h4>Finance & Accounting</h4>
-          <p>Mengelola keuangan dan membaca laporan akuntansi</p>
-          <div class="text-button">
-            <a href="#">Read More <i class="fa fa-arrow-right"></i></a>
+    <div class="container" style="padding-top: 50px;">
+      <div class="row">
+        <div class="col-lg-3">
+          <div class="service-item first-service">
+            <div class="icon"></div>
+            <h4>Finance & Accounting</h4>
+            <p>Mengelola keuangan dan membaca laporan akuntansi</p>
+            <div class="text-button">
+              <a href="#">Read More <i class="fa fa-arrow-right"></i></a>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="col-lg-3">
-        <div class="service-item second-service">
-          <div class="icon"></div>
-          <h4>Business in Society</h4>
-          <p>Peran bisnis dalam etika dan keberlanjutan</p>
-          <div class="text-button">
-            <a href="#">Read More <i class="fa fa-arrow-right"></i></a>
+        <div class="col-lg-3">
+          <div class="service-item second-service">
+            <div class="icon"></div>
+            <h4>Business in Society</h4>
+            <p>Peran bisnis dalam etika dan keberlanjutan</p>
+            <div class="text-button">
+              <a href="#">Read More <i class="fa fa-arrow-right"></i></a>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="col-lg-3">
-        <div class="service-item third-service">
-          <div class="icon"></div>
-          <h4>Marketing</h4>
-          <p>Strategi memahami pelanggan dan membangun brand</p>
-          <div class="text-button">
-            <a href="#">Read More <i class="fa fa-arrow-right"></i></a>
+        <div class="col-lg-3">
+          <div class="service-item third-service">
+            <div class="icon"></div>
+            <h4>Marketing</h4>
+            <p>Strategi memahami pelanggan dan membangun brand</p>
+            <div class="text-button">
+              <a href="#">Read More <i class="fa fa-arrow-right"></i></a>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="col-lg-3">
-        <div class="service-item fourth-service">
-          <div class="icon"></div>
-          <h4>Digital Transformation & AI</h4>
-          <p>Pemanfaatan teknologi digital dan AI dalam bisnis</p>
-          <div class="text-button">
-            <a href="#">Read More <i class="fa fa-arrow-right"></i></a>
+        <div class="col-lg-3">
+          <div class="service-item fourth-service">
+            <div class="icon"></div>
+            <h4>Digital Transformation & AI</h4>
+            <p>Pemanfaatan teknologi digital dan AI dalam bisnis</p>
+            <div class="text-button">
+              <a href="#">Read More <i class="fa fa-arrow-right"></i></a>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
+
+  <div id="gallery" class="gallery section" style="padding-top: 50px;">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 offset-lg-2">
+          <div class="section-heading wow fadeInDown" data-wow-duration="1s" data-wow-delay="0.5s">
+            <h4>Our Laboratory <em>Gallery</em></h4>
+            <img src="assets/images/heading-line-dec.png" alt="">
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.2s">
+          <div class="gallery-item">
+            <img src="assets/images/gallery1.jpg" alt="Lab View 1">
+          </div>
+        </div>
+        <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.4s">
+          <div class="gallery-item">
+            <img src="assets/images/gallery2.jpg" alt="Lab Activity 2">
+          </div>
+        </div>
+        <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.6s">
+          <div class="gallery-item">
+            <img src="assets/images/gallery3.jpg" alt="Lab Facility 3">
+          </div>
+        </div>
+        <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.8s">
+          <div class="gallery-item">
+            <img src="assets/images/gallery3.jpg" alt="Seminar 4">
+          </div>
+        </div>
+        <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-duration="1s" data-wow-delay="1.0s">
+          <div class="gallery-item">
+            <img src="assets/images/gallery1.jpg" alt="Workshop 5">
+          </div>
+        </div>
+        <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-duration="1s" data-wow-delay="1.2s">
+          <div class="gallery-item">
+            <img src="assets/images/gallery2.jpg" alt="Dosen Meeting 6">
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
+  <div id="dosen-member" class="dosen-member section"
+    style="background-color: #f7f7f7; padding-bottom: 90px; padding-top: 50px;">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 offset-lg-2">
+          <div class="section-heading wow fadeInDown" data-wow-duration="1s" data-wow-delay="0.5s">
+            <h4>Our <em>Dosen Member</em> Team</h4>
+            <img src="assets/images/heading-line-dec.png" alt="">
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.2s">
+          <div class="member-card">
+            <img src="assets/images/dosen.jpg" alt="Foto Dosen 1">
+            <h5>Dr. Ir. Budi Santoso, M.Kom.</h5>
+            <p>Ketua Laboratorium</p>
+            <p>Pakar Big Data & Strategi Bisnis</p>
+          </div>
+        </div>
 
+        <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.4s">
+          <div class="member-card">
+            <img src="assets/images/dosen.jpg" alt="Foto Dosen 2">
+            <h5>Prof. Nia Kurniawan, S.T., M.Sc.</h5>
+            <p>Anggota Laboratorium</p>
+            <p>Spesialis Business Intelligence</p>
+          </div>
+        </div>
 
+        <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.6s">
+          <div class="member-card">
+            <img src="assets/images/dosen.jpg" alt="Foto Dosen 3">
+            <h5>Ahmad Fikri, S.Kom., M.T.</h5>
+            <p>Anggota Laboratorium</p>
+            <p>Peneliti Data Mining & CRM</p>
+          </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.8s">
+          <div class="member-card">
+            <img src="assets/images/dosen.jpg" alt="Foto Dosen 4">
+            <h5>Citra Dewi, B.A., M.B.A.</h5>
+            <p>Anggota Laboratorium</p>
+            <p>Dosen Kewirausahaan Digital</p>
+          </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-duration="1s" data-wow-delay="1.0s">
+          <div class="member-card">
+            <img src="assets/images/dosen.jpg" alt="Foto Dosen 5">
+            <h5>Rudi Hartono, Ph.D.</h5>
+            <p>Anggota Laboratorium</p>
+            <p>Ahli Sistem Informasi Manajemen</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
   <footer id="newsletter">
     <div class="container">
       <div class="row">
@@ -449,7 +603,6 @@
   </footer>
 
 
-  <!-- Scripts -->
   <script src="vendor/jquery/jquery.min.js"></script>
   <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="assets/js/owl-carousel.js"></script>
