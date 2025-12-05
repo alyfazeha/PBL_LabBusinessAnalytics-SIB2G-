@@ -94,3 +94,4 @@ class BlockedDate
         return $stmt->fetchColumn() ? true : false;
     }
 }
+?>
