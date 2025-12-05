@@ -11,6 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit(json_encode(['status' => 'error', 'message' => 'Method Not Allowed']));
 }
 
+$id = $_POST['publikasi_id'] ?? $_POST['id'] ?? null;
 $data = [
     'judul'         => $_POST['judul'] ?? null,
     'external_link' => $_POST['external_link'] ?? null,
@@ -18,19 +19,18 @@ $data = [
     'dosen_nidn'    => $_POST['dosen_nidn'] ?? null
 ];
 
-if (!$data['judul'] || !$data['kategori_id'] || !$data['dosen_nidn']) {
+if (!$id || !$data['judul']) {
     http_response_code(400);
-    exit(json_encode(['status' => 'error', 'message' => 'Data tidak lengkap']));
+    exit(json_encode(['status' => 'error', 'message' => 'ID dan Judul wajib diisi']));
 }
 
 $model = new Publikasi();
-$id = $model->create($data);
+$update = $model->update($id, $data);
 
-if ($id) {
-    http_response_code(201);
-    echo json_encode(['status' => 'success', 'message' => 'Berhasil disimpan', 'data' => ['id' => $id]]);
+if ($update) {
+    echo json_encode(['status' => 'success', 'message' => 'Data berhasil diupdate']);
 } else {
     http_response_code(500);
-    echo json_encode(['status' => 'error', 'message' => 'Gagal menyimpan data']);
+    echo json_encode(['status' => 'error', 'message' => 'Gagal update database']);
 }
 ?>
