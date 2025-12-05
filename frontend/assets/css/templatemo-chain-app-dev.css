@@ -1252,6 +1252,210 @@ Services Style
 }
 
 
+/* 
+---------------------------------------------
+facilitys Style
+--------------------------------------------- 
+*/
+
+.facilitys {
+  padding-top: 130px;
+  position: relative;
+}
+
+.facilitys .section-heading p {
+  margin-top: 10px;
+  margin-left: 18%;
+  margin-right: 18%;
+}
+
+.facilitys .container-fluid {
+  padding-left: 65px;
+  padding-right: 65px;
+}
+
+.facilitys .row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  /* PENTING: Membuat item meregang mengisi tinggi maksimum di baris */
+}
+
+.facility-item {
+  height: 100%;
+  /* PENTING: Memastikan item mengambil tinggi penuh dari kolom Flexbox */
+  /* Tambahkan margin-bottom ke kolom jika item bersentuhan */
+  /* padding-bottom: 30px; */
+  /* Mungkin tidak perlu jika margin pada kolom sudah cukup */
+}
+
+.facilitys:after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -300px;
+  width: 261px;
+  height: 368px;
+  z-index: 0;
+}
+
+.facilitys:before {
+  content: '';
+  background-image: url(../images/services-right-dec.png);
+  background-repeat: no-repeat;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 1136px;
+  height: 244px;
+  z-index: 0;
+}
+
+.facilitys .section-heading {
+  text-align: center;
+  margin-bottom: 80px;
+}
+
+.facility-item {
+  position: relative;
+  z-index: 1;
+  padding: 30px;
+  box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+  border-radius: 10px;
+  border-top-right-radius: 50px;
+  transition: all .3s;
+}
+
+.facility-item h4 {
+  transition: all .3s;
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 15px;
+}
+
+.facility-item p {
+  transition: all .3s;
+  font-size: 15px;
+  color: #555555;
+  margin-bottom: 20px;
+}
+
+.facility-item:hover h4,
+.facility-item:hover p,
+.facility-item:hover .text-button a {
+  color: #fff;
+}
+
+.facility-item:hover {
+  background-image: url(../images/service-bg.jpg);
+  background-position: right top;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+/* 
+---------------------------------------------
+proyeks Style
+--------------------------------------------- 
+*/
+
+.proyeks {
+  padding-top: 130px;
+  position: relative;
+}
+
+.proyeks .section-heading p {
+  margin-top: 10px;
+  margin-left: 18%;
+  margin-right: 18%;
+}
+
+.proyeks .container-fluid {
+  padding-left: 65px;
+  padding-right: 65px;
+}
+
+.proyeks .row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  /* PENTING: Membuat item meregang mengisi tinggi maksimum di baris */
+}
+
+.proyek-item {
+  height: 100%;
+  /* PENTING: Memastikan item mengambil tinggi penuh dari kolom Flexbox */
+  /* Tambahkan margin-bottom ke kolom jika item bersentuhan */
+  /* padding-bottom: 30px; */
+  /* Mungkin tidak perlu jika margin pada kolom sudah cukup */
+}
+
+.proyeks:after {
+  content: '';
+  background-image: url(../images/services-left-dec.png);
+  background-repeat: no-repeat;
+  position: absolute;
+  left: 0;
+  bottom: -300px;
+  width: 261px;
+  height: 368px;
+  z-index: 0;
+}
+
+.proyeks:before {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 1136px;
+  height: 244px;
+  z-index: 0;
+}
+
+.proyeks .section-heading {
+  text-align: center;
+  margin-bottom: 80px;
+}
+
+.proyek-item {
+  position: relative;
+  z-index: 1;
+  padding: 30px;
+  box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+  border-radius: 10px;
+  border-top-right-radius: 50px;
+  transition: all .3s;
+}
+
+.proyek-item h4 {
+  transition: all .3s;
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 15px;
+}
+
+.proyek-item p {
+  transition: all .3s;
+  font-size: 15px;
+  color: #555555;
+  margin-bottom: 20px;
+}
+
+.proyek-item:hover h4,
+.proyek-item:hover p,
+.proyek-item:hover .text-button a {
+  color: #fff;
+}
+
+.proyek-item:hover {
+  background-image: url(../images/service-bg.jpg);
+  background-position: right top;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
 
 /*
 ---------------------------------------------
@@ -1331,12 +1535,12 @@ About Us
 
 /* gallery */
 .the-gallery {
-  padding-top: 80px;
+  margin-top: 130px;
 }
 
 .the-gallery .section-heading {
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: 80px;
 }
 
 /* --- 1. MEMBATASI UKURAN CAROUSEL KESELURUHAN --- */
@@ -1414,6 +1618,396 @@ About Us
   background-color: rgba(0, 0, 0, 0.3);
   border-radius: 50%;
   padding: 8px;
+}
+
+/* ---------------------------------------------
+the-dosen-member / Anggota Dosen Style
+--------------------------------------------- 
+*/
+
+.the-dosen-member {
+  padding-top: 130px;
+}
+
+.the-dosen-member .section-heading {
+  text-align: center;
+  margin-bottom: 80px;
+}
+
+/* KODE UNTUK TINGGI KARTU SAMA */
+.the-dosen-member .dosen-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+}
+
+.member-card {
+  /* Gaya Dasar Kartu */
+  text-align: center;
+  border-radius: 10px;
+  background-color: #fff;
+  border: 1px solid #eeeeee;
+
+  /* Efek & Transisi */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+
+  /* Flexbox untuk konten dan tombol di bawah */
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  /* **SOLUSI CLIPPING:** Tambahkan ruang vertikal internal yang lebih besar */
+  padding: 40px 30px;
+  /* Padding atas dan bawah diperbesar untuk memberi ruang bayangan */
+  margin-bottom: 30px;
+  /* Jarak bawah kartu tetap 30px */
+}
+
+/* Efek Hover Melayang (SOLUSI CLIPPING DITERAPKAN) */
+.member-card:hover {
+  transform: translateY(-10px);
+  /* Geser 10px ke atas */
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.3);
+  /* Bayangan lebih besar */
+  border-color: #4b8ef1;
+
+  /* **SOLUSI CLIPPING:** Pastikan di lapisan teratas */
+  position: relative;
+  z-index: 100;
+}
+
+/* Gambar Dosen */
+.member-card img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 50%;
+  margin: 0 auto 15px;
+  border: 4px solid #4b8ef1;
+  transition: all 0.3s ease;
+}
+
+/* Efek Hover pada Gambar */
+.member-card:hover img {
+  border-color: #0d6efd;
+}
+
+/* Nama Dosen */
+.member-card h5 {
+  font-weight: 700;
+  color: #1e1e1e;
+  margin-bottom: 5px;
+  font-size: 1.25rem;
+}
+
+/* Jabatan */
+.member-card span {
+  display: block;
+  color: #4b8ef1;
+  font-size: 0.95rem;
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+
+/* Keahlian (Deskripsi) */
+.member-card p {
+  color: #555555;
+  font-size: 0.9rem;
+  margin-bottom: 20px;
+  flex-grow: 1;
+}
+
+/* Tombol Info Detail */
+.member-card .main-blue-button {
+  margin-top: auto;
+  margin-bottom: 0;
+}
+
+.member-card .main-blue-button a {
+  font-size: 14px;
+  font-weight: 500;
+  color: #fff;
+  background-color: #4b8ef1;
+  padding: 8px 18px;
+  border-radius: 20px;
+  transition: all .3s;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.member-card .main-blue-button a:hover {
+  background-color: #0d6efd;
+}
+
+/* Perbaikan Style Carousel Dosen */
+#dosenCarousel {
+  position: relative;
+  /* Tambahkan ruang yang cukup di kiri/kanan untuk tombol */
+  padding-left: 50px;
+  padding-right: 50px;
+}
+
+#dosenCarousel .carousel-control-prev,
+#dosenCarousel .carousel-control-next {
+  width: 50px;
+  opacity: 1;
+}
+
+#dosenCarousel .carousel-control-prev-icon,
+#dosenCarousel .carousel-control-next-icon {
+  width: 40px;
+  height: 40px;
+  background-color: #4b8ef1;
+  border-radius: 50%;
+}
+
+/*
+---------------------------------------------
+13. Publications (Modifikasi Minimal Style)
+---------------------------------------------
+*/
+.publications {
+  margin-top: 50px;
+
+}
+
+.publications .section-heading {
+  text-align: center;
+  margin-bottom: 80px;
+}
+
+/* Menggunakan Flexbox pada row untuk memastikan kolom memiliki tinggi yang sama */
+#publications .row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  /* Item akan meregang mengisi tinggi maksimum di baris */
+}
+
+.publication-item {
+  background-color: #ffffff;
+  /* Mengubah latar belakang menjadi putih agar garis lebih menonjol */
+  border: 1px solid #e0e0e0;
+  /* GARIS BARU: Garis tipis 1px berwarna abu-abu sangat terang */
+  border-radius: 8px;
+  /* Menggunakan radius yang lebih kecil agar sesuai dengan tombol */
+  margin-bottom: 30px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.03);
+  /* Mengurangi bayangan agar garis terlihat jelas */
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s ease;
+}
+
+/* Opsional: Tambahkan efek hover */
+.publication-item:hover {
+  /* Efek Melayang: Naik 5px dan Bayangan Lebih Besar */
+  transform: translateY(-5px);
+  box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.1);
+  border-color: #c0c0c0;
+  /* Garis sedikit lebih tebal saat di hover */
+}
+
+/* Style khusus untuk versi minimal (tanpa gambar) */
+.publication-item.minimal {
+  /* Atur padding di dalam down-content */
+}
+
+/* Styling konten */
+.publication-item .down-content {
+  padding: 30px;
+  /* Padding di sekitar konten */
+  text-align: left;
+  flex-grow: 1;
+  /* Membuat konten meregang ke bawah */
+  display: flex;
+  flex-direction: column;
+}
+
+.publication-item .down-content h4 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1e1e1e;
+  margin-bottom: 10px;
+  line-height: 1.4;
+  /* Tambahkan margin-bottom yang lebih besar jika perlu */
+}
+
+/* Style untuk tahun terbit */
+.publication-item .down-content .publication-year {
+  font-size: 14px;
+  color: #7a7a7a;
+  margin-bottom: 20px;
+  display: block;
+  /* Agar mengambil baris sendiri */
+}
+
+/* Gaya untuk tombol 'Lihat Publikasi' */
+.publication-item .down-content .main-blue-button {
+  margin-top: auto;
+  /* Mendorong tombol ke bagian paling bawah card */
+  display: block;
+  text-align: center;
+  /* Tombol berada di tengah */
+}
+
+.publication-item .down-content .main-blue-button a {
+  font-size: 14px;
+  font-weight: 500;
+  color: #fff;
+  background-color: #4b8ef1;
+  padding: 10px 20px;
+  border-radius: 25px;
+  transition: all .3s;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.publication-item .down-content .main-blue-button a:hover {
+  background-color: #0d6efd;
+}
+
+/*
+---------------------------------------------
+14. Publikasi - Kontrol Navigasi & Filter (REVISI FINAL)
+---------------------------------------------
+*/
+
+/* Kontrol Filter (Di atas Card) */
+.filter-controls {
+  margin-bottom: 30px;
+  text-align: center;
+  margin-top: -50px;
+}
+
+.filter-controls .main-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+/* Gaya Dasar Tombol Filter */
+.filter-dropdown .filter-btn,
+.filter-controls .sinta-button {
+  font-size: 14px;
+  font-weight: 500;
+  padding: 10px 20px;
+  transition: all .3s;
+  text-decoration: none;
+  display: inline-block;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+
+/* 1. Tombol Filter Tahun (Kotak Sudut Halus - Gaya Sekunder) */
+.filter-dropdown .filter-btn {
+  color: #4b8ef1;
+  /* Teks Biru */
+  background-color: #f0f0f0;
+  /* Latar Belakang Abu-abu Sangat Muda */
+  border-radius: 8px;
+  /* Sudut kotak yang halus */
+  border: none;
+}
+
+.filter-dropdown .filter-btn:hover {
+  background-color: #e0e0e0;
+}
+
+/* 2. Tombol SINTA (Kotak Sudut Halus - Warna Abu-abu Tua) */
+.filter-controls .sinta-button {
+  color: #fff;
+  background-color: #333333;
+  /* Abu-abu Tua Solid */
+  border-radius: 8px;
+  /* Bentuk Kotak */
+  border: none;
+  line-height: 1.5;
+}
+
+.filter-controls .sinta-button:hover {
+  background-color: #1e1e1e;
+  /* Abu-abu lebih gelap saat hover */
+}
+
+
+/* Kontrol Navigasi (Di bawah Card) */
+.navigation-controls {
+  margin-top: 20px;
+}
+
+.navigation-controls .pagination-buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 0;
+}
+
+/* 3. Tombol Previous/Next (Dikembalikan ke Gaya Outline Sederhana) */
+.navigation-controls .nav-btn {
+  background: none;
+  border: 1px solid #ddd;
+  /* Border Abu-abu Muda */
+  color: #7a7a7a;
+  /* Teks Abu-abu */
+  padding: 10px 15px;
+  border-radius: 25px;
+  /* Bentuk Pil/Oval */
+  cursor: pointer;
+  transition: all .3s;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.navigation-controls .nav-btn:hover {
+  background-color: #f7f7f7;
+  /* Latar Belakang Abu-abu Sangat Muda saat hover */
+  border-color: #ccc;
+  color: #1e1e1e;
+}
+
+/* 4. Tombol Utama (Lihat Semua List Publikasi - Kotak Sudut Halus, Warna Abu-abu Tua) */
+.navigation-controls .all-list-button a {
+  font-size: 14px;
+  font-weight: 500;
+  color: #fff;
+  background-color: #333333;
+  /* Abu-abu Tua Solid */
+  padding: 10px 20px;
+  border-radius: 8px;
+  /* Bentuk Kotak */
+  transition: all .3s;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.navigation-controls .all-list-button a:hover {
+  background-color: #1e1e1e;
+}
+
+/* Penyesuaian Responsif (tetap sama) */
+@media (max-width: 767px) {
+  .filter-controls .main-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .navigation-controls .pagination-buttons {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  /* Tombol nav di ponsel kembali ke bentuk pil standar */
+  .navigation-controls .nav-btn {
+    width: auto;
+    /* Biarkan lebar mengikuti teks */
+    height: auto;
+    border-radius: 25px;
+    padding: 10px 15px;
+  }
 }
 
 /* 
@@ -1875,7 +2469,7 @@ footer #search button:hover {
 }
 
 .footer-widget .logo img {
-  max-width: 96px;
+  max-width: 100%;
   margin-bottom: 30px;
 }
 
@@ -1938,6 +2532,45 @@ footer p a:hover {
   color: #fff;
 }
 
+/* ======================================================== */
+/* FIX MUTLAK: Social Media Icons in Footer (Putih & Besar) */
+/* ======================================================== */
+
+/* 1. Aturan untuk Container (Opsional, tapi bagus untuk layout) */
+.footer-widget .social-links-footer {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  /* Jarak antar ikon */
+  margin-top: 20px;
+}
+
+/* 2. Aturan Mutlak untuk Warna dan Ukuran Ikon */
+/* Menargetkan elemen <i> di dalam <a>, di dalam .social-links-footer, di dalam .footer-widget */
+/* Ini adalah spesifisitas tertinggi yang mungkin. */
+.footer-widget .social-links-footer a i {
+  /* Font-size untuk ukuran */
+  font-size: 45px !important;
+
+  /* Color untuk warna putih */
+  color: #ffffff !important;
+
+  /* Penting: Pastikan tidak ada properti lain (seperti line-height) yang mengganggu */
+  line-height: 1 !important;
+}
+
+/* 3. Efek Hover agar ikon tetap putih saat disorot */
+.footer-widget .social-links-footer a:hover i {
+  color: #cccccc !important;
+  /* Warna abu-abu terang saat hover */
+}
+
+.main-button a:hover {
+  color: #4A90E2 !important;
+  /* Warna Teks Saat Hover: Biru */
+  /* Opsional: Tambahkan transisi agar perubahan warna lebih halus */
+  transition: color 0.3s ease;
+}
 
 /*
 ---------------------------------------------
