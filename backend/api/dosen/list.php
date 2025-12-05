@@ -9,4 +9,3 @@ $dosenModel = new Dosen();
 $dosen = $dosenModel->all();
 
 echo json_encode($dosen);
-?>
