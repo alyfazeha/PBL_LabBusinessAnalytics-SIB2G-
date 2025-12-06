@@ -1,7 +1,11 @@
 <?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 header('Content-Type: application/json');
-require_once __DIR__ . "/../config/koneksi.php";
-require_once __DIR__ . "/../models/ContentCategory.php";
+require_once __DIR__ . "/../../config/koneksi.php";
+require_once __DIR__ . "/../../models/ContentCategory.php";
 
 // Tidak perlu require_role (Public)
 

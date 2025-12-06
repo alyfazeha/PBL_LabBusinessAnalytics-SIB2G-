@@ -1,10 +1,14 @@
 <?php
-require_once __DIR__ . "/../config/database.php";
+require_once __DIR__ . "/../../config/database.php";
 
 session_start();
 
+header('Content-Type: application/json');
+
 if (!isset($_SESSION['user_id'])) {
-    die("Unauthorized access.");
+    // Kirim error dalam format JSON juga, jangan die() polosan
+    echo json_encode(["error" => "Unauthorized access."]);
+    exit;
 }
 
 $user_id = $_SESSION['user_id'];
@@ -16,11 +20,10 @@ $db  = new Database();
 $conn = $db->getConnection();
 
 /* ==========================================================
-   QUERY SESUAI ROLE
+   QUERY SESUAI ROLE (LOGIKA KAMU SUDAH BENAR DISINI)
 ========================================================== */
 
 if ($role === 'admin') {
-    // admin → semua booking
     $sql = "
         SELECT b.*, s.nama_sarana, u.username AS peminjam
         FROM bookings b
@@ -31,7 +34,6 @@ if ($role === 'admin') {
     $stmt = $conn->prepare($sql);
 
 } elseif ($role === 'dosen') {
-    // dosen → booking yang memilih dia sebagai penanggung jawab
     $sql = "
         SELECT b.*, s.nama_sarana, u.username AS peminjam
         FROM bookings b
@@ -44,7 +46,6 @@ if ($role === 'admin') {
     $stmt->bindParam(":nidn", $nidn);
 
 } else {
-    // mahasiswa → booking miliknya
     $sql = "
         SELECT b.*, s.nama_sarana, u.username AS peminjam
         FROM bookings b
@@ -59,4 +60,7 @@ if ($role === 'admin') {
 
 $stmt->execute();
 $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// PERBAIKAN 3: KIRIM DATANYA KE FRONTEND! (Penting Banget)
+echo json_encode($rows);
 ?>

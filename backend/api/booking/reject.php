@@ -1,8 +1,12 @@
 <?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// FIX PATH: Gunakan ../../
+require_once __DIR__ . "/../../config/auth.php";
 require_once __DIR__ . "/BookingController.php";
-require_once __DIR__ . "/../config/auth.php";
 require_admin();
-session_start();
 
 $controller = new BookingController();
 
@@ -13,3 +17,4 @@ $reason     = $_POST['reason'];
 $response = $controller->rejectBooking($booking_id, $admin_id, $reason);
 
 echo json_encode($response);
+?>
