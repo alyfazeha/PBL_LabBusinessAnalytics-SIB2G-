@@ -1,10 +1,14 @@
 <?php
-header('Content-Type: application/json');
-require_once __DIR__ . "/../config/koneksi.php";
-require_once __DIR__ . "/../models/Publikasi.php";
-require_once __DIR__ . "/../config/auth.php";
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
-// Hanya ADMIN yang boleh hapus
+header('Content-Type: application/json');
+
+require_once __DIR__ . "/../../config/koneksi.php";
+require_once __DIR__ . "/../../models/Publikasi.php";
+require_once __DIR__ . "/../../config/auth.php";
+
 require_role(['admin']);
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {

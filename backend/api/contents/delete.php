@@ -1,4 +1,8 @@
 <?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 header('Content-Type: application/json');
 require_once __DIR__ . "/../config/koneksi.php";
 require_once __DIR__ . "/../models/Content.php";

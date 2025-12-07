@@ -1,7 +1,12 @@
 <?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 header('Content-Type: application/json');
-require_once __DIR__ . "/../config/koneksi.php";
-require_once __DIR__ . "/../models/Publikasi.php";
+
+require_once __DIR__ . "/../../config/koneksi.php";
+require_once __DIR__ . "/../../models/Publikasi.php";
 
 $id = $_GET['id'] ?? null;
 

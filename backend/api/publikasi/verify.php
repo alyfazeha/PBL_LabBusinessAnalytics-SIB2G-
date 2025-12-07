@@ -1,10 +1,13 @@
 <?php
-// File: publikasi/verify.php
-header('Content-Type: application/json');
-require_once __DIR__ . "/../models/Publikasi.php";
-require_once __DIR__ . "/../config/auth.php";
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
-// Pakai require_role biar konsisten
+header('Content-Type: application/json');
+
+require_once __DIR__ . "/../../models/Publikasi.php";
+require_once __DIR__ . "/../../config/auth.php";
+
 require_role(['admin']);
 
 $id = $_POST['publikasi_id'] ?? null;
@@ -17,8 +20,6 @@ if (!$id || !$status) {
 }
 
 $model = new Publikasi();
-
-// Perbaikan: Panggil 'changeStatus', BUKAN 'verify'
 $ok = $model->changeStatus($id, $status);
 
 if ($ok) {

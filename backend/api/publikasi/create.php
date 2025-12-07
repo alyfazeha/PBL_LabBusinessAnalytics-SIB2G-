@@ -1,8 +1,14 @@
 <?php
+// 1. Cek Session
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 header('Content-Type: application/json');
-require_once __DIR__ . "/../config/koneksi.php";
-require_once __DIR__ . "/../models/Publikasi.php";
-require_once __DIR__ . "/../config/auth.php";
+
+require_once __DIR__ . "/../../config/koneksi.php";
+require_once __DIR__ . "/../../models/Publikasi.php";
+require_once __DIR__ . "/../../config/auth.php";
 
 require_role(['admin', 'dosen']);
 
@@ -20,7 +26,7 @@ $data = [
 
 if (!$data['judul'] || !$data['kategori_id'] || !$data['dosen_nidn']) {
     http_response_code(400);
-    exit(json_encode(['status' => 'error', 'message' => 'Data tidak lengkap']));
+    exit(json_encode(['status' => 'error', 'message' => 'Data tidak lengkap (Judul, Kategori, NIDN wajib)']));
 }
 
 $model = new Publikasi();

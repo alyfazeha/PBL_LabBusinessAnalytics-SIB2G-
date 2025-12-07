@@ -1,7 +1,13 @@
 <?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 header("Content-Type: application/json");
-require_once __DIR__ . "/../models/User.php";
-require_once __DIR__ . "/../config/auth.php";
+
+require_once __DIR__ . "/../../models/User.php";
+require_once __DIR__ . "/../../config/auth.php";
+
 require_admin();
 
 $username = trim($_POST['username'] ?? "");
@@ -10,8 +16,8 @@ $email = trim($_POST['email'] ?? "");
 $display_name = trim($_POST['display_name'] ?? "");
 $role = trim($_POST['role'] ?? "");
 
-// Validasi input
 if ($username === "" || $password === "" || $role === "") {
+    http_response_code(400);
     echo json_encode([
         "success" => false,
         "message" => "Username, password, dan role wajib diisi."
@@ -21,7 +27,6 @@ if ($username === "" || $password === "" || $role === "") {
 
 $userModel = new User();
 
-// Hash password
 $hash = password_hash($password, PASSWORD_BCRYPT);
 
 $data = [
@@ -34,8 +39,10 @@ $data = [
 
 $success = $userModel->create($data);
 
-echo json_encode([
-    'success' => $success,
-    'message' => $success ? 'User created' : 'Failed to create user'
-]);
+if ($success) {
+    echo json_encode(['success' => true, 'message' => 'User created']);
+} else {
+    http_response_code(500);
+    echo json_encode(['success' => false, 'message' => 'Failed to create user']);
+}
 ?>
