@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Dosen | Admin</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/cssadmin.css">
+
+    <style>
+        /* Gaya untuk menampung tabel dengan scroll jika perlu */
+        .data-table-container {
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            min-width: 950px;
+            /* Atur lebar minimum agar tabel tidak terlalu menyempit */
+            border-collapse: collapse;
+        }
+
+        /* Mengatur gaya dasar sel agar rapi */
+        .data-table th,
+        .data-table td {
+            white-space: normal;
+            vertical-align: top;
+            /* PENTING: Ratakan konten ke atas agar teks yang wrap terlihat rapi */
+            padding: 8px;
+            /* Sedikit padding agar tidak terlalu mepet */
+        }
+
+        /* Mengatasi masalah garis putus-putus/tebal */
+        .data-table tr {
+            border-bottom: 1px solid #ddd;
+            /* Atur batas bawah setiap baris secara eksplisit */
+        }
+
+        .data-table tbody tr:last-child {
+            border-bottom: none;
+            /* Hapus garis bawah pada baris terakhir */
+        }
+
+        /* Gaya khusus untuk Foto */
+        .dosen-photo {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 50%;
+            display: block;
+            margin: 0 auto;
+        }
+
+        /* Mengatur lebar spesifik untuk kolom */
+        .data-table th:nth-child(1),
+        .data-table td:nth-child(1) {
+            /* Foto */
+            width: 50px;
+            text-align: center;
+        }
+
+        .data-table th:nth-child(2),
+        .data-table td:nth-child(2) {
+            /* NIDN */
+            width: 100px;
+            word-break: break-all;
+        }
+
+        .data-table th:nth-child(3),
+        .data-table td:nth-child(3) {
+            /* NIP */
+            width: 120px;
+            word-break: break-all;
+        }
+
+        .data-table th:nth-child(4),
+        .data-table td:nth-child(4) {
+            /* Nama Lengkap */
+            width: 180px;
+            max-width: 180px;
+        }
+
+        .data-table th:nth-child(5),
+        .data-table td:nth-child(5) {
+            /* Email */
+            width: 150px;
+            max-width: 150px;
+            font-size: 0.9em;
+            word-break: break-all;
+        }
+
+        .data-table th:nth-child(8),
+        .data-table td:nth-child(8) {
+            /* Aksi */
+            width: 120px;
+            min-width: 120px;
+            text-align: center;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: space-around;
+            /* Agar tombol Edit dan Hapus ada jarak */
+            align-items: center;
+            flex-direction: column;
+            /* Tombol diletakkan secara vertikal untuk menghemat ruang horizontal */
+            gap: 5px;
+            /* Jarak antar tombol */
+        }
+
+        /* Tombol Aksi */
+        .action-buttons .edit-btn,
+        .action-buttons .delete-btn {
+            width: 80%;
+            /* Agar tombol terlihat seragam */
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <div class="logo-area">
+            <h3>Lab Admin</h3>
+        </div>
+        <nav>
+            <a href="admin.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="peminjaman.html"><i class="fas fa-calendar-alt"></i> Peminjaman</a>
+            <a href="konten.html"><i class="fas fa-newspaper"></i> Berita & Konten</a>
+            <a href="dosen.html" class="active"><i class="fas fa-users"></i> Data Dosen</a>
+            <a href="#" id="logoutTrigger"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <header>
+            <h1>Kelola Data Dosen</h1>
+        </header>
+
+        <div class="data-section">
+            <div id="message" class="message" style="margin-bottom: 20px; display: none;"></div>
+
+            <div class="data-controls">
+                <h2>Daftar Dosen</h2>
+
+                <a href="tambah_dosen.html" class="add-button">
+                    <i class="fas fa-plus"></i> Tambah Dosen
+                </a>
+            </div>
+
+            <div class="data-table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="text-align: center;">Foto</th>
+                            <th>NIDN</th>
+                            <th>NIP</th>
+                            <th>Nama Lengkap</th>
+                            <th>Email</th>
+                            <th>Jabatan</th>
+                            <th>Prodi</th>
+                            <th style="text-align: center;">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dosenTableBody">
+                        <tr>
+                            <td colspan="8">Memuat data dosen...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="logoutModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <h3>Konfirmasi Logout</h3>
+            <p>Apakah Anda yakin ingin keluar dari sesi Admin?</p>
+            <div class="modal-actions">
+                <button id="cancelLogout" class="cancel-button">Batal</button>
+                <button id="confirmLogout" class="submit-button">Logout</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // Logika Logout (Dipertahankan)
+        const logoutTrigger = document.getElementById('logoutTrigger');
+        const logoutModal = document.getElementById('logoutModal');
+        const cancelLogoutBtn = document.getElementById('cancelLogout');
+        const confirmLogoutBtn = document.getElementById('confirmLogout');
+
+        logoutTrigger.addEventListener('click', (e) => {
+            e.preventDefault();
+            logoutModal.style.display = 'flex';
+        });
+
+        cancelLogoutBtn.addEventListener('click', () => {
+            logoutModal.style.display = 'none';
+        });
+
+        confirmLogoutBtn.addEventListener('click', async () => {
+            const url = '../backend/api/auth/logout.php';
+            try {
+                await fetch(url, { method: 'POST' });
+                window.location.href = 'index.html';
+            } catch (error) {
+                console.error('Logout Error:', error);
+                window.location.href = 'index.html';
+            }
+        });
+
+        window.addEventListener('click', (e) => {
+            if (e.target === logoutModal) {
+                logoutModal.style.display = 'none';
+            }
+        });
+
+        // --- UTILITY FUNCTION ---
+        const messageDiv = document.getElementById('message');
+        const dosenTableBody = document.getElementById('dosenTableBody');
+
+        function displayMessage(type, text) {
+            messageDiv.textContent = text;
+            messageDiv.className = `alert alert-${type}`;
+            messageDiv.style.display = 'block';
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+                messageDiv.className = 'message';
+            }, 5000);
+        }
+
+        // --- FUNGSI RENDER TABEL ---
+        function renderDosen(dosenArray) {
+            let html = '';
+            const totalCols = 8;
+
+            if (dosenArray.length === 0) {
+                dosenTableBody.innerHTML = `<tr><td colspan="${totalCols}" style="text-align: center;">Tidak ada data Dosen yang ditemukan.</td></tr>`;
+                return;
+            }
+
+            dosenArray.forEach(dosen => {
+                const fotoUrl = dosen.foto_url && dosen.foto_url !== 'NULL' && dosen.foto_url !== '' ? dosen.foto_url : 'assets/img/placeholder.jpg';
+                const placeholderPath = 'assets/img/placeholder.jpg';
+
+                const nipText = dosen.nip ? dosen.nip : '-';
+                const emailText = dosen.email ? dosen.email : '-';
+
+                html += `
+                    <tr>
+                        <td>
+                            <img 
+                                src="${fotoUrl}" 
+                                alt="Foto ${dosen.nama}" 
+                                class="dosen-photo" 
+                                onerror="this.onerror=null; this.src='${placeholderPath}';" 
+                            />
+                        </td>
+                        <td>${dosen.nidn}</td>
+                        <td>${nipText}</td>
+                        <td>${dosen.nama}</td>
+                        <td>${emailText}</td>
+                        <td>${dosen.jabatan}</td>
+                        <td>${dosen.prodi}</td>
+                        
+                        <td class="action-buttons">
+                            <button 
+                                class="edit-btn" 
+                                onclick="window.location.href='edit_dosen.html?nidn=${dosen.nidn}'" 
+                                title="Edit Data ${dosen.nama}"
+                            >
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button 
+                                class="delete-btn" 
+                                onclick="deleteDosen('${dosen.nidn}', '${dosen.nama}')" 
+                                title="Hapus Data ${dosen.nama}"
+                            >
+                                <i class="fas fa-trash"></i> Hapus
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+            dosenTableBody.innerHTML = html;
+        }
+
+        // --- FUNGSI FETCH DATA (READ) ---
+        async function fetchDosen() {
+            dosenTableBody.innerHTML = `<tr><td colspan="8" style="text-align: center;">Memuat data...</td></tr>`;
+            const url = '../backend/api/dosen/list.php';
+
+            try {
+                const response = await fetch(url);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                renderDosen(data);
+
+            } catch (error) {
+                console.error('Error fetching Dosen:', error);
+                dosenTableBody.innerHTML = `<tr><td colspan="8" style="color: red; text-align: center;">Gagal memuat data Dosen. Cek koneksi server API.</td></tr>`;
+            }
+        }
+
+        // --- FUNGSI DELETE (Dipertahankan) ---
+        window.deleteDosen = async (nidn, nama) => {
+            if (!confirm(`Apakah Anda yakin ingin menghapus Dosen: ${nama} (${nidn})? Tindakan ini tidak dapat dibatalkan.`)) {
+                return;
+            }
+
+            const url = '../backend/api/dosen/delete.php';
+            const formData = new FormData();
+            formData.append('nidn', nidn);
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    displayMessage('success', result.message || `Dosen ${nama} berhasil dihapus.`);
+                    fetchDosen(); // Muat ulang data tabel
+                } else {
+                    displayMessage('error', result.message || `Gagal menghapus Dosen ${nama}.`);
+                }
+
+            } catch (error) {
+                console.error('Error deleting Dosen:', error);
+                displayMessage('error', 'Terjadi kesalahan jaringan/server saat menghapus.');
+            }
+        };
+
+
+        // Panggil fungsi saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', fetchDosen);
+    </script>
+</body>
+
+</html>

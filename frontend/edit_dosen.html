@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Dosen | Admin</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/cssadmin.css">
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <div class="logo-area">
+            <h3>Lab Admin</h3>
+        </div>
+        <nav>
+            <a href="admin.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="peminjaman.html"><i class="fas fa-calendar-alt"></i> Peminjaman</a>
+            <a href="konten.html"><i class="fas fa-newspaper"></i> Berita & Konten</a>
+            <a href="dosen.html" class="active"><i class="fas fa-users"></i> Data Dosen</a>
+            <a href="#" id="logoutTrigger"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </nav>
+    </div>
+
+    <div class="main-content-dosen">
+        <header>
+            <div class="page-title-group">
+                <a href="dosen.html" class="back-icon-link" title="Kembali ke Daftar Dosen">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+                <h1>Edit Data Dosen</h1>
+            </div>
+        </header>
+        <div class="data-section">
+            <div id="message" class="message" style="margin-bottom: 20px; display: none;"></div>
+
+            <div class="data-form-container">
+                <h2>Form Edit Data Dosen</h2>
+
+                <form id="editDosenForm" class="data-form form-grid" enctype="multipart/form-data">
+
+                    <input type="hidden" id="input-nidn-key" name="nidn">
+
+                    <div class="form-column">
+                        <div class="form-group">
+                            <label for="input-user_id">User ID (Existing):</label>
+                            <input type="number" id="input-user_id" name="user_id" required readonly
+                                placeholder="ID pengguna dari tabel **users** (tidak dapat diubah).">
+                        </div>
+                        <div class="form-group">
+                            <label for="input-nidn">NIDN:</label>
+                            <input type="text" id="input-nidn" name="nidn_dummy" required readonly
+                                placeholder="Tidak dapat diubah karena NIDN adalah Primary Key.">
+                        </div>
+                        <div class="form-group">
+                            <label for="input-nip">NIP:</label>
+                            <input type="text" id="input-nip" name="nip" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="input-nama">Nama Lengkap:</label>
+                            <input type="text" id="input-nama" name="nama" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="input-email">Email:</label>
+                            <input type="email" id="input-email" name="email" required>
+                        </div>
+                    </div>
+
+                    <div class="form-column">
+                        <div class="form-group">
+                            <label for="input-jabatan">Jabatan:</label>
+                            <input type="text" id="input-jabatan" name="jabatan" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="input-prodi">Prodi:</label>
+                            <input type="text" id="input-prodi" name="prodi" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="input-pendidikan">Pendidikan Terakhir:</label>
+                            <input type="text" id="input-pendidikan" name="pendidikan" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Foto Profil Saat Ini:</label>
+                            <div id="foto-preview-area" style="margin-bottom: 10px;">
+                                <img id="current-foto" src="" alt="Foto Profil Lama"
+                                    style="max-width: 100px; max-height: 100px; border-radius: 8px; border: 1px solid #ddd; object-fit: cover; display: none;">
+                                <p id="no-foto-text" style="color: #888; font-style: italic; display: none;">Belum ada
+                                    foto.</p>
+                            </div>
+
+                            <label for="input-foto">Ganti Foto Profil:</label>
+                            <input type="file" id="input-foto" name="foto_profil" accept="image/jpeg,image/png">
+                            <small>Kosongkan jika tidak ingin mengubah foto.</small>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label for="input-matkul">Mata Kuliah Diampu:</label>
+                            <textarea id="input-matkul" name="mata_kuliah" required rows="3"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-actions full-width">
+                        <button type="submit" class="submit-button update-button"><i class="fas fa-sync-alt"></i> Update
+                            Dosen</button>
+                        <a href="dosen.html" class="cancel-button"><i class="fas fa-times"></i> Batal</a>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+    <div id="logoutModal" class="modal-overlay">
+    </div>
+
+    <script>
+        // Logika Logout (Sama dengan dosen.html)
+        const logoutTrigger = document.getElementById('logoutTrigger');
+        const logoutModal = document.getElementById('logoutModal');
+        const cancelLogoutBtn = document.getElementById('cancelLogout');
+        const confirmLogoutBtn = document.getElementById('confirmLogout');
+
+        logoutTrigger.addEventListener('click', (e) => {
+            e.preventDefault();
+            logoutModal.style.display = 'flex';
+        });
+
+        cancelLogoutBtn.addEventListener('click', () => {
+            logoutModal.style.display = 'none';
+        });
+
+        confirmLogoutBtn.addEventListener('click', async () => {
+            const url = '../backend/api/auth/logout.php';
+            try {
+                await fetch(url, { method: 'POST' });
+                window.location.href = 'index.html';
+            } catch (error) {
+                console.error('Logout Error:', error);
+                window.location.href = 'index.html';
+            }
+        });
+
+        window.addEventListener('click', (e) => {
+            if (e.target === logoutModal) {
+                logoutModal.style.display = 'none';
+            }
+        });
+
+        // =======================================================
+        // DOSEN EDIT LOGIC (UPDATE)
+        // =======================================================
+        const form = document.getElementById('editDosenForm');
+        const messageDiv = document.getElementById('message');
+        const dosenNidnDisplay = document.getElementById('dosen-nidn-display');
+        const currentFoto = document.getElementById('current-foto');
+        const noFotoText = document.getElementById('no-foto-text');
+
+        function displayMessage(type, text) {
+            messageDiv.textContent = text;
+            messageDiv.className = `alert alert-${type}`;
+            messageDiv.style.display = 'block';
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+                messageDiv.className = 'message';
+            }, 5000);
+        }
+
+        function getNidnFromUrl() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('nidn');
+        }
+
+        // --- FUNGSI MUAT DATA LAMA (DETAIL) ---
+        async function fetchDosenDetail(nidn) {
+            const url = `../backend/api/dosen/detail.php?nidn=${nidn}`;
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data && data.nidn) {
+                    // Isi Form
+                    document.getElementById('input-nidn-key').value = data.nidn; // Hidden Key
+                    document.getElementById('input-nidn').value = data.nidn;
+                    document.getElementById('input-user_id').value = data.user_id;
+                    document.getElementById('input-nip').value = data.nip;
+                    document.getElementById('input-nama').value = data.nama;
+                    document.getElementById('input-email').value = data.email;
+                    document.getElementById('input-jabatan').value = data.jabatan;
+                    document.getElementById('input-prodi').value = data.prodi;
+                    document.getElementById('input-pendidikan').value = data.pendidikan;
+                    document.getElementById('input-matkul').value = data.mata_kuliah;
+
+                    dosenNidnDisplay.textContent = data.nidn; // Tampilkan NIDN di judul
+
+                    // LOGIKA PREVIEW FOTO
+                    const fotoPath = data.foto_path;
+                    if (fotoPath) {
+                        // Asumsi path gambar dimulai dari root project (misalnya: ../backend/uploads/dosen/...)
+                        currentFoto.src = `../backend/${fotoPath}`;
+                        currentFoto.style.display = 'block';
+                        noFotoText.style.display = 'none';
+                    } else {
+                        currentFoto.style.display = 'none';
+                        noFotoText.style.display = 'block';
+                    }
+
+                } else {
+                    displayMessage('error', data.message || 'Gagal memuat data detail Dosen. NIDN tidak valid.');
+                }
+            } catch (error) {
+                console.error('Error fetching detail:', error);
+                displayMessage('error', 'Terjadi kesalahan jaringan/server saat memuat data.');
+            }
+        }
+
+        // --- FUNGSI UPDATE DATA ---
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const url = '../backend/api/dosen/update.php';
+            const formData = new FormData(form);
+
+            // Karena NIDN di input teks di-set readonly, pastikan NIDN key yang tersembunyi
+            // sudah ada di FormData. (Sudah otomatis jika name="nidn" di hidden input).
+
+            const submitButton = form.querySelector('.submit-button');
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
+
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    body: formData // Kirim FormData (termasuk file)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    displayMessage('success', result.message || 'Data Dosen berhasil diubah!');
+
+                    setTimeout(() => {
+                        window.location.href = 'dosen.html'; // Redirect
+                    }, 1500);
+                } else {
+                    displayMessage('error', result.message || 'Gagal mengubah Dosen.');
+                }
+
+            } catch (error) {
+                console.error('Error updating Dosen:', error);
+                displayMessage('error', 'Terjadi kesalahan jaringan/server saat mengubah Dosen.');
+            } finally {
+                submitButton.disabled = false;
+                submitButton.innerHTML = '<i class="fas fa-sync-alt"></i> Update Dosen';
+            }
+        });
+
+        // Panggil fungsi saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', () => {
+            const nidn = getNidnFromUrl();
+            if (nidn) {
+                fetchDosenDetail(nidn);
+            } else {
+                dosenNidnDisplay.textContent = 'Error';
+                displayMessage('error', 'NIDN Dosen tidak ditemukan di URL. Tidak bisa melakukan edit.');
+            }
+        });
+    </script>
+</body>
+
+</html>
