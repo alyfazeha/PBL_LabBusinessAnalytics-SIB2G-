@@ -160,6 +160,60 @@ header h1 {
     font-weight: 600;
 }
 
+/* --- Styling Tabel Aksi (Edit dan Hapus Bersebelahan) --- */
+
+/* Ini membuat tombol berjejer horizontal di dalam cell */
+.data-table td.action-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    /* Memusatkan kelompok tombol di kolom */
+    align-items: center;
+    /* Pastikan tinggi cell tetap sama meskipun ada tombol */
+    height: 100%;
+}
+
+/* Memastikan kolom Aksi tidak terlalu lebar */
+.data-table th:last-child,
+.data-table td:last-child {
+    width: 120px;
+    text-align: center;
+}
+
+/* Styling Tombol Aksi */
+.data-table .edit-btn,
+.data-table .delete-btn {
+    padding: 6px 10px;
+    font-size: 0.85em;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.3s;
+    border: none;
+    cursor: pointer;
+    line-height: 1;
+    /* Penting untuk menjaga tinggi tombol tetap minimal */
+}
+
+.data-table .edit-btn {
+    background-color: #ffc107;
+    /* Kuning/Warning */
+    color: #333;
+}
+
+.data-table .edit-btn:hover {
+    background-color: #e0a800;
+}
+
+.data-table .delete-btn {
+    background-color: #dc3545;
+    /* Merah/Danger */
+    color: #fff;
+}
+
+.data-table .delete-btn:hover {
+    background-color: #c82333;
+}
+
 /* Status Badges */
 .status {
     padding: 5px 10px;
@@ -789,4 +843,350 @@ header h1 {
 .back-link-home i {
     margin-right: 10px;
     font-size: 1.1em;
+}
+
+/* ================== FORM ADD DOSEN / Form Section Umum ================== */
+
+/* Container untuk Form Input */
+.form-section {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    max-width: 600px;
+    margin: 30px auto;
+    /* Pusat form di tengah main-content */
+}
+
+.form-section h2 {
+    color: var(--primary-blue);
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: var(--dark-grey);
+}
+
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1em;
+    transition: border-color 0.3s;
+}
+
+.form-group input:focus {
+    border-color: var(--primary-blue);
+    outline: none;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+/* Tombol Submit */
+.btn-submit {
+    background-color: var(--primary-blue);
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.btn-submit:hover {
+    background-color: #3a7bd2;
+    transform: translateY(-1px);
+}
+
+/* Pesan Notifikasi (Success/Error) */
+.message {
+    padding: 10px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    text-align: center;
+    font-weight: 600;
+    display: none;
+    /* Default tersembunyi */
+}
+
+.message.success {
+    background-color: #d4edda;
+    /* Hijau Muda */
+    color: #155724;
+    /* Hijau Tua */
+    border: 1px solid #c3e6cb;
+}
+
+.message.error {
+    background-color: #f8d7da;
+    /* Merah Muda */
+    color: #721c24;
+    /* Merah Tua */
+    border: 1px solid #f5c6cb;
+}
+
+/* --- Styling Grid untuk Form Dua Kolom (Sudah Diperkenalkan) --- */
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px 40px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+    /* Tambahkan margin agar ada jarak antar grup */
+}
+
+.data-section {
+    padding: 20px 30px;
+    /* Tambahkan padding di sini agar konten tidak mepet */
+}
+
+/* --- Styling Input dan Textarea --- */
+.data-form input[type="text"],
+.data-form input[type="number"],
+.data-form input[type="email"],
+.data-form input[type="url"],
+.data-form textarea {
+    padding: 12px;
+    height: 45px;
+    /* Lebih besar */
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    /* Lebih membulat */
+    margin-top: 6px;
+    width: 100%;
+    background-color: #fff;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.data-form input:focus,
+.data-form textarea:focus {
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+    /* Efek fokus biru */
+    outline: none;
+}
+
+/* --- Styling Input File --- */
+.data-form input[type="file"] {
+    /* Gaya input file bawaan sulit diubah, ini memberikan padding yang serasi */
+    padding: 10px 0;
+}
+
+/* --- Styling Label dan Text Bantuan --- */
+.data-form label {
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: var(--dark-grey);
+    line-height: 1.2;
+}
+
+.data-form small {
+    color: #6c757d;
+    font-size: 0.85em;
+    margin-top: 5px;
+    line-height: 1.2;
+    padding-left: 5px;
+}
+
+/* --- Styling Kontainer Form Utama --- */
+.data-form-container {
+    margin-top: 0;
+    margin-bottom: 0;
+    background: #ffffff;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+.data-form-container h2 {
+    color: var(--primary-blue);
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+/* --- Styling Tombol Aksi (CRUD) --- */
+.form-actions {
+    display: flex;
+    /* Ubah dari flex-end (jika sudah ada) menjadi ini, atau pastikan ini yang dipakai: */
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 30px;
+    /* Pastikan .full-width bekerja: */
+    grid-column: 1 / -1;
+}
+
+.submit-button,
+.cancel-button {
+    padding: 12px 25px;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    /* Untuk tombol yang berupa <a> */
+    text-align: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Tombol Simpan/Update (Warna Biru Utama) */
+.submit-button {
+    background-color: var(--primary-blue);
+    color: #fff;
+    box-shadow: 0 4px 8px rgba(74, 144, 226, 0.3);
+}
+
+.submit-button:hover:not(:disabled) {
+    background-color: #3b7ad6;
+    /* Biru sedikit lebih gelap */
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(74, 144, 226, 0.4);
+}
+
+/* Tombol Batal (Warna Sekunder/Abu-abu) */
+.cancel-button {
+    background-color: #6c757d;
+    color: #fff;
+}
+
+.cancel-button:hover {
+    background-color: #5a6268;
+}
+
+/* Styling Ikon di Tombol */
+.submit-button i,
+.cancel-button i {
+    margin-right: 8px;
+}
+
+/* Styling Back Link di luar form */
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    margin: 20px 0 30px 0;
+    padding: 8px 15px;
+    background-color: #e9ecef;
+    /* Latar belakang abu muda */
+    color: var(--dark-grey);
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 0.95em;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.back-link:hover {
+    background-color: #dee2e6;
+    color: var(--primary-blue);
+
+}
+
+/* --- Styling Form Group & Input (Diperbarui di cssadmin.css) --- */
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+    /* Pastikan setiap grup elemen memiliki ketinggian yang konsisten */
+}
+
+/* Label: Memastikan font-weight dan margin konsisten */
+.data-form label {
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: var(--dark-grey);
+    line-height: 1.2;
+    /* Menjaga konsistensi tinggi baris */
+}
+
+
+
+/* Input, Textarea, File Input: Memberi tinggi yang seragam jika memungkinkan */
+.data-form input[type="text"],
+.data-form input[type="number"],
+.data-form input[type="email"],
+.data-form input[type="url"],
+.data-form textarea {
+    padding: 12px;
+    height: 45px;
+    /* Menetapkan tinggi standar untuk input teks agar lurus */
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    margin-top: 6px;
+    width: 100%;
+}
+
+/* Input File memerlukan perlakuan khusus */
+.data-form input[type="file"] {
+    /* Hapus height: 45px; karena input file sulit distyling */
+    padding: 10px 0;
+}
+
+/* --- Perubahan untuk Tombol Kembali ke Judul --- */
+/* Hapus styling .back-link lama, dan gunakan styling baru di header */
+
+.main-content-dosen {
+    margin-left: 250px;
+    padding: 0;
+    width: calc(100% - 250px);
+    /* Memastikan konten mengisi sisa ruang */
+}
+
+.main-content-dosen header {
+    display: flex;
+    align-items: center;
+    /* Meratakan item secara vertikal */
+    justify-content: space-between;
+    /* Untuk meletakkan elemen di kanan/kiri */
+    padding: 20px 30px;
+    background-color: #fff;
+    border-bottom: 1px solid #ddd;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.page-title-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    /* Jarak antara ikon dan teks judul */
+}
+
+.back-icon-link {
+    color: var(--dark-grey);
+    font-size: 1.5em;
+    /* Ukuran ikon panah */
+    transition: color 0.3s;
+    text-decoration: none;
+    padding-right: 10px;
+    /* Jarak ke judul */
+}
+
+.back-icon-link:hover {
+    color: var(--primary-blue);
 }
