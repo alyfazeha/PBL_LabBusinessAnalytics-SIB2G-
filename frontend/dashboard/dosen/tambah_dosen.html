@@ -7,17 +7,20 @@
     <title>Tambah Dosen | Admin</title>
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/cssadmin.css">
+    <link rel="stylesheet" href="../../assets/css/cssadmin.css">
     <style>
-        .input-group-file, .input-group-url {
+        .input-group-file,
+        .input-group-url {
             margin-bottom: 10px;
             padding: 5px 0;
             border-left: 3px solid #007bff;
             padding-left: 10px;
         }
+
         .input-group-url {
             border-left: 3px solid #ffc107;
         }
+
         .input-group-file input[type="file"],
         .input-group-url input[type="text"] {
             width: 100%;
@@ -32,9 +35,9 @@
             <h3>Lab Admin</h3>
         </div>
         <nav>
-            <a href="admin.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-            <a href="peminjaman.html"><i class="fas fa-calendar-alt"></i> Peminjaman</a>
-            <a href="konten.html"><i class="fas fa-newspaper"></i> Berita & Konten</a>
+            <a href="../admin.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="../peminjaman.html"><i class="fas fa-calendar-alt"></i> Peminjaman</a>
+            <a href="../konten.html"><i class="fas fa-newspaper"></i> Berita & Konten</a>
             <a href="dosen.html" class="active"><i class="fas fa-users"></i> Data Dosen</a>
             <a href="#" id="logoutTrigger"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </nav>
@@ -100,7 +103,8 @@
 
                             <div class="input-group-url">
                                 <label for="input-link-foto">Atau, Masukkan **Link URL Foto**:</label>
-                                <input type="text" id="input-link-foto" name="foto_path_url" placeholder="https://website.com/foto.jpg">
+                                <input type="text" id="input-link-foto" name="foto_path_url"
+                                    placeholder="https://website.com/foto.jpg">
                             </div>
                             <small>File unggahan (Desktop) akan diutamakan jika keduanya diisi.</small>
                         </div>
@@ -148,13 +152,13 @@
         });
 
         confirmLogoutBtn.addEventListener('click', async () => {
-            const url = '../backend/api/auth/logout.php';
+            const url = '../../../backend/api/auth/logout.php';
             try {
                 await fetch(url, { method: 'POST' });
-                window.location.href = 'index.html';
+                window.location.href = '../../public/index.html';
             } catch (error) {
                 console.error('Logout Error:', error);
-                window.location.href = 'index.html';
+                window.location.href = '../../public/index.html';
             }
         });
 
@@ -183,8 +187,8 @@
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            const url = '../backend/api/dosen/create.php';
-            let formData = new FormData(form); 
+            const url = '../../../backend/api/dosen/create.php';
+            let formData = new FormData(form);
 
             // =========================================================
             // LOGIKA FOTO: Memastikan hanya satu field foto yang valid yang dikirim
@@ -193,16 +197,16 @@
             const urlLink = inputLinkFoto.value.trim();
 
             // Hapus kedua field placeholder yang tidak digunakan di backend
-            formData.delete('foto_file'); 
+            formData.delete('foto_file');
             formData.delete('foto_path_url');
-            
+
             if (file) {
                 // PRIORITAS 1: File diunggah (kirim sebagai 'foto_file')
-                formData.append('foto_file', file); 
+                formData.append('foto_file', file);
             } else if (urlLink !== "") {
                 // PRIORITAS 2: Link URL dimasukkan (kirim sebagai 'foto_path')
-                formData.append('foto_path', urlLink); 
-            } 
+                formData.append('foto_path', urlLink);
+            }
             // Jika tidak ada foto (baik file maupun URL), maka field foto tidak terkirim.
 
             // =========================================================

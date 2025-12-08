@@ -7,7 +7,7 @@
     <title>Peminjaman | Admin</title>
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/cssadmin.css">
+    <link rel="stylesheet" href="../assets/css/cssadmin.css">
 </head>
 
 <body>
@@ -20,7 +20,7 @@
             <a href="admin.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
             <a href="peminjaman.html" class="active"><i class="fas fa-calendar-alt"></i> Peminjaman</a>
             <a href="konten.html"><i class="fas fa-newspaper"></i> Berita & Konten</a>
-            <a href="dosen.html"><i class="fas fa-users"></i> Data Dosen</a>
+            <a href="dosen/dosen.html"><i class="fas fa-users"></i> Data Dosen</a>
             <a href="#" id="logoutTrigger"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </nav>
     </div>
@@ -106,7 +106,7 @@
 
         confirmLogoutBtn.addEventListener('click', async () => {
             // Path ke PHP: dari frontend/ ke backend/api/auth/logout.php
-            const url = '../backend/api/auth/logout.php';
+            const url = '../../backend/api/auth/logout.php';
 
             try {
                 const response = await fetch(url, {
@@ -117,16 +117,16 @@
                 if (result.success) {
                     // Logout berhasil di server
                     logoutModal.style.display = 'none';
-                    window.location.href = 'index.html'; // Redirect ke halaman utama
+                    window.location.href = '../public/index.html'; // Redirect ke halaman utama
                 } else {
                     // Jika ada masalah logout di server, tetap redirect agar user tidak terjebak
-                    window.location.href = 'index.html';
+                    window.location.href = '../public/index.html';
                 }
 
             } catch (error) {
                 // Jika terjadi error jaringan/server, tetap redirect
                 console.error('Logout Error:', error);
-                window.location.href = 'index.html';
+                window.location.href = '../public/index.html';
             }
         });
 
