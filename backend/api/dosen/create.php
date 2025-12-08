@@ -32,7 +32,7 @@ try {
     $mata_kuliah = trim($_POST['mata_kuliah'] ?? "");
 
     // Ambil Link Foto Manual (jika ada)
-    $foto_path_input = trim($_POST['foto_path'] ?? ""); 
+    $foto_path_input = trim($_POST['foto_path'] ?? "");
 
     // Validasi Wajib
     if ($nidn === "" || $nama === "" || $email === "") {
@@ -40,16 +40,14 @@ try {
     }
 
     // ---------------------------------------------------------
-    // 2. LOGIKA UPLOAD FOTO (BARU)
+    // 2. LOGIKA UPLOAD FOTO
     // ---------------------------------------------------------
-    $final_foto_path = $foto_path_input; // Default pake link URL kalau gak ada upload
+    $final_foto_path = $foto_path_input; // Default pakai link URL kalau gak ada upload
 
     if (isset($_FILES['foto_file']) && $_FILES['foto_file']['error'] === UPLOAD_ERR_OK) {
         $fileTmpPath = $_FILES['foto_file']['tmp_name'];
         $fileName = $_FILES['foto_file']['name'];
-        $fileSize = $_FILES['foto_file']['size'];
-        $fileType = $_FILES['foto_file']['type'];
-        
+
         $fileNameCmps = explode(".", $fileName);
         $fileExtension = strtolower(end($fileNameCmps));
 
@@ -59,24 +57,26 @@ try {
             // Buat nama file unik biar gak bentrok (pake NIDN + timestamp)
             $newFileName = $nidn . '_' . time() . '.' . $fileExtension;
 
-            // Tentukan folder upload (Pastikan folder ini ada!)
-            // Kita simpan di frontend/assets/uploads/dosen/
-            // Path relatif dari file ini (api/dosen) ke folder upload
-            $uploadFileDir = __DIR__ . '/../../../frontend/assets/uploads/dosen/';
-            
-            // Buat folder jika belum ada
+            // --- PENGGUNAAN PATH ABSOLUT YANG KOREK ---
+            // Naik 3 level untuk mencapai root project (PBL_LabBusinessAnalytics-SIB2G)
+            $projectRoot = dirname(__DIR__, 3);
+            $uploadFileDir = $projectRoot . '/frontend/assets/uploads/dosen/';
+            // ---------------------------------------------
+
+            // Buat folder jika belum ada (sudah benar)
             if (!is_dir($uploadFileDir)) {
                 mkdir($uploadFileDir, 0777, true);
             }
 
             $dest_path = $uploadFileDir . $newFileName;
 
-            if(move_uploaded_file($fileTmpPath, $dest_path)) {
+            // --- Lakukan pemindahan file HANYA SATU KALI DI SINI ---
+            if (move_uploaded_file($fileTmpPath, $dest_path)) {
                 // Simpan path relatif untuk diakses dari browser
-                // (Sesuaikan dengan struktur foldermu di frontend)
                 $final_foto_path = 'assets/uploads/dosen/' . $newFileName;
             } else {
-                throw new Exception("Gagal memindahkan file foto ke folder tujuan.");
+                // Tambahkan detail path untuk debug terakhir jika gagal
+                throw new Exception("Gagal memindahkan file foto ke folder tujuan. Path Target Absolut: " . $dest_path);
             }
         } else {
             throw new Exception("Format foto tidak didukung. Gunakan JPG, PNG, atau GIF.");
@@ -86,6 +86,7 @@ try {
     // END LOGIKA UPLOAD
     // ---------------------------------------------------------
 
+    // !!! BAGIAN DUPLIKAT move_uploaded_file() SUDAH DIHAPUS DI SINI !!!
 
     // 3. Mulai Transaksi Database
     $db = Database::getInstance();
@@ -132,7 +133,7 @@ try {
                         :researchgate_url, :scholar_url, :sinta_url,
                         :nip, :prodi, :pendidikan, :sertifikasi, :mata_kuliah
                     )";
-        
+
         $stmtDosen = $db->prepare($sqlDosen);
         $stmtDosen->execute([
             ':nidn' => $nidn,
@@ -140,7 +141,7 @@ try {
             ':nama' => $nama,
             ':jabatan' => $jabatan,
             ':email' => $email,
-            ':foto_path' => $final_foto_path, // <--- PAKE VARIABLE BARU INI
+            ':foto_path' => $final_foto_path,
             ':researchgate_url' => $researchgate_url,
             ':scholar_url' => $scholar_url,
             ':sinta_url' => $sinta_url,
@@ -153,14 +154,14 @@ try {
 
         $db->commit();
         echo json_encode(['success' => true, 'message' => 'Berhasil menyimpan data dosen!']);
-
     } catch (Exception $ex) {
         $db->rollBack();
+        // Melemparkan exception ke blok catch utama di luar
         throw $ex;
     }
-
 } catch (Exception $e) {
     http_response_code(500);
+    // Masih menggunakan logika error handling sebelumnya
     if (strpos($e->getMessage(), 'Duplicate entry') !== false) {
         if (strpos($e->getMessage(), 'users_email_unique') !== false) {
             echo json_encode(['success' => false, 'message' => 'Email ini sudah dipakai oleh user lain.']);
@@ -171,4 +172,3 @@ try {
         echo json_encode(['success' => false, 'message' => 'Error Server: ' . $e->getMessage()]);
     }
 }
-?>
