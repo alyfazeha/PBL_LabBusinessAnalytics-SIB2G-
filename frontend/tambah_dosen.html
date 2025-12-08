@@ -40,14 +40,9 @@
             <div class="data-form-container">
                 <h2>Form Data Dosen Baru</h2>
 
-                <form id="addDosenForm" class="data-form form-grid" enctype="multipart/form-data">
+                <form id="addDosenForm" class="data-form form-grid">
 
                     <div class="form-column">
-                        <div class="form-group">
-                            <label for="input-user_id">User ID (Existing):</label>
-                            <input type="number" id="input-user_id" name="user_id" required
-                                placeholder="ID pengguna dari tabel **users** (role 'dosen').">
-                        </div>
                         <div class="form-group">
                             <label for="input-nidn">NIDN:</label>
                             <input type="text" id="input-nidn" name="nidn" required>
@@ -81,11 +76,10 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="input-foto">Foto Profil:</label>
-                            <input type="file" id="input-foto" name="foto_profil" accept="image/jpeg,image/png">
-                            <small>Opsional. Format: JPG/PNG, Maksimal 2MB.</small>
+                            <label for="input-foto">Link Foto Profil (URL):</label>
+                            <input type="text" id="input-foto" name="foto_path" placeholder="https://website.com/foto.jpg">
+                            <small>Masukkan link gambar dari internet.</small>
                         </div>
-
                         <div class="form-group full-width">
                             <label for="input-matkul">Mata Kuliah Diampu:</label>
                             <textarea id="input-matkul" name="mata_kuliah" required rows="3"></textarea>
@@ -102,11 +96,19 @@
         </div>
     </div>
 
-    <div id="logoutModal" class="modal-overlay">
+    <div id="logoutModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <h3>Konfirmasi Logout</h3>
+            <p>Apakah Anda yakin ingin keluar dari sesi Admin?</p>
+            <div class="modal-actions">
+                <button id="cancelLogout" class="cancel-button">Batal</button>
+                <button id="confirmLogout" class="submit-button">Logout</button>
+            </div>
+        </div>
     </div>
 
     <script>
-        // Logika Logout (Sama dengan dosen.html)
+        // --- LOGIKA LOGOUT ---
         const logoutTrigger = document.getElementById('logoutTrigger');
         const logoutModal = document.getElementById('logoutModal');
         const cancelLogoutBtn = document.getElementById('cancelLogout');
@@ -138,7 +140,7 @@
             }
         });
 
-        // --- FUNGSI UTAMA TAMBAH DOSEN (CREATE) ---
+        // --- FUNGSI TAMBAH DOSEN (CREATE) ---
         const form = document.getElementById('addDosenForm');
         const messageDiv = document.getElementById('message');
 
@@ -155,15 +157,14 @@
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
 
+            // PENTING: Backend sekarang otomatis handle user_id
             const url = '../backend/api/dosen/create.php';
-            // FormData otomatis menangani file upload karena enctype di form HTML sudah diset.
             const formData = new FormData(form);
 
-            // Tampilkan loading/disable tombol
+            // Tombol Loading
             const submitButton = form.querySelector('.submit-button');
             submitButton.disabled = true;
             submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
-
 
             try {
                 const response = await fetch(url, {
@@ -182,7 +183,7 @@
                     }, 1500);
 
                 } else {
-                    displayMessage('error', result.message || 'Gagal menambahkan Dosen. Pastikan data unik (NIDN, NIP, Email) belum terdaftar.');
+                    displayMessage('error', result.message || 'Gagal menambahkan Dosen.');
                 }
 
             } catch (error) {

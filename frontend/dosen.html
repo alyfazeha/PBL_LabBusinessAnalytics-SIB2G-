@@ -246,8 +246,13 @@
             }
 
             dosenArray.forEach(dosen => {
-                const fotoUrl = dosen.foto_url && dosen.foto_url !== 'NULL' && dosen.foto_url !== '' ? dosen.foto_url : 'assets/img/placeholder.jpg';
-                const placeholderPath = 'assets/img/placeholder.jpg';
+                // ============================================================
+                // PERBAIKAN DI SINI:
+                // Mengganti 'dosen.foto_url' menjadi 'dosen.foto_path'
+                // ============================================================
+                const fotoSrc = dosen.foto_path && dosen.foto_path !== 'NULL' && dosen.foto_path !== '' ?
+                    dosen.foto_path :
+                    'https://via.placeholder.com/50?text=No+Img'; // Gunakan link online agar pasti muncul
 
                 const nipText = dosen.nip ? dosen.nip : '-';
                 const emailText = dosen.email ? dosen.email : '-';
@@ -256,10 +261,10 @@
                     <tr>
                         <td>
                             <img 
-                                src="${fotoUrl}" 
+                                src="${fotoSrc}" 
                                 alt="Foto ${dosen.nama}" 
                                 class="dosen-photo" 
-                                onerror="this.onerror=null; this.src='${placeholderPath}';" 
+                                onerror="this.src='https://via.placeholder.com/50?text=Error';" 
                             />
                         </td>
                         <td>${dosen.nidn}</td>

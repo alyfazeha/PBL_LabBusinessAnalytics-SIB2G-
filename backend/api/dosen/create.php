@@ -8,21 +8,21 @@ ini_set('display_errors', 0);
 error_reporting(E_ALL);
 
 try {
-    // FIX PATH: Gunakan ../../ (Naik 2 level)
+    // 1. FIX PATH (Pastikan path ini benar di servermu)
+    require_once __DIR__ . "/../../config/database.php";
     require_once __DIR__ . "/../../models/Dosen.php";
     require_once __DIR__ . "/../../config/auth.php";
 
-    // Cek Role
+    // 2. Cek Role Admin
     if (function_exists('require_role')) {
-        require_role(['admin', 'dosen']);
+        require_role(['admin']);
     }
 
-    // Ambil Data Input
+    // 3. Ambil Data Input
     $nidn = trim($_POST['nidn'] ?? "");
-    $user_id = trim($_POST['user_id'] ?? "");
     $nama = trim($_POST['nama'] ?? "");
-    $jabatan = trim($_POST['jabatan'] ?? "");
     $email = trim($_POST['email'] ?? "");
+    $jabatan = trim($_POST['jabatan'] ?? "");
     $foto_path = trim($_POST['foto_path'] ?? "");
     $researchgate_url = trim($_POST['researchgate_url'] ?? "");
     $scholar_url = trim($_POST['scholar_url'] ?? "");
@@ -33,40 +33,100 @@ try {
     $sertifikasi = trim($_POST['sertifikasi'] ?? "");
     $mata_kuliah = trim($_POST['mata_kuliah'] ?? "");
 
-    // Validasi
-    if ($nidn === "" || $nip === "" || $user_id === "" || $nama === "" || $jabatan === "" || $email === "" || $prodi === "" || $pendidikan === "" || $mata_kuliah === "" ) {
-        throw new Exception("Semua field wajib (NIDN, NIP, User ID, Nama, Jabatan, Email, Prodi, Pendidikan, MK) harus diisi.");
+    // Validasi Wajib
+    if ($nidn === "" || $nama === "" || $email === "") {
+        throw new Exception("NIDN, Nama, dan Email wajib diisi.");
     }
 
-    $dosenModel = new Dosen();
+    $db = Database::getInstance();
+    $db->beginTransaction();
 
-    $data = [
-        "nidn" => $nidn,
-        "user_id" => $user_id,
-        "nama" => $nama,
-        "jabatan" => $jabatan,
-        "email" => $email,
-        "foto_path" => $foto_path,
-        "researchgate_url" => $researchgate_url,
-        "scholar_url" => $scholar_url,
-        "sinta_url" => $sinta_url,
-        "nip" => $nip,
-        "prodi" => $prodi,
-        "pendidikan" => $pendidikan,
-        "sertifikasi" => $sertifikasi,
-        "mata_kuliah" => $mata_kuliah
-    ];
+    try {
+        $user_id_to_use = null;
 
-    $success = $dosenModel->create($data);
+        // --- LANGKAH PINTAR: Cek apakah User (NIDN) sudah ada? ---
+        $stmtCheck = $db->prepare("SELECT user_id FROM users WHERE username = :u LIMIT 1");
+        $stmtCheck->execute([':u' => $nidn]);
+        $existingUser = $stmtCheck->fetch(PDO::FETCH_ASSOC);
 
-    if ($success) {
-        echo json_encode(['success' => true, 'message' => 'Dosen berhasil ditambahkan']);
-    } else {
-        throw new Exception("Gagal menyimpan data ke database.");
+        if ($existingUser) {
+            // KASUS A: User sudah ada (Sisa data lama/memang sudah punya akun)
+            // Kita pakai ID yang sudah ada itu.
+            $user_id_to_use = $existingUser['user_id'];
+        } else {
+            // KASUS B: User belum ada -> Kita buatkan baru
+            $default_password = password_hash("dosen123", PASSWORD_BCRYPT);
+            $sqlUser = "INSERT INTO users (username, password_hash, role, email, display_name, created_at) 
+                        VALUES (:username, :pass, 'dosen', :email, :nama, NOW())";
+            
+            $stmtUser = $db->prepare($sqlUser);
+            $stmtUser->execute([
+                ':username' => $nidn,
+                ':pass'     => $default_password,
+                ':email'    => $email,
+                ':nama'     => $nama
+            ]);
+            // Ambil ID user baru
+            $user_id_to_use = $db->lastInsertId();
+        }
+
+        // --- CEK DATA DOSEN GANDA ---
+        // Jangan sampai kita insert ke tabel dosen jika NIDN itu sudah terdaftar sebagai dosen
+        $stmtCheckDosen = $db->prepare("SELECT nidn FROM dosen WHERE nidn = :n LIMIT 1");
+        $stmtCheckDosen->execute([':n' => $nidn]);
+        if ($stmtCheckDosen->fetch()) {
+            throw new Exception("Gagal: Data Dosen dengan NIDN $nidn sudah ada di database.");
+        }
+
+        // --- SIMPAN DATA DOSEN ---
+        // Kita insert manual query disini agar masuk dalam satu transaksi yang sama
+        $sqlDosen = "INSERT INTO dosen (
+                        nidn, user_id, nama, jabatan, email, foto_path,
+                        researchgate_url, scholar_url, sinta_url, 
+                        nip, prodi, pendidikan, sertifikasi, mata_kuliah
+                    ) VALUES (
+                        :nidn, :user_id, :nama, :jabatan, :email, :foto_path,
+                        :researchgate_url, :scholar_url, :sinta_url,
+                        :nip, :prodi, :pendidikan, :sertifikasi, :mata_kuliah
+                    )";
+        
+        $stmtDosen = $db->prepare($sqlDosen);
+        $stmtDosen->execute([
+            ':nidn' => $nidn,
+            ':user_id' => $user_id_to_use, // Gunakan ID hasil logika pintar tadi
+            ':nama' => $nama,
+            ':jabatan' => $jabatan,
+            ':email' => $email,
+            ':foto_path' => $foto_path,
+            ':researchgate_url' => $researchgate_url,
+            ':scholar_url' => $scholar_url,
+            ':sinta_url' => $sinta_url,
+            ':nip' => $nip,
+            ':prodi' => $prodi,
+            ':pendidikan' => $pendidikan,
+            ':sertifikasi' => $sertifikasi,
+            ':mata_kuliah' => $mata_kuliah
+        ]);
+
+        $db->commit();
+        echo json_encode(['success' => true, 'message' => 'Berhasil menyimpan data dosen!']);
+
+    } catch (Exception $ex) {
+        $db->rollBack();
+        throw $ex;
     }
 
 } catch (Exception $e) {
     http_response_code(500);
-    echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+    // Tangkap error duplicate entry biar pesannya lebih enak dibaca
+    if (strpos($e->getMessage(), 'Duplicate entry') !== false) {
+        if (strpos($e->getMessage(), 'users_email_unique') !== false) {
+            echo json_encode(['success' => false, 'message' => 'Email ini sudah dipakai oleh user lain.']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Data duplikat terdeteksi. Cek NIDN/NIP.']);
+        }
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Error Server: ' . $e->getMessage()]);
+    }
 }
 ?>
