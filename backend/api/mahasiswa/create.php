@@ -12,7 +12,7 @@ require_once __DIR__ . "/../../config/auth.php";
 require_role2(['admin', 'mahasiswa']);
 
 $nim     = trim($_POST['nim'] ?? "");
-$user_id = trim($_POST['user_id'] ?? ""); 
+$user_id = trim($_POST['user_id'] ?? "");
 $nama    = trim($_POST['nama'] ?? "");
 $prodi   = trim($_POST['prodi'] ?? "");
 $tingkat = trim($_POST['tingkat'] ?? "");
@@ -53,4 +53,3 @@ if ($mahasiswaModel->create($data)) {
         'message' => 'Gagal membuat mahasiswa (Mungkin NIM sudah ada)'
     ]);
 }
-?>

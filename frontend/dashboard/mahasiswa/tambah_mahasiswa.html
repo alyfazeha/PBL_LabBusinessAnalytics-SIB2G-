@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tambah Mahasiswa | Admin</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../assets/css/cssadmin.css">
+    <link rel="stylesheet" href="../../assets/css/cssmahasiswa.css">
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <div class="logo-area">
+            <h3>Lab Admin</h3>
+        </div>
+        <nav>
+            <a href="../admin.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="../peminjaman.html"><i class="fas fa-calendar-alt"></i> Peminjaman</a>
+            <a href="../konten.html"><i class="fas fa-newspaper"></i> Berita & Konten</a>
+            <a href="../dosen/dosen.html"><i class="fas fa-users"></i> Data Dosen</a>
+            <a href="mahasiswa.html" class="active"><i class="fas fa-user-graduate"></i> Data Mahasiswa</a>
+            <a href="#" id="logoutTrigger"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <header>
+            <div class="page-title-group">
+                <a href="mahasiswa.html" class="back-icon-link" title="Kembali ke Daftar Mahasiswa">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+                <h1>Tambah Data Mahasiswa</h1>
+            </div>
+        </header>
+
+        <div class="data-section">
+            <div id="message" class="message-area" style="display: none;"></div>
+
+            <form id="addMahasiswaForm" class="data-form">
+                <div class="form-group">
+                    <label for="nim">NIM</label>
+                    <input type="text" id="nim" name="nim" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="nama">Nama Lengkap</label>
+                    <input type="text" id="nama" name="nama" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="prodi">Program Studi</label>
+                    <select id="prodi" name="prodi" required>
+                        <option value="">-- Pilih Prodi --</option>
+                        <option value="D4 TI">D4 Teknik Informatika</option>
+                        <option value="D4 SIB">D4 Sistem Informasi Bisnis</option>
+                        <option value="D2 PPLS">D2 PPLS</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="tingkat">Tingkat/Semester</label>
+                    <select id="tingkat" name="tingkat" required>
+                        <option value="">-- Pilih Tingkat --</option>
+                        <option value="1">Tingkat 1</option>
+                        <option value="2">Tingkat 2</option>
+                        <option value="3">Tingkat 3</option>
+                        <option value="4">Tingkat 4</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="no_hp">Nomor HP</label>
+                    <input type="text" id="no_hp" name="no_hp" placeholder="Contoh: 081234567890">
+                </div>
+
+                <button type="submit" class="submit-button"><i class="fas fa-save"></i> Simpan Mahasiswa</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="logoutModal" class="modal">
+        <div class="modal-content">
+            <h2>Konfirmasi Logout</h2>
+            <p>Apakah Anda yakin ingin keluar dari Dashboard Admin?</p>
+            <button id="cancelLogoutBtn" class="btn btn-secondary">Batal</button>
+            <button id="confirmLogoutBtn" class="btn btn-primary"
+                style="text-align: center; padding-left: 25px;">Logout</button>
+        </div>
+    </div>
+
+    <script>
+        // Fungsi utilitas untuk menampilkan pesan
+        function displayMessage(type, message) {
+            const messageArea = document.getElementById('message');
+            messageArea.textContent = message;
+            messageArea.className = `message-area ${type}`;
+            messageArea.style.display = 'block';
+            setTimeout(() => {
+                messageArea.style.display = 'none';
+            }, 3000);
+        }
+
+        const form = document.getElementById('addMahasiswaForm');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(form);
+            // Endpoint Mahasiswa
+            const url = '../../../backend/api/mahasiswa/create.php';
+
+            const submitButton = form.querySelector('.submit-button');
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    displayMessage('success', result.message || 'Mahasiswa berhasil ditambahkan!');
+                    form.reset();
+
+                    setTimeout(() => {
+                        window.location.href = 'mahasiswa.html'; // Redirect ke halaman daftar
+                    }, 1500);
+
+                } else {
+                    displayMessage('error', result.message || 'Gagal menambahkan Mahasiswa.');
+                }
+
+            } catch (error) {
+                console.error('Error adding Mahasiswa:', error);
+                displayMessage('error', 'Terjadi kesalahan jaringan/server saat menambahkan Mahasiswa.');
+            } finally {
+                submitButton.disabled = false;
+                submitButton.innerHTML = '<i class="fas fa-save"></i> Simpan Mahasiswa';
+            }
+        });
+
+        // Logika Logout (PERTAMBAHAN BARU)
+        const logoutModal = document.getElementById('logoutModal');
+        const logoutTrigger = document.getElementById('logoutTrigger');
+        const cancelLogoutBtn = document.getElementById('cancelLogoutBtn');
+        const confirmLogoutBtn = document.getElementById('confirmLogoutBtn');
+
+        logoutTrigger.addEventListener('click', (e) => {
+            e.preventDefault();
+            // Ganti: logoutModal.style.display = 'flex';
+            // Tambahkan kelas 'show' yang memiliki display: flex di CSS
+            logoutModal.classList.add('show');
+        });
+
+        cancelLogoutBtn.addEventListener('click', () => {
+            // Ganti: logoutModal.style.display = 'none';
+            // Hapus kelas 'show'
+            logoutModal.classList.remove('show');
+        });
+
+        confirmLogoutBtn.addEventListener('click', async () => {
+            const url = '../../../backend/api/auth/logout.php';
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    // Pastikan modal ditutup
+                    logoutModal.classList.remove('show');
+                    window.location.href = '../../public/index.html'; // Redirect ke halaman utama
+                } else {
+                    window.location.href = '../../public/index.html';
+                }
+
+            } catch (error) {
+                console.error('Logout Error:', error);
+                window.location.href = '../../public/index.html';
+            }
+        });
+    </script>
+</body>
+
+</html>
