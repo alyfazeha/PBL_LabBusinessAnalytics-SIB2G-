@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Mahasiswa | Admin</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../assets/css/cssadmin.css">
+    <link rel="stylesheet" href="../../assets/css/cssmahasiswa.css">
+
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <div class="logo-area">
+            <h3>Lab Admin</h3>
+        </div>
+        <nav>
+            <a href="../admin.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="../peminjaman.html"><i class="fas fa-calendar-alt"></i> Peminjaman</a>
+            <a href="../konten.html"><i class="fas fa-newspaper"></i> Berita & Konten</a>
+            <a href="../dosen/dosen.html"><i class="fas fa-users"></i> Data Dosen</a>
+            <a href="mahasiswa.html" class="active"><i class="fas fa-user-graduate"></i> Data Mahasiswa</a>
+            <a href="#" id="logoutTrigger"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <header>
+            <div class="page-title-group">
+                <a href="mahasiswa.html" class="back-icon-link"><i class="fas fa-arrow-left"></i></a>
+                <h1>Edit Data Mahasiswa: <span id="mahasiswaNimDisplay">Memuat...</span></h1>
+            </div>
+        </header>
+
+        <div class="data-section">
+            <div id="message" class="message-area" style="display: none;"></div>
+
+            <form id="editMahasiswaForm" class="data-form">
+                <input type="hidden" id="nim_hidden" name="nim">
+
+                <div class="form-group">
+                    <label for="nim_display">NIM (Tidak dapat diubah)</label>
+                    <input type="text" id="nim_display" disabled>
+                </div>
+
+                <div class="form-group">
+                    <label for="nama">Nama Lengkap (*)</label>
+                    <input type="text" id="nama" name="nama" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="prodi">Program Studi (*)</label>
+                    <select id="prodi" name="prodi" required>
+                        <option value="D3 TI">D3 Teknologi Informasi</option>
+                        <option value="D4 TI">D4 Teknologi Informasi</option>
+                        <option value="S2 Terapan">S2 Terapan</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="tingkat">Tingkat/Semester (*)</label>
+                    <select id="tingkat" name="tingkat" required>
+                        <option value="1">Tingkat 1</option>
+                        <option value="2">Tingkat 2</option>
+                        <option value="3">Tingkat 3</option>
+                        <option value="4">Tingkat 4 (D4/S1)</option>
+                        <option value="S2">S2</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email (*)</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="no_hp">Nomor HP</label>
+                    <input type="text" id="no_hp" name="no_hp" placeholder="Contoh: 081234567890">
+                </div>
+
+                <button type="submit" class="submit-button"><i class="fas fa-sync-alt"></i> Update Mahasiswa</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="logoutModal" class="modal">
+        <div class="modal-content">
+            <h2>Konfirmasi Logout</h2>
+            <p>Apakah Anda yakin ingin keluar dari Dashboard Admin?</p>
+            <button id="cancelLogoutBtn" class="btn btn-secondary">Batal</button>
+            <button id="confirmLogoutBtn" class="btn btn-primary"
+                style="text-align: center; padding-left: 25px;">Logout</button>
+        </div>
+    </div>
+
+
+    <script>
+        // Fungsi utilitas untuk menampilkan pesan
+        function displayMessage(type, message) {
+            const messageArea = document.getElementById('message');
+            messageArea.textContent = message;
+            messageArea.className = `message-area ${type}`;
+            messageArea.style.display = 'block';
+            setTimeout(() => {
+                messageArea.style.display = 'none';
+            }, 3000);
+        }
+
+        // Fungsi untuk mengambil NIM dari URL
+        function getNimFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('nim');
+        }
+
+        const mahasiswaNimDisplay = document.getElementById('mahasiswaNimDisplay');
+        const form = document.getElementById('editMahasiswaForm');
+
+        // --- FUNGSI AMBIL DETAIL MAHASISWA ---
+        async function fetchMahasiswaDetail(nim) {
+            // Endpoint Detail Mahasiswa
+            const url = `../../../backend/api/mahasiswa/detail.php?nim=${nim}`;
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (response.ok && data && !data.error) {
+                    // Isi form dengan data yang didapat
+                    mahasiswaNimDisplay.textContent = data.nim;
+                    document.getElementById('nim_hidden').value = data.nim;
+                    document.getElementById('nim_display').value = data.nim;
+                    document.getElementById('nama').value = data.nama;
+                    document.getElementById('prodi').value = data.prodi;
+                    document.getElementById('tingkat').value = data.tingkat;
+                    document.getElementById('email').value = data.email || '';
+                    document.getElementById('no_hp').value = data.no_hp || '';
+
+                } else {
+                    displayMessage('error', data.error || 'Data Mahasiswa tidak ditemukan.');
+                    mahasiswaNimDisplay.textContent = 'Error';
+                }
+            } catch (error) {
+                console.error('Fetch Error:', error);
+                displayMessage('error', 'Terjadi kesalahan jaringan/server saat memuat data.');
+            }
+        }
+
+        // --- SUBMIT UPDATE FORM ---
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(form);
+            // Endpoint Update Mahasiswa
+            const url = '../../../backend/api/mahasiswa/update.php';
+
+            const submitButton = form.querySelector('.submit-button');
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
+
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    body: formData // Kirim FormData
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    displayMessage('success', result.message || 'Data Mahasiswa berhasil diubah!');
+
+                    setTimeout(() => {
+                        window.location.href = 'mahasiswa.html'; // Redirect
+                    }, 1500);
+                } else {
+                    displayMessage('error', result.message || 'Gagal mengubah Mahasiswa.');
+                }
+
+            } catch (error) {
+                console.error('Error updating Mahasiswa:', error);
+                displayMessage('error', 'Terjadi kesalahan jaringan/server saat mengubah Mahasiswa.');
+            } finally {
+                submitButton.disabled = false;
+                submitButton.innerHTML = '<i class="fas fa-sync-alt"></i> Update Mahasiswa';
+            }
+        });
+
+        // Panggil fungsi saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', () => {
+            const nim = getNimFromUrl();
+            if (nim) {
+                fetchMahasiswaDetail(nim);
+            } else {
+                mahasiswaNimDisplay.textContent = 'Error';
+                displayMessage('error', 'NIM Mahasiswa tidak ditemukan di URL. Tidak bisa melakukan edit.');
+            }
+        });
+
+        // Logika Logout (PERTAMBAHAN BARU)
+        const logoutModal = document.getElementById('logoutModal');
+        const logoutTrigger = document.getElementById('logoutTrigger');
+        const cancelLogoutBtn = document.getElementById('cancelLogoutBtn');
+        const confirmLogoutBtn = document.getElementById('confirmLogoutBtn');
+
+        logoutTrigger.addEventListener('click', (e) => {
+            e.preventDefault();
+            // Ganti: logoutModal.style.display = 'flex';
+            // Tambahkan kelas 'show' yang memiliki display: flex di CSS
+            logoutModal.classList.add('show');
+        });
+
+        cancelLogoutBtn.addEventListener('click', () => {
+            // Ganti: logoutModal.style.display = 'none';
+            // Hapus kelas 'show'
+            logoutModal.classList.remove('show');
+        });
+
+        confirmLogoutBtn.addEventListener('click', async () => {
+            const url = '../../../backend/api/auth/logout.php';
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    // Pastikan modal ditutup
+                    logoutModal.classList.remove('show');
+                    window.location.href = '../../public/index.html'; // Redirect ke halaman utama
+                } else {
+                    window.location.href = '../../public/index.html';
+                }
+
+            } catch (error) {
+                console.error('Logout Error:', error);
+                window.location.href = '../../public/index.html';
+            }
+        });
+    </script>
+</body>
+
+</html>

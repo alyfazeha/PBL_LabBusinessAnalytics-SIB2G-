@@ -14,7 +14,7 @@ try {
     require_once __DIR__ . "/../../config/auth.php";
 
     if (function_exists('require_role')) {
-        require_role(['admin', 'dosen']);
+        require_role(['admin']);
     }
 
     // 1. Ambil Data Text
@@ -59,7 +59,7 @@ try {
 
             // --- PENGGUNAAN PATH ABSOLUT YANG KOREK ---
             // Naik 3 level untuk mencapai root project (PBL_LabBusinessAnalytics-SIB2G)
-            $projectRoot = dirname(__DIR__, 3);
+            $projectRoot = dirname(__DIR__, 2);
             $uploadFileDir = $projectRoot . '/frontend/assets/uploads/dosen/';
             // ---------------------------------------------
 
@@ -73,7 +73,7 @@ try {
             // --- Lakukan pemindahan file HANYA SATU KALI DI SINI ---
             if (move_uploaded_file($fileTmpPath, $dest_path)) {
                 // Simpan path relatif untuk diakses dari browser
-                $final_foto_path = '../../assets/uploads/dosen/' . $newFileName;
+                $final_foto_path = 'assets/uploads/dosen/' . $newFileName;
             } else {
                 // Tambahkan detail path untuk debug terakhir jika gagal
                 throw new Exception("Gagal memindahkan file foto ke folder tujuan. Path Target Absolut: " . $dest_path);
