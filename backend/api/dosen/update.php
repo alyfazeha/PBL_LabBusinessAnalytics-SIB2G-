@@ -8,7 +8,6 @@ ini_set('display_errors', 0);
 error_reporting(E_ALL);
 
 try {
-    // FIX PATH: Gunakan ../../
     require_once __DIR__ . "/../../models/Dosen.php";
     require_once __DIR__ . "/../../config/auth.php";
 
@@ -18,27 +17,19 @@ try {
 
     $dosenModel = new Dosen();
 
-    // Validasi NIDN
     if (!isset($_POST['nidn'])) {
         throw new Exception('NIDN tidak ditemukan.');
     }
 
     $nidn = $_POST['nidn'];
-
-    // 1. AMBIL DATA LAMA DULU (Penting untuk fallback foto)
     $currentDosen = $dosenModel->find($nidn);
     if (!$currentDosen) {
-        throw new Exception('Data Dosen tidak ditemukan di database.');
+        throw new Exception('Data Dosen tidak ditemukan.');
     }
 
-    // =========================================================================
-    // LOGIKA UPDATE FOTO (File vs Link vs Lama)
-    // =========================================================================
-    
-    // Default: Pakai foto lama (biar gak hilang kalau user gak ganti foto)
+    // --- LOGIKA UPDATE FOTO (YANG DIPERBAIKI) ---
     $final_foto_path = $currentDosen['foto_path'];
 
-    // Cek 1: Apakah User Mengupload File Baru?
     if (isset($_FILES['foto_file']) && $_FILES['foto_file']['error'] === UPLOAD_ERR_OK) {
         $fileTmpPath = $_FILES['foto_file']['tmp_name'];
         $fileName = $_FILES['foto_file']['name'];
@@ -47,42 +38,36 @@ try {
 
         $allowedfileExtensions = array('jpg', 'gif', 'png', 'jpeg', 'webp');
         if (in_array($fileExtension, $allowedfileExtensions)) {
-            // Nama file baru (unik pakai timestamp)
             $newFileName = $nidn . '_' . time() . '.' . $fileExtension;
             
-            // Folder tujuan (Relative dari file ini)
-            $uploadFileDir = __DIR__ . '/../../../frontend/assets/uploads/dosen/';
+            // PATH DINAMIS (SAMA SEPERTI CREATE)
+            $projectRoot = dirname(__DIR__, 3); 
+            $uploadFileDir = $projectRoot . '/frontend/assets/uploads/dosen/';
             
             if (!is_dir($uploadFileDir)) {
-                mkdir($uploadFileDir, 0777, true);
+                if (!mkdir($uploadFileDir, 0777, true)) {
+                    throw new Exception("Gagal membuat folder upload.");
+                }
             }
 
             $dest_path = $uploadFileDir . $newFileName;
 
             if(move_uploaded_file($fileTmpPath, $dest_path)) {
-                // Simpan path relatif untuk database
                 $final_foto_path = 'assets/uploads/dosen/' . $newFileName;
             } else {
                 throw new Exception("Gagal mengupload file foto.");
             }
         }
     } 
-    // Cek 2: Jika tidak upload file, apakah user memasukkan Link URL Baru?
     elseif (!empty($_POST['foto_path'])) {
         $final_foto_path = trim($_POST['foto_path']);
     }
-    // Jika dua-duanya kosong, $final_foto_path tetap pakai data lama.
 
-    // =========================================================================
-    // END LOGIKA FOTO
-    // =========================================================================
-
-    // Siapkan Data Update
     $data = [
         'nama'          => trim($_POST['nama'] ?? $currentDosen['nama']),
         'jabatan'       => trim($_POST['jabatan'] ?? $currentDosen['jabatan']),
         'email'         => trim($_POST['email'] ?? $currentDosen['email']),
-        'foto_path'     => $final_foto_path, // <--- Pakai variabel hasil logika di atas
+        'foto_path'     => $final_foto_path,
         'researchgate_url' => trim($_POST['researchgate_url'] ?? $currentDosen['researchgate_url']),
         'scholar_url'   => trim($_POST['scholar_url'] ?? $currentDosen['scholar_url']),
         'sinta_url'     => trim($_POST['sinta_url'] ?? $currentDosen['sinta_url']),

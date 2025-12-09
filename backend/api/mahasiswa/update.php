@@ -1,75 +1,59 @@
 <?php
+// 1. Matikan error text HTML SEBELUM session dimulai
+ini_set('display_errors', 0);
+error_reporting(E_ALL);
+
+header("Content-Type: application/json");
+
+// 2. Baru mulai session (Cek dulu biar gak muncul Notice)
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-header("Content-Type: application/json");
+try {
+    require_once __DIR__ . "/../../models/Mahasiswa.php";
+    require_once __DIR__ . "/../../config/auth.php";
 
-// FIX PATH: Mundur 2 langkah (../../)
-require_once __DIR__ . "/../../models/Mahasiswa.php";
-require_once __DIR__ . "/../../config/auth.php";
+    if (function_exists('require_role2')) {
+        require_role2(['admin', 'mahasiswa']);
+    }
 
-$mahasiswaModel = new Mahasiswa();
+    $mahasiswaModel = new Mahasiswa();
 
-// Validasi harus ada NIM
-if (!isset($_POST['nim'])) {
-    echo json_encode([
-        'success' => false,
-        'message' => 'NIM tidak ditemukan'
-    ]);
-    exit;
-}
+    // 3. Validasi NIM (Wajib Ada)
+    if (!isset($_POST['nim']) || empty($_POST['nim'])) {
+        throw new Exception('NIM tidak ditemukan. Pastikan Frontend mengirimkan key "nim".');
+    }
 
-$nim = $_POST['nim']; // PK Mahasiswa
+    $nim = $_POST['nim'];
 
-// Ambil mahasiswa untuk validasi/default values
-$currentMahasiswa = $mahasiswaModel->find($nim);
+    // 4. Cek Data Lama
+    $current = $mahasiswaModel->find($nim);
+    if (!$current) {
+        throw new Exception('Data Mahasiswa tidak ditemukan di database.');
+    }
 
-if (!$currentMahasiswa) {
-    echo json_encode([
-        'success' => false,
-        'message' => 'Mahasiswa tidak ditemukan'
-    ]);
-    exit;
-}
+    // 5. Siapkan Data Baru
+    $data = [
+        'nama'    => trim($_POST['nama'] ?? $current['nama']),
+        'prodi'   => trim($_POST['prodi'] ?? $current['prodi']),
+        'tingkat' => trim($_POST['tingkat'] ?? $current['tingkat']),
+        'no_hp'   => trim($_POST['no_hp'] ?? $current['no_hp']),
+        'email'   => trim($_POST['email'] ?? $current['email']),
+    ];
 
-// Ambil data baru dari POST. User ID dan NIM tidak diupdate.
-$new_nama = trim($_POST['nama'] ?? $currentMahasiswa['nama']);
-$new_prodi = trim($_POST['prodi'] ?? $currentMahasiswa['prodi']);
-$new_tingkat = trim($_POST['tingkat'] ?? $currentMahasiswa['tingkat']);
-$new_no_hp = trim($_POST['no_hp'] ?? $currentMahasiswa['no_hp']);
-$new_email = trim($_POST['email'] ?? $currentMahasiswa['email']);
+    if ($data['nama'] === "" || $data['prodi'] === "") {
+        throw new Exception("Nama dan Prodi tidak boleh kosong.");
+    }
 
+    if ($mahasiswaModel->update($nim, $data)) {
+        echo json_encode(['success' => true, 'message' => 'Mahasiswa berhasil diupdate']);
+    } else {
+        throw new Exception("Gagal update database.");
+    }
 
-// Data update (sesuai field yang bisa diubah di model::update)
-$data = [
-    'nama'          => $new_nama,
-    'prodi'         => $new_prodi,
-    'tingkat'       => $new_tingkat,
-    'no_hp'         => $new_no_hp,
-    'email'         => $new_email,
-];
-
-// Validasi penting
-if ($new_nama === "" || $new_prodi === "" || $new_tingkat === "") {
-    echo json_encode([
-        'success' => false,
-        'message' => 'Nama, Prodi, dan Tingkat tidak boleh kosong.'
-    ]);
-    exit;
-}
-
-$success = $mahasiswaModel->update($nim, $data); // Menggunakan Mahasiswa::update($nim, $data)
-
-if ($success) {
-    echo json_encode([
-        'status' => 'success',
-        'message' => 'Mahasiswa berhasil diperbarui'
-    ]);
-} else {
-    echo json_encode([
-        'status' => 'error',
-        'message' => 'Gagal memperbarui mahasiswa'
-    ]);
+} catch (Exception $e) {
+    http_response_code(500);
+    echo json_encode(['success' => false, 'message' => $e->getMessage()]);
 }
 ?>

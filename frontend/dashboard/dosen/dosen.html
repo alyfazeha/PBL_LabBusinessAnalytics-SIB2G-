@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kelola Dosen | Admin</title>
+    <title>Kelola Data Dosen | Admin</title>
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../../assets/css/cssadmin.css">
@@ -18,104 +18,59 @@
         .data-table {
             width: 100%;
             min-width: 950px;
-            /* Atur lebar minimum agar tabel tidak terlalu menyempit */
             border-collapse: collapse;
         }
 
-        /* Mengatur gaya dasar sel agar rapi */
         .data-table th,
         .data-table td {
             white-space: normal;
-            vertical-align: top;
-            /* PENTING: Ratakan konten ke atas agar teks yang wrap terlihat rapi */
-            padding: 8px;
-            /* Sedikit padding agar tidak terlalu mepet */
+            vertical-align: middle; /* Foto lebih rapi dengan middle */
+            padding: 10px;
         }
 
-        /* Mengatasi masalah garis putus-putus/tebal */
         .data-table tr {
             border-bottom: 1px solid #ddd;
-            /* Atur batas bawah setiap baris secara eksplisit */
         }
 
         .data-table tbody tr:last-child {
             border-bottom: none;
-            /* Hapus garis bawah pada baris terakhir */
         }
 
         /* Gaya khusus untuk Foto */
         .dosen-photo {
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             object-fit: cover;
             border-radius: 50%;
             display: block;
             margin: 0 auto;
+            border: 1px solid #ddd;
         }
 
         /* Mengatur lebar spesifik untuk kolom */
-        .data-table th:nth-child(1),
-        .data-table td:nth-child(1) {
-            /* Foto */
-            width: 50px;
-            text-align: center;
-        }
-
-        .data-table th:nth-child(2),
-        .data-table td:nth-child(2) {
-            /* NIDN */
-            width: 100px;
-            word-break: break-all;
-        }
-
-        .data-table th:nth-child(3),
-        .data-table td:nth-child(3) {
-            /* NIP */
-            width: 120px;
-            word-break: break-all;
-        }
-
-        .data-table th:nth-child(4),
-        .data-table td:nth-child(4) {
-            /* Nama Lengkap */
-            width: 180px;
-            max-width: 180px;
-        }
-
-        .data-table th:nth-child(5),
-        .data-table td:nth-child(5) {
-            /* Email */
-            width: 150px;
-            max-width: 150px;
-            font-size: 0.9em;
-            word-break: break-all;
-        }
-
-        .data-table th:nth-child(8),
-        .data-table td:nth-child(8) {
-            /* Aksi */
-            width: 120px;
-            min-width: 120px;
-            text-align: center;
-        }
+        .data-table th:nth-child(1), .data-table td:nth-child(1) { width: 60px; text-align: center; }
+        .data-table th:nth-child(2), .data-table td:nth-child(2) { width: 100px; word-break: break-all; }
+        .data-table th:nth-child(3), .data-table td:nth-child(3) { width: 120px; word-break: break-all; }
+        .data-table th:nth-child(4), .data-table td:nth-child(4) { width: 180px; }
+        .data-table th:nth-child(5), .data-table td:nth-child(5) { width: 150px; font-size: 0.9em; word-break: break-all; }
+        .data-table th:nth-child(8), .data-table td:nth-child(8) { width: 140px; text-align: center; }
 
         .action-buttons {
             display: flex;
-            justify-content: space-around;
-            /* Agar tombol Edit dan Hapus ada jarak */
-            align-items: center;
-            flex-direction: column;
-            /* Tombol diletakkan secara vertikal untuk menghemat ruang horizontal */
+            justify-content: center;
             gap: 5px;
-            /* Jarak antar tombol */
         }
-
-        /* Tombol Aksi */
-        .action-buttons .edit-btn,
-        .action-buttons .delete-btn {
-            width: 80%;
-            /* Agar tombol terlihat seragam */
+        
+        .action-buttons button {
+            cursor: pointer;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            color: white;
         }
+        
+        .edit-btn { background-color: #f39c12; }
+        .delete-btn { background-color: #e74c3c; }
     </style>
 
 </head>
@@ -146,7 +101,6 @@
 
             <div class="data-controls">
                 <h2>Daftar Dosen</h2>
-
                 <a href="tambah_dosen.html" class="add-button">
                     <i class="fas fa-plus"></i> Tambah Dosen
                 </a>
@@ -168,7 +122,7 @@
                     </thead>
                     <tbody id="dosenTableBody">
                         <tr>
-                            <td colspan="8">Memuat data dosen...</td>
+                            <td colspan="8" style="text-align: center;">Memuat data dosen...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -188,9 +142,8 @@
         </div>
     </div>
 
-
     <script>
-        // Logika Logout (Dipertahankan)
+        // --- LOGIKA LOGOUT ---
         const logoutTrigger = document.getElementById('logoutTrigger');
         const logoutModal = document.getElementById('logoutModal');
         const cancelLogoutBtn = document.getElementById('cancelLogout');
@@ -206,13 +159,15 @@
         });
 
         confirmLogoutBtn.addEventListener('click', async () => {
+            // Path API: Mundur 3 langkah (Dosen -> Dashboard -> Frontend -> Root) -> Backend
             const url = '../../../backend/api/auth/logout.php';
             try {
                 await fetch(url, { method: 'POST' });
+                // Path Redirect: Mundur 2 langkah (Dosen -> Dashboard -> Frontend) -> Public
                 window.location.href = '../../public/index.html';
             } catch (error) {
                 console.error('Logout Error:', error);
-                window.location.href = '../public/index.html';
+                window.location.href = '../../public/index.html';
             }
         });
 
@@ -248,12 +203,20 @@
 
             dosenArray.forEach(dosen => {
                 // ============================================================
-                // PERBAIKAN DI SINI:
-                // Mengganti 'dosen.foto_url' menjadi 'dosen.foto_path'
+                // PERBAIKAN UTAMA: LOGIKA PATH FOTO
                 // ============================================================
-                const fotoSrc = dosen.foto_path && dosen.foto_path !== 'NULL' && dosen.foto_path !== '' ?
-                    dosen.foto_path :
-                    'https://via.placeholder.com/50?text=No+Img'; // Gunakan link online agar pasti muncul
+                let fotoSrc = 'https://via.placeholder.com/50?text=No+Img';
+
+                if (dosen.foto_path && dosen.foto_path !== 'NULL' && dosen.foto_path !== '') {
+                    if (dosen.foto_path.startsWith('http')) {
+                        // Jika Link Online (http...), pakai langsung
+                        fotoSrc = dosen.foto_path;
+                    } else {
+                        // Jika File Lokal (assets/...), tambahkan '../../' di depan
+                        // agar mundur dari folder 'dosen' ke folder 'frontend'
+                        fotoSrc = '../../' + dosen.foto_path;
+                    }
+                }
 
                 const nipText = dosen.nip ? dosen.nip : '-';
                 const emailText = dosen.email ? dosen.email : '-';
@@ -263,7 +226,7 @@
                         <td>
                             <img 
                                 src="${fotoSrc}" 
-                                alt="Foto ${dosen.nama}" 
+                                alt="Foto" 
                                 class="dosen-photo" 
                                 onerror="this.src='https://via.placeholder.com/50?text=Error';" 
                             />
@@ -279,14 +242,14 @@
                             <button 
                                 class="edit-btn" 
                                 onclick="window.location.href='edit_dosen.html?nidn=${dosen.nidn}'" 
-                                title="Edit Data ${dosen.nama}"
+                                title="Edit Data"
                             >
                                 <i class="fas fa-edit"></i> Edit
                             </button>
                             <button 
                                 class="delete-btn" 
                                 onclick="deleteDosen('${dosen.nidn}', '${dosen.nama}')" 
-                                title="Hapus Data ${dosen.nama}"
+                                title="Hapus Data"
                             >
                                 <i class="fas fa-trash"></i> Hapus
                             </button>
@@ -300,6 +263,8 @@
         // --- FUNGSI FETCH DATA (READ) ---
         async function fetchDosen() {
             dosenTableBody.innerHTML = `<tr><td colspan="8" style="text-align: center;">Memuat data...</td></tr>`;
+            
+            // Path API: Mundur 3 langkah (Sesuai struktur folder dalam)
             const url = '../../../backend/api/dosen/list.php';
 
             try {
@@ -318,7 +283,7 @@
             }
         }
 
-        // --- FUNGSI DELETE (Dipertahankan) ---
+        // --- FUNGSI DELETE ---
         window.deleteDosen = async (nidn, nama) => {
             if (!confirm(`Apakah Anda yakin ingin menghapus Dosen: ${nama} (${nidn})? Tindakan ini tidak dapat dibatalkan.`)) {
                 return;
@@ -348,7 +313,6 @@
                 displayMessage('error', 'Terjadi kesalahan jaringan/server saat menghapus.');
             }
         };
-
 
         // Panggil fungsi saat halaman dimuat
         document.addEventListener('DOMContentLoaded', fetchDosen);

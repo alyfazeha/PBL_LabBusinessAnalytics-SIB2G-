@@ -25,7 +25,15 @@ try {
     $researchgate_url = trim($_POST['researchgate_url'] ?? "");
     $scholar_url = trim($_POST['scholar_url'] ?? "");
     $sinta_url = trim($_POST['sinta_url'] ?? "");
+    
+    // --- PERBAIKAN NIP ---
     $nip = trim($_POST['nip'] ?? "");
+    // Jika NIP kosong atau isinya cuma strip (-), ubah jadi NULL agar tidak error Unique
+    if ($nip === "" || $nip === "-") {
+        $nip = null;
+    }
+    // ---------------------
+
     $prodi = trim($_POST['prodi'] ?? "");
     $pendidikan = trim($_POST['pendidikan'] ?? "");
     $sertifikasi = trim($_POST['sertifikasi'] ?? "");
@@ -42,51 +50,39 @@ try {
     // ---------------------------------------------------------
     // 2. LOGIKA UPLOAD FOTO
     // ---------------------------------------------------------
-    $final_foto_path = $foto_path_input; // Default pakai link URL kalau gak ada upload
+    $final_foto_path = $foto_path_input;
 
     if (isset($_FILES['foto_file']) && $_FILES['foto_file']['error'] === UPLOAD_ERR_OK) {
         $fileTmpPath = $_FILES['foto_file']['tmp_name'];
         $fileName = $_FILES['foto_file']['name'];
-
         $fileNameCmps = explode(".", $fileName);
         $fileExtension = strtolower(end($fileNameCmps));
 
-        // Validasi Ekstensi
         $allowedfileExtensions = array('jpg', 'gif', 'png', 'jpeg', 'webp');
         if (in_array($fileExtension, $allowedfileExtensions)) {
-            // Buat nama file unik biar gak bentrok (pake NIDN + timestamp)
             $newFileName = $nidn . '_' . time() . '.' . $fileExtension;
 
-            // --- PENGGUNAAN PATH ABSOLUT YANG KOREK ---
-            // Naik 3 level untuk mencapai root project (PBL_LabBusinessAnalytics-SIB2G)
-            $projectRoot = dirname(__DIR__, 2);
+            // Path Dinamis ke Root Project
+            $projectRoot = dirname(__DIR__, 3); 
             $uploadFileDir = $projectRoot . '/frontend/assets/uploads/dosen/';
-            // ---------------------------------------------
-
-            // Buat folder jika belum ada (sudah benar)
+            
             if (!is_dir($uploadFileDir)) {
-                mkdir($uploadFileDir, 0777, true);
+                if (!mkdir($uploadFileDir, 0777, true)) {
+                    throw new Exception("Gagal membuat folder upload di: " . $uploadFileDir);
+                }
             }
 
             $dest_path = $uploadFileDir . $newFileName;
 
-            // --- Lakukan pemindahan file HANYA SATU KALI DI SINI ---
-            if (move_uploaded_file($fileTmpPath, $dest_path)) {
-                // Simpan path relatif untuk diakses dari browser
+            if(move_uploaded_file($fileTmpPath, $dest_path)) {
                 $final_foto_path = 'assets/uploads/dosen/' . $newFileName;
             } else {
-                // Tambahkan detail path untuk debug terakhir jika gagal
-                throw new Exception("Gagal memindahkan file foto ke folder tujuan. Path Target Absolut: " . $dest_path);
+                throw new Exception("Gagal memindahkan file. Cek izin folder.");
             }
         } else {
-            throw new Exception("Format foto tidak didukung. Gunakan JPG, PNG, atau GIF.");
+            throw new Exception("Format foto tidak didukung.");
         }
     }
-    // ---------------------------------------------------------
-    // END LOGIKA UPLOAD
-    // ---------------------------------------------------------
-
-    // !!! BAGIAN DUPLIKAT move_uploaded_file() SUDAH DIHAPUS DI SINI !!!
 
     // 3. Mulai Transaksi Database
     $db = Database::getInstance();
@@ -133,7 +129,7 @@ try {
                         :researchgate_url, :scholar_url, :sinta_url,
                         :nip, :prodi, :pendidikan, :sertifikasi, :mata_kuliah
                     )";
-
+        
         $stmtDosen = $db->prepare($sqlDosen);
         $stmtDosen->execute([
             ':nidn' => $nidn,
@@ -145,7 +141,7 @@ try {
             ':researchgate_url' => $researchgate_url,
             ':scholar_url' => $scholar_url,
             ':sinta_url' => $sinta_url,
-            ':nip' => $nip,
+            ':nip' => $nip, // Ini sekarang bisa NULL
             ':prodi' => $prodi,
             ':pendidikan' => $pendidikan,
             ':sertifikasi' => $sertifikasi,
@@ -154,21 +150,19 @@ try {
 
         $db->commit();
         echo json_encode(['success' => true, 'message' => 'Berhasil menyimpan data dosen!']);
+
     } catch (Exception $ex) {
         $db->rollBack();
-        // Melemparkan exception ke blok catch utama di luar
         throw $ex;
     }
+
 } catch (Exception $e) {
     http_response_code(500);
-    // Masih menggunakan logika error handling sebelumnya
     if (strpos($e->getMessage(), 'Duplicate entry') !== false) {
-        if (strpos($e->getMessage(), 'users_email_unique') !== false) {
-            echo json_encode(['success' => false, 'message' => 'Email ini sudah dipakai oleh user lain.']);
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Data duplikat terdeteksi. Cek NIDN/NIP.']);
-        }
+        // Cek detail error apakah karena email atau NIDN/NIP lain
+        echo json_encode(['success' => false, 'message' => 'Data duplikat terdeteksi (NIDN, Email, atau NIP sudah ada).']);
     } else {
-        echo json_encode(['success' => false, 'message' => 'Error Server: ' . $e->getMessage()]);
+        echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
     }
 }
+?>
