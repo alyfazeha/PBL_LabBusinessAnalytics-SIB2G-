@@ -36,7 +36,7 @@
         <div class="data-section">
             <div id="message" class="message-area" style="display: none;"></div>
 
-            <form id="kontenForm" class="data-form">
+            <form id="kontenForm" class="data-form" enctype="multipart/form-data">
                 <input type="hidden" id="content_id" name="content_id">
 
                 <div class="form-group">
@@ -47,18 +47,30 @@
                 <div class="form-group">
                     <label for="category_id">Kategori <span class="required">*</span></label>
                     <select id="category_id" name="category_id" required>
+                        <option value="">-- Sedang memuat... --</option>
                     </select>
                 </div>
 
-                <div class="form-group">
-                    <label for="featured_image">URL Gambar Utama</label>
-                    <input type="url" id="featured_image" name="featured_image"
-                        placeholder="Contoh: https://example.com/gambar.jpg">
-                    <small id="currentImage"></small>
+                <div class="form-group" id="currentImageContainer" style="display:none;">
+                    <label>Gambar Saat Ini:</label>
+                    <div>
+                        <img id="currentImagePreview" src="" alt="Preview" style="max-width: 200px; border-radius: 5px; border: 1px solid #ddd;">
+                    </div>
                 </div>
 
                 <div class="form-group">
-                    <label for="excerpt">Ringkasan (Max 150 Karakter)</label>
+                    <label for="featured_image_url">Ganti dengan URL (Link)</label>
+                    <input type="url" id="featured_image_url" name="featured_image_url" placeholder="https://...">
+                </div>
+
+                <div class="form-group">
+                    <label for="featured_image_file">Ganti dengan Upload File</label>
+                    <input type="file" id="featured_image_file" name="featured_image_file" accept="image/*">
+                    <small>Biarkan kosong jika tidak ingin mengubah gambar.</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="excerpt">Ringkasan</label>
                     <textarea id="excerpt" name="excerpt" rows="3"></textarea>
                 </div>
 
@@ -68,8 +80,8 @@
                 </div>
 
                 <div class="form-actions">
-                    <button type="submit" class="btn btn-primary" id="submitBtn"><i class="fas fa-save"></i> Simpan
-                        Perubahan</button>
+                    <button type="submit" class="btn btn-primary" id="submitBtn"><i class="fas fa-save"></i> Simpan Perubahan</button>
+                    <a href="konten.html" class="btn btn-secondary">Batal</a>
                 </div>
             </form>
         </div>
@@ -90,149 +102,125 @@
             messageArea.textContent = message;
             messageArea.className = 'message-area ' + type;
             messageArea.style.display = 'block';
-            setTimeout(() => {
-                messageArea.style.display = 'none';
-            }, 5000);
+            setTimeout(() => { messageArea.style.display = 'none'; }, 5000);
         }
 
-        // Global variable untuk ID konten
-        let contentId = null;
+        // Ambil ID dari URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const contentId = urlParams.get('id');
 
-        async function fetchKategori(selectedId) {
-            const url = '../../../backend/api/contents/kategori_list.php';
+        // 1. Fetch Kategori Dulu
+        async function fetchKategori(selectedId = null) {
             try {
-                const response = await fetch(url);
+                const response = await fetch('../../../backend/api/contents/kategori_list.php');
                 const result = await response.json();
                 const select = document.getElementById('category_id');
                 select.innerHTML = '<option value="">-- Pilih Kategori --</option>';
 
                 if (result.status === 'success' && result.data) {
-                    result.data.forEach(kategori => {
+                    result.data.forEach(cat => {
                         const option = document.createElement('option');
-                        option.value = kategori.id;
-                        option.textContent = kategori.category_name;
-                        if (kategori.id == selectedId) {
-                            option.selected = true;
-                        }
+                        option.value = cat.category_id || cat.id;
+                        option.textContent = cat.category_name || cat.nama;
+                        if (option.value == selectedId) option.selected = true;
                         select.appendChild(option);
                     });
                 }
             } catch (error) {
-                console.error('Fetch Kategori error:', error);
+                console.error('Kategori Error:', error);
             }
         }
 
-        async function fetchKontenDetail(id) {
-            const url = `../../../backend/api/contents/detail.php?id=${id}`;
+        // 2. Fetch Detail Konten
+        async function fetchDetail() {
+            if (!contentId) {
+                displayMessage('error', 'ID tidak ditemukan!');
+                return;
+            }
+
             try {
-                const response = await fetch(url);
+                const response = await fetch(`../../../backend/api/contents/detail.php?id=${contentId}`);
                 const result = await response.json();
 
                 if (result.status === 'success' && result.data) {
                     const data = result.data;
-                    document.getElementById('content_id').value = data.id;
+                    
+                    // Isi Form
+                    document.getElementById('content_id').value = data.content_id || data.id;
                     document.getElementById('title').value = data.title;
                     document.getElementById('excerpt').value = data.excerpt || '';
                     document.getElementById('body').value = data.body;
-                    document.getElementById('featured_image').value = data.featured_image || '';
+                    
+                    // Logic Gambar Preview
                     if (data.featured_image) {
-                        document.getElementById('currentImage').innerHTML = `<br>Gambar saat ini: <a href="${data.featured_image}" target="_blank">Lihat Gambar</a>`;
+                        document.getElementById('currentImageContainer').style.display = 'block';
+                        document.getElementById('currentImagePreview').src = data.featured_image;
+                        
+                        // Jika gambar lama adalah URL, isi kolom URL (Opsional)
+                        if (data.featured_image.startsWith('http')) {
+                            document.getElementById('featured_image_url').value = data.featured_image;
+                        }
                     }
-                    // Muat Kategori dan pilih yang sesuai
+
+                    // Load kategori dan set yang terpilih
                     fetchKategori(data.category_id);
+
                 } else {
-                    displayMessage('error', 'Konten tidak ditemukan.');
+                    displayMessage('error', 'Gagal memuat data konten.');
                 }
             } catch (error) {
-                console.error('Fetch Detail error:', error);
-                displayMessage('error', 'Terjadi kesalahan jaringan saat memuat data.');
+                console.error('Detail Error:', error);
+                displayMessage('error', 'Terjadi kesalahan jaringan.');
             }
         }
 
+        // 3. Submit Form Update
         const kontenForm = document.getElementById('kontenForm');
         kontenForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const submitBtn = document.getElementById('submitBtn');
             submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+            submitBtn.innerHTML = 'Menyimpan...';
 
             const formData = new FormData(kontenForm);
-            const url = '../../../backend/api/contents/update.php';
-
+            
             try {
-                const response = await fetch(url, {
+                const response = await fetch('../../../backend/api/contents/update.php', {
                     method: 'POST',
                     body: formData
                 });
                 const result = await response.json();
 
-                if (response.ok && result.status === 'success') {
+                if (result.status === 'success') {
                     displayMessage('success', result.message);
-                    // Muat ulang detail setelah update
-                    fetchKontenDetail(contentId);
+                    // Refresh data/preview setelah update
+                    fetchDetail();
                 } else {
-                    const errorMessage = result.message || 'Gagal menyimpan perubahan.';
-                    displayMessage('error', errorMessage);
+                    displayMessage('error', result.message);
                 }
             } catch (error) {
-                console.error('Submit error:', error);
-                displayMessage('error', 'Terjadi kesalahan jaringan atau server.');
+                displayMessage('error', 'Terjadi kesalahan server.');
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = '<i class="fas fa-save"></i> Simpan Perubahan';
             }
         });
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            contentId = urlParams.get('id');
+        // Jalankan saat load
+        document.addEventListener('DOMContentLoaded', fetchDetail);
 
-            if (contentId) {
-                fetchKontenDetail(contentId);
-            } else {
-                displayMessage('error', 'ID Konten tidak ditemukan di URL. Tidak bisa melakukan edit.');
-            }
-        });
-
-        // --- LOGIKA LOGOUT (PERBAIKAN) ---
+        // --- LOGOUT ---
         const logoutModal = document.getElementById('logoutModal');
         const logoutTrigger = document.getElementById('logoutTrigger');
         const cancelLogoutBtn = document.getElementById('cancelLogoutBtn');
         const confirmLogoutBtn = document.getElementById('confirmLogoutBtn');
 
-        logoutTrigger.addEventListener('click', (e) => {
-            e.preventDefault();
-            // GANTI style.display = 'flex' DENGAN classList.add('show')
-            logoutModal.classList.add('show');
-        });
-
-        cancelLogoutBtn.addEventListener('click', () => {
-            // GANTI style.display = 'none' DENGAN classList.remove('show')
-            logoutModal.classList.remove('show');
-        });
-
-        confirmLogoutBtn.addEventListener('click', async () => {
-            const url = '../../../backend/api/auth/logout.php';
-
-            try {
-                const response = await fetch(url, {
-                    method: 'POST',
-                });
-                const result = await response.json();
-
-                if (result.success) {
-                    logoutModal.classList.remove('show');
-                    window.location.href = '../../public/index.html';
-                } else {
-                    window.location.href = '../../public/index.html';
-                }
-
-            } catch (error) {
-                console.error('Logout Error:', error);
-                window.location.href = '../../public/index.html';
-            }
-        });
+        if(logoutTrigger) logoutTrigger.onclick = (e) => { e.preventDefault(); logoutModal.classList.add('show'); };
+        if(cancelLogoutBtn) cancelLogoutBtn.onclick = () => logoutModal.classList.remove('show');
+        if(confirmLogoutBtn) confirmLogoutBtn.onclick = async () => {
+            await fetch('../../../backend/api/auth/logout.php', { method: 'POST' });
+            window.location.href = '../../public/index.html';
+        };
     </script>
 </body>
-
 </html>
