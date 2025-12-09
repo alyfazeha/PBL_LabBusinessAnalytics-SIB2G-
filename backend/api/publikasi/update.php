@@ -1,4 +1,11 @@
 <?php
+
+ini_set('display_errors', 0); // Matikan error HTML agar JSON valid
+error_reporting(E_ALL);
+
+header('Content-Type: application/json');
+header("Access-Control-Allow-Origin: *"); // Tambahkan ini jaga-jaga masalah CORS
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }

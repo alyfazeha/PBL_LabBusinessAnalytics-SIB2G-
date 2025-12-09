@@ -17,7 +17,29 @@ class PublikasiCategory { // <--- NAMA CLASS DISAMAKAN DENGAN NAMA FILE
         while ($row = pg_fetch_assoc($result)) {
             $data[] = $row;
         }
-        return $data;
+        return $data;<?php
+// 1. Panggil file database
+require_once __DIR__ . '/../config/database.php';
+
+class PublikasiCategory { 
+    private $db;
+
+    public function __construct() {
+        // 2. Ambil koneksi PDO dari Database.php
+        $this->db = Database::getInstance();
     }
+
+    public function getAll() {
+        // 3. Query menggunakan gaya PDO
+        $query = "SELECT * FROM kategori_publikasi ORDER BY id ASC";
+        
+        // Eksekusi Query
+        $stmt = $this->db->query($query);
+        
+        // Ambil semua data sebagai array
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+}
+?>
 }
 ?>
