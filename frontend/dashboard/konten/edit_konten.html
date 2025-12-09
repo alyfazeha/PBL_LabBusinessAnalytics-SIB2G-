@@ -21,6 +21,7 @@
             <a href="../admin.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
             <a href="../peminjaman/peminjaman.html"><i class="fas fa-calendar-alt"></i> Peminjaman</a>
             <a href="konten.html" class="active"><i class="fas fa-newspaper"></i> Berita & Konten</a>
+            <a href="../publikasi/publikasi.html"><i class="fas fa-newspaper"></i> Publikasi</a>
             <a href="../dosen/dosen.html"><i class="fas fa-users"></i> Data Dosen</a>
             <a href="../mahasiswa/mahasiswa.html"><i class="fas fa-user-graduate"></i> Data Mahasiswa</a>
             <a href="#" id="logoutTrigger"><i class="fas fa-sign-out-alt"></i> Logout</a>
@@ -54,7 +55,8 @@
                 <div class="form-group" id="currentImageContainer" style="display:none;">
                     <label>Gambar Saat Ini:</label>
                     <div>
-                        <img id="currentImagePreview" src="" alt="Preview" style="max-width: 200px; border-radius: 5px; border: 1px solid #ddd;">
+                        <img id="currentImagePreview" src="" alt="Preview"
+                            style="max-width: 200px; border-radius: 5px; border: 1px solid #ddd;">
                     </div>
                 </div>
 
@@ -80,7 +82,8 @@
                 </div>
 
                 <div class="form-actions">
-                    <button type="submit" class="btn btn-primary" id="submitBtn"><i class="fas fa-save"></i> Simpan Perubahan</button>
+                    <button type="submit" class="btn btn-primary" id="submitBtn"><i class="fas fa-save"></i> Simpan
+                        Perubahan</button>
                     <a href="konten.html" class="btn btn-secondary">Batal</a>
                 </div>
             </form>
@@ -144,18 +147,18 @@
 
                 if (result.status === 'success' && result.data) {
                     const data = result.data;
-                    
+
                     // Isi Form
                     document.getElementById('content_id').value = data.content_id || data.id;
                     document.getElementById('title').value = data.title;
                     document.getElementById('excerpt').value = data.excerpt || '';
                     document.getElementById('body').value = data.body;
-                    
+
                     // Logic Gambar Preview
                     if (data.featured_image) {
                         document.getElementById('currentImageContainer').style.display = 'block';
                         document.getElementById('currentImagePreview').src = data.featured_image;
-                        
+
                         // Jika gambar lama adalah URL, isi kolom URL (Opsional)
                         if (data.featured_image.startsWith('http')) {
                             document.getElementById('featured_image_url').value = data.featured_image;
@@ -183,7 +186,7 @@
             submitBtn.innerHTML = 'Menyimpan...';
 
             const formData = new FormData(kontenForm);
-            
+
             try {
                 const response = await fetch('../../../backend/api/contents/update.php', {
                     method: 'POST',
@@ -215,12 +218,13 @@
         const cancelLogoutBtn = document.getElementById('cancelLogoutBtn');
         const confirmLogoutBtn = document.getElementById('confirmLogoutBtn');
 
-        if(logoutTrigger) logoutTrigger.onclick = (e) => { e.preventDefault(); logoutModal.classList.add('show'); };
-        if(cancelLogoutBtn) cancelLogoutBtn.onclick = () => logoutModal.classList.remove('show');
-        if(confirmLogoutBtn) confirmLogoutBtn.onclick = async () => {
+        if (logoutTrigger) logoutTrigger.onclick = (e) => { e.preventDefault(); logoutModal.classList.add('show'); };
+        if (cancelLogoutBtn) cancelLogoutBtn.onclick = () => logoutModal.classList.remove('show');
+        if (confirmLogoutBtn) confirmLogoutBtn.onclick = async () => {
             await fetch('../../../backend/api/auth/logout.php', { method: 'POST' });
             window.location.href = '../../public/index.html';
         };
     </script>
 </body>
+
 </html>

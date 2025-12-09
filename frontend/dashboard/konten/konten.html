@@ -21,6 +21,7 @@
             <a href="../admin.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
             <a href="../peminjaman/peminjaman.html"><i class="fas fa-calendar-alt"></i> Peminjaman</a>
             <a href="konten.html" class="active"><i class="fas fa-newspaper"></i> Berita & Konten</a>
+            <a href="../publikasi/publikasi.html"><i class="fas fa-newspaper"></i> Publikasi</a>
             <a href="../dosen/dosen.html"><i class="fas fa-users"></i> Data Dosen</a>
             <a href="../mahasiswa/mahasiswa.html"><i class="fas fa-user-graduate"></i> Data Mahasiswa</a>
             <a href="#" id="logoutTrigger"><i class="fas fa-sign-out-alt"></i> Logout</a>
@@ -42,7 +43,8 @@
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Foto</th> <th>Judul</th>
+                            <th>Foto</th>
+                            <th>Judul</th>
                             <th>Kategori</th>
                             <th>Penulis</th>
                             <th>Tgl. Publikasi</th>
@@ -51,7 +53,7 @@
                         </tr>
                     </thead>
                     <tbody id="kontenTableBody">
-                        </tbody>
+                    </tbody>
                 </table>
             </div>
         </div>
@@ -99,7 +101,7 @@
 
         function renderKontenTable(kontenList) {
             kontenTableBody.innerHTML = '';
-            
+
             if (kontenList.length === 0) {
                 kontenTableBody.innerHTML = '<tr><td colspan="8" style="text-align:center;">Belum ada data konten.</td></tr>';
                 return;
@@ -107,7 +109,7 @@
 
             kontenList.forEach(konten => {
                 const row = kontenTableBody.insertRow();
-                
+
                 // Cek status published (bisa boolean true/false atau string 't'/'f' atau '1'/'0')
                 const isPub = konten.is_published === true || konten.is_published === 't' || konten.is_published === '1';
                 const statusClass = isPub ? 'status-published' : 'status-pending';
@@ -120,7 +122,7 @@
 
                 // Logika ID & Penulis
                 // Gunakan content_id (bukan id) karena database pakai content_id
-                const id = konten.content_id; 
+                const id = konten.content_id;
                 const penulis = konten.user_name || 'Admin'; // Fallback jika user_name kosong
 
                 row.innerHTML = `
@@ -176,7 +178,7 @@
 
         async function togglePublish(id, currentStatus) {
             const newStatus = !currentStatus; // Balik status
-            
+
             const url = '../../../backend/api/contents/publish.php';
             const formData = new FormData();
             formData.append('content_id', id);
@@ -191,7 +193,7 @@
 
                 if (result.status === true || result.status === 'success') {
                     displayMessage('success', result.message);
-                    fetchKonten(); 
+                    fetchKonten();
                 } else {
                     displayMessage('error', result.message);
                 }
@@ -209,26 +211,26 @@
         const cancelLogoutBtn = document.getElementById('cancelLogoutBtn');
         const confirmLogoutBtn = document.getElementById('confirmLogoutBtn');
 
-        if(logoutTrigger) {
+        if (logoutTrigger) {
             logoutTrigger.addEventListener('click', (e) => {
                 e.preventDefault();
                 logoutModal.classList.add('show');
             });
         }
 
-        if(cancelLogoutBtn) {
+        if (cancelLogoutBtn) {
             cancelLogoutBtn.addEventListener('click', () => {
                 logoutModal.classList.remove('show');
             });
         }
 
-        if(confirmLogoutBtn) {
+        if (confirmLogoutBtn) {
             confirmLogoutBtn.addEventListener('click', async () => {
                 const url = '../../../backend/api/auth/logout.php';
                 try {
                     await fetch(url, { method: 'POST' });
                     // Redirect ke login/landing page
-                    window.location.href = '../../public/index.html'; 
+                    window.location.href = '../../public/index.html';
                 } catch (error) {
                     console.error('Logout Error:', error);
                     window.location.href = '../../public/index.html';
@@ -243,4 +245,5 @@
         });
     </script>
 </body>
+
 </html>

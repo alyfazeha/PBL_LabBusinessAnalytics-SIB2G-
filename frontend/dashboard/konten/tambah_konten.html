@@ -21,6 +21,7 @@
             <a href="../admin.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
             <a href="../peminjaman/peminjaman.html"><i class="fas fa-calendar-alt"></i> Peminjaman</a>
             <a href="konten.html" class="active"><i class="fas fa-newspaper"></i> Berita & Konten</a>
+            <a href="../publikasi/publikasi.html"><i class="fas fa-newspaper"></i> Publikasi</a>
             <a href="../dosen/dosen.html"><i class="fas fa-users"></i> Data Dosen</a>
             <a href="../mahasiswa/mahasiswa.html"><i class="fas fa-user-graduate"></i> Data Mahasiswa</a>
             <a href="#" id="logoutTrigger"><i class="fas fa-sign-out-alt"></i> Logout</a>
@@ -51,8 +52,8 @@
 
                 <div class="form-group">
                     <label for="featured_image_url">Link Gambar (URL)</label>
-                    <input type="url" id="featured_image_url" name="featured_image_url" 
-                           placeholder="Contoh: https://example.com/gambar.jpg">
+                    <input type="url" id="featured_image_url" name="featured_image_url"
+                        placeholder="Contoh: https://example.com/gambar.jpg">
                 </div>
 
                 <div class="form-group">
@@ -72,7 +73,8 @@
                 </div>
 
                 <div class="form-actions">
-                    <button type="submit" class="btn btn-primary" id="submitBtn"><i class="fas fa-save"></i> Simpan Konten</button>
+                    <button type="submit" class="btn btn-primary" id="submitBtn"><i class="fas fa-save"></i> Simpan
+                        Konten</button>
                     <button type="reset" class="btn btn-secondary"><i class="fas fa-redo"></i> Reset Form</button>
                 </div>
             </form>
@@ -124,7 +126,7 @@
 
         // 2. Submit Form (Create)
         const kontenForm = document.getElementById('kontenForm');
-        
+
         kontenForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const submitBtn = document.getElementById('submitBtn');
@@ -143,7 +145,7 @@
 
                 if (response.ok && result.status === 'success') {
                     displayMessage('success', result.message);
-                    kontenForm.reset(); 
+                    kontenForm.reset();
                 } else {
                     displayMessage('error', result.message || 'Gagal menambahkan konten.');
                 }
@@ -164,12 +166,13 @@
         const cancelLogoutBtn = document.getElementById('cancelLogoutBtn');
         const confirmLogoutBtn = document.getElementById('confirmLogoutBtn');
 
-        if(logoutTrigger) logoutTrigger.onclick = (e) => { e.preventDefault(); logoutModal.classList.add('show'); };
-        if(cancelLogoutBtn) cancelLogoutBtn.onclick = () => logoutModal.classList.remove('show');
-        if(confirmLogoutBtn) confirmLogoutBtn.onclick = async () => {
+        if (logoutTrigger) logoutTrigger.onclick = (e) => { e.preventDefault(); logoutModal.classList.add('show'); };
+        if (cancelLogoutBtn) cancelLogoutBtn.onclick = () => logoutModal.classList.remove('show');
+        if (confirmLogoutBtn) confirmLogoutBtn.onclick = async () => {
             await fetch('../../../backend/api/auth/logout.php', { method: 'POST' });
             window.location.href = '../../public/index.html';
         };
     </script>
 </body>
+
 </html>
