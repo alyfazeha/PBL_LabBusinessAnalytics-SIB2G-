@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
         integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
-    <link rel="stylesheet" href="assets/css/csslogin.css">
+    <link rel="stylesheet" href="../assets/css/csslogin.css">
 </head>
 
 <body>
@@ -99,7 +99,7 @@
 
                 const formData = new FormData(loginForm);
                 // Path ke PHP: dari frontend/ ke backend/api/auth/login.php
-                const url = '../backend/api/auth/login.php';
+                const url = '../../backend/api/auth/login.php';
 
                 try {
                     const response = await fetch(url, {
@@ -120,7 +120,7 @@
 
                         // LOGIKA PENGALIHAN BERDASARKAN ROLE
                         if (result.data.role === 'admin') {
-                            window.location.href = 'admin.html'; // Pindah ke admin.html (di folder frontend/)
+                            window.location.href = '../dashboard/admin.html'; // Pindah ke admin.html (di folder frontend/)
                         } else {
                             window.location.href = 'index.html'; // Pindah ke index.html (di folder frontend/)
                         }
@@ -143,7 +143,7 @@
 
                 const formData = new FormData(registerForm);
                 // Path ke PHP: dari frontend/ ke backend/api/auth/register.php
-                const url = '../backend/api/auth/register.php';
+                const url = '../../backend/api/auth/register.php';
 
                 try {
                     const response = await fetch(url, {

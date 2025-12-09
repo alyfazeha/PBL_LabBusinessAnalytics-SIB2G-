@@ -1,12 +1,22 @@
 <?php
-header('Content-Type: application/json');
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
-require_once __DIR__ . "/../models/Mahasiswa.php";
-require_once __DIR__ . "/../config/auth.php";
+header('Content-Type: application/json');
+ini_set('display_errors', 0); 
+
+require_once __DIR__ . "/../../models/Mahasiswa.php";
+require_once __DIR__ . "/../../config/auth.php";
+
+// Pastikan fungsi require_admin() ada di auth.php
 require_admin();
 
 $mahasiswaModel = new Mahasiswa();
-$mahasiswa = $mahasiswaModel->all();
+$data = $mahasiswaModel->all();
 
-echo json_encode($mahasiswa);
+// Kirim array kosong jika data tidak ada (biar frontend gak error)
+if (!$data) $data = [];
+
+echo json_encode($data);
 ?>

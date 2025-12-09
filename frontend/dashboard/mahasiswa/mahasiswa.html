@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Mahasiswa | Admin</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../assets/css/cssadmin.css">
+    <link rel="stylesheet" href="../../assets/css/cssmahasiswa.css">
+
+    <style>
+        /* Sisakan gaya yang sangat spesifik dan tidak bisa di generalisasi jika perlu, */
+        /* tetapi untuk kasus ini, HAPUS SEMUA style yang terkait tabel dan data-table-container. */
+    </style>
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <div class="logo-area">
+            <h3>Lab Admin</h3>
+        </div>
+        <nav>
+            <a href="../admin.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="../peminjaman.html"><i class="fas fa-calendar-alt"></i> Peminjaman</a>
+            <a href="../konten.html"><i class="fas fa-newspaper"></i> Berita & Konten</a>
+            <a href="../dosen/dosen.html"><i class="fas fa-users"></i> Data Dosen</a>
+            <a href="mahasiswa.html" class="active"><i class="fas fa-user-graduate"></i> Data Mahasiswa</a>
+            <a href="#" id="logoutTrigger"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <header>
+            <h1>Kelola Data Mahasiswa</h1>
+        </header>
+
+        <div class="data-section">
+            <div id="message" class="message-area" style="display: none;"></div>
+
+            <div class="controls-area">
+                <input type="text" id="searchInput" placeholder="Cari Mahasiswa (NIM/Nama/Prodi/Tingkat)">
+                <a href="tambah_mahasiswa.html" class="btn btn-primary"><i class="fas fa-plus"></i> Tambah Data</a>
+            </div>
+
+            <div class="data-table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>NIM</th>
+                            <th>Nama Mahasiswa</th>
+                            <th>Prodi</th>
+                            <th>Tingkat</th>
+                            <th>Email</th>
+                            <th>No. HP</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="mahasiswaTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="logoutModal" class="modal">
+        <div class="modal-content">
+            <h2>Konfirmasi Logout</h2>
+            <p>Apakah Anda yakin ingin keluar dari Dashboard Admin?</p>
+            <button id="cancelLogoutBtn" class="btn btn-secondary">Batal</button>
+            <button id="confirmLogoutBtn" class="btn btn-primary"
+                style="text-align: center; padding-left: 25px;">Logout</button>
+        </div>
+    </div>
+
+    <script>
+        // Fungsi utilitas untuk menampilkan pesan
+        function displayMessage(type, message) {
+            const messageArea = document.getElementById('message');
+            messageArea.textContent = message;
+            messageArea.className = `message-area ${type}`;
+            messageArea.style.display = 'block';
+            setTimeout(() => {
+                messageArea.style.display = 'none';
+            }, 3000);
+        }
+
+        // --- FUNGSI FETCH MAHASISWA ---
+        const mahasiswaTableBody = document.getElementById('mahasiswaTableBody');
+
+        async function fetchMahasiswa() {
+            // Path ke API Mahasiswa
+            const url = '../../../backend/api/mahasiswa/list.php';
+            mahasiswaTableBody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Memuat data...</td></tr>';
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (response.ok && Array.isArray(data)) {
+                    renderMahasiswaTable(data);
+                } else {
+                    throw new Error(data.message || 'Gagal memuat data Mahasiswa.');
+                }
+            } catch (error) {
+                console.error('Fetch Error:', error);
+                mahasiswaTableBody.innerHTML = `<tr><td colspan="7" style="color: red; text-align: center;">${error.message} Cek koneksi server API.</td></tr>`;
+            }
+        }
+
+        function renderMahasiswaTable(mahasiswaList) {
+            mahasiswaTableBody.innerHTML = '';
+            if (mahasiswaList.length === 0) {
+                mahasiswaTableBody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Tidak ada data Mahasiswa.</td></tr>';
+                return;
+            }
+
+            mahasiswaList.forEach(mhs => {
+                const row = `
+                    <tr>
+                        <td>${mhs.nim}</td>
+                        <td>${mhs.nama}</td>
+                        <td>${mhs.prodi}</td>
+                        <td>${mhs.tingkat}</td>
+                        <td>${mhs.email || '-'}</td>
+                        <td>${mhs.no_hp || '-'}</td>
+                        <td>
+                            <a href="edit_mahasiswa.html?nim=${mhs.nim}" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i> Edit</a>
+                            <button onclick="deleteMahasiswa('${mhs.nim}', '${mhs.nama}')" class="btn btn-danger btn-sm"><i class="fas fa-trash-alt"></i> Hapus</button>
+                        </td>
+                    </tr>
+                `;
+                mahasiswaTableBody.insertAdjacentHTML('beforeend', row);
+            });
+        }
+
+        // --- FUNGSI DELETE ---
+        window.deleteMahasiswa = async (nim, nama) => {
+            if (!confirm(`Apakah Anda yakin ingin menghapus Mahasiswa: ${nama} (${nim})? Tindakan ini tidak dapat dibatalkan.`)) {
+                return;
+            }
+
+            // Path ke API Delete Mahasiswa
+            const url = '../../../backend/api/mahasiswa/delete.php';
+            const formData = new FormData();
+            formData.append('nim', nim);
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    displayMessage('success', result.message || `Mahasiswa ${nama} berhasil dihapus.`);
+                    fetchMahasiswa(); // Muat ulang data tabel
+                } else {
+                    displayMessage('error', result.message || `Gagal menghapus Mahasiswa ${nama}.`);
+                }
+
+            } catch (error) {
+                console.error('Error deleting Mahasiswa:', error);
+                displayMessage('error', 'Terjadi kesalahan jaringan/server saat menghapus.');
+            }
+        };
+
+
+        // Panggil fungsi saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', fetchMahasiswa);
+
+        // Logika Logout (PERBAIKAN AGAR TIDAK MUNCUL DI AWAL)
+        const logoutModal = document.getElementById('logoutModal');
+        const logoutTrigger = document.getElementById('logoutTrigger');
+        const cancelLogoutBtn = document.getElementById('cancelLogoutBtn');
+        const confirmLogoutBtn = document.getElementById('confirmLogoutBtn');
+
+        logoutTrigger.addEventListener('click', (e) => {
+            e.preventDefault();
+            // GANTI style.display = 'flex' DENGAN classList.add('show')
+            logoutModal.classList.add('show');
+        });
+
+        cancelLogoutBtn.addEventListener('click', () => {
+            // GANTI style.display = 'none' DENGAN classList.remove('show')
+            logoutModal.classList.remove('show');
+        });
+
+        confirmLogoutBtn.addEventListener('click', async () => {
+            const url = '../../../backend/api/auth/logout.php';
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    // Tutup modal sebelum redirect
+                    logoutModal.classList.remove('show');
+                    window.location.href = '../../public/index.html'; // Redirect ke halaman utama
+                } else {
+                    window.location.href = '../../public/index.html';
+                }
+
+            } catch (error) {
+                console.error('Logout Error:', error);
+                window.location.href = '../../public/index.html';
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -4,10 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Utama | Admin</title>
+    <title>Peminjaman | Admin</title>
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/cssadmin.css">
+    <link rel="stylesheet" href="../assets/css/cssadmin.css">
 </head>
 
 <body>
@@ -17,62 +17,67 @@
             <h3>Lab Admin</h3>
         </div>
         <nav>
-            <a href="admin.html" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-            <a href="peminjaman.html"><i class="fas fa-calendar-alt"></i> Peminjaman</a>
+            <a href="admin.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="peminjaman.html" class="active"><i class="fas fa-calendar-alt"></i> Peminjaman</a>
             <a href="konten.html"><i class="fas fa-newspaper"></i> Berita & Konten</a>
-            <a href="pengguna.html"><i class="fas fa-users"></i> Pengguna</a>
+            <a href="dosen/dosen.html"><i class="fas fa-users"></i> Data Dosen</a>
+            <a href="mahasiswa/mahasiswa.html"><i class="fas fa-user-graduate"></i> Data Mahasiswa</a>
             <a href="#" id="logoutTrigger"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </nav>
     </div>
 
     <div class="main-content">
         <header>
-            <h1>Selamat Datang, Admin!</h1>
+            <h1>Kelola Peminjaman</h1>
         </header>
 
-        <div class="stats-grid">
-            <div class="stat-card blue">
-                <i class="fas fa-calendar-check"></i>
-                <h2>120</h2>
-                <p>Total Peminjaman</p>
-            </div>
-            <div class="stat-card yellow">
-                <i class="fas fa-hourglass-half"></i>
-                <h2>15</h2>
-                <p>Menunggu Persetujuan</p>
-            </div>
-            <div class="stat-card green">
-                <i class="fas fa-user-tie"></i>
-                <h2>450</h2>
-                <p>Total Pengguna</p>
-            </div>
-        </div>
-
         <div class="data-section">
-            <h2>Daftar Peminjaman Terbaru</h2>
+            <button class="btn-action create-new"><i class="fas fa-plus"></i> Block Tanggal Khusus</button>
+
             <table class="data-table">
+                <h2>Semua Permintaan Peminjaman</h2>
                 <thead>
                     <tr>
                         <th>ID</th>
                         <th>Peminjam</th>
-                        <th>Tanggal</th>
+                        <th>Tanggal Pinjam</th>
+                        <th>Keperluan</th>
                         <th>Status</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
+                        <td>103</td>
+                        <td>Cindy Lestari</td>
+                        <td>2025-12-05 (14:00)</td>
+                        <td>Seminar Internal</td>
+                        <td><span class="status pending">Pending</span></td>
+                        <td>
+                            <button class="btn-action approve">Approve</button>
+                            <button class="btn-action reject">Reject</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>102</td>
+                        <td>Dewi Maharani</td>
+                        <td>2025-12-01 (09:00)</td>
+                        <td>Rapat Dosen</td>
+                        <td><span class="status rejected">Rejected</span></td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
                         <td>101</td>
                         <td>Andy Wiratama</td>
-                        <td>2025-11-28</td>
-                        <td><span class="status pending">Pending</span></td>
-                        <td><button class="btn-action approve">Approve</button></td>
+                        <td>2025-11-28 (10:00)</td>
+                        <td>Riset Skripsi</td>
+                        <td><span class="status approved">Approved</span></td>
+                        <td>-</td>
                     </tr>
                 </tbody>
             </table>
         </div>
     </div>
-
     <div id="logoutModal" class="modal-overlay">
         <div class="modal-content">
             <h2>Konfirmasi Logout</h2>
@@ -83,7 +88,6 @@
             </div>
         </div>
     </div>
-
     <script>
         const logoutTrigger = document.getElementById('logoutTrigger');
         const logoutModal = document.getElementById('logoutModal');
@@ -103,7 +107,7 @@
 
         confirmLogoutBtn.addEventListener('click', async () => {
             // Path ke PHP: dari frontend/ ke backend/api/auth/logout.php
-            const url = '../backend/api/auth/logout.php';
+            const url = '../../backend/api/auth/logout.php';
 
             try {
                 const response = await fetch(url, {
@@ -114,16 +118,16 @@
                 if (result.success) {
                     // Logout berhasil di server
                     logoutModal.style.display = 'none';
-                    window.location.href = 'index.html'; // Redirect ke halaman utama
+                    window.location.href = '../public/index.html'; // Redirect ke halaman utama
                 } else {
                     // Jika ada masalah logout di server, tetap redirect agar user tidak terjebak
-                    window.location.href = 'index.html';
+                    window.location.href = '../public/index.html';
                 }
 
             } catch (error) {
                 // Jika terjadi error jaringan/server, tetap redirect
                 console.error('Logout Error:', error);
-                window.location.href = 'index.html';
+                window.location.href = '../public/index.html';
             }
         });
 

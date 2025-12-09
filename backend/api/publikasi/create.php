@@ -1,29 +1,42 @@
 <?php
-require_once __DIR__ . "/../models/Publikasi.php";
-require_once __DIR__ . "/../config/auth.php";
+// 1. Cek Session
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+header('Content-Type: application/json');
+
+require_once __DIR__ . "/../../config/koneksi.php";
+require_once __DIR__ . "/../../models/Publikasi.php";
+require_once __DIR__ . "/../../config/auth.php";
+
 require_role(['admin', 'dosen']);
 
-$model = new Publikasi();
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    exit(json_encode(['status' => 'error', 'message' => 'Method Not Allowed']));
+}
 
 $data = [
-    'slug'           => $_POST['slug'],
-    'judul'          => $_POST['judul'],
-    'abstrak'        => $_POST['abstrak'] ?? null,
-    'isi'            => $_POST['isi'] ?? null,
-    'kategori_id'    => $_POST['kategori_id'] ?? null,
-    'featured_image' => $_POST['featured_image'] ?? null,
-    'file_path'      => $_POST['file_path'] ?? null,
-    'external_link'  => $_POST['external_link'] ?? null,
-    'author_nidn'    => $_POST['author_nidn'],
-    'created_by'     => $_POST['created_by']
+    'judul'         => $_POST['judul'] ?? null,
+    'external_link' => $_POST['external_link'] ?? null,
+    'kategori_id'   => $_POST['kategori_id'] ?? null,
+    'dosen_nidn'    => $_POST['dosen_nidn'] ?? null
 ];
 
-// authors array optional
-$authors = isset($_POST['authors']) ? json_decode($_POST['authors'], true) : [];
+if (!$data['judul'] || !$data['kategori_id'] || !$data['dosen_nidn']) {
+    http_response_code(400);
+    exit(json_encode(['status' => 'error', 'message' => 'Data tidak lengkap (Judul, Kategori, NIDN wajib)']));
+}
 
-$pid = $model->create($data, $authors);
+$model = new Publikasi();
+$id = $model->create($data);
 
-echo json_encode([
-    'success' => true,
-    'publikasi_id' => $pid
-]);
+if ($id) {
+    http_response_code(201);
+    echo json_encode(['status' => 'success', 'message' => 'Berhasil disimpan', 'data' => ['id' => $id]]);
+} else {
+    http_response_code(500);
+    echo json_encode(['status' => 'error', 'message' => 'Gagal menyimpan data']);
+}
+?>

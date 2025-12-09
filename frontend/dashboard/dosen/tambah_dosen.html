@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tambah Dosen | Admin</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../assets/css/cssadmin.css">
+    <style>
+        .input-group-file,
+        .input-group-url {
+            margin-bottom: 10px;
+            padding: 5px 0;
+            border-left: 3px solid #007bff;
+            padding-left: 10px;
+        }
+
+        .input-group-url {
+            border-left: 3px solid #ffc107;
+        }
+
+        .input-group-file input[type="file"],
+        .input-group-url input[type="text"] {
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <div class="logo-area">
+            <h3>Lab Admin</h3>
+        </div>
+        <nav>
+            <a href="../admin.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="../peminjaman.html"><i class="fas fa-calendar-alt"></i> Peminjaman</a>
+            <a href="../konten.html"><i class="fas fa-newspaper"></i> Berita & Konten</a>
+            <a href="dosen.html" class="active"><i class="fas fa-users"></i> Data Dosen</a>
+            <a href="../mahasiswa/mahasiswa.html"><i class="fas fa-user-graduate"></i> Data Mahasiswa</a>
+            <a href="#" id="logoutTrigger"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </nav>
+    </div>
+
+    <div class="main-content-dosen">
+        <header>
+            <div class="page-title-group">
+                <a href="dosen.html" class="back-icon-link" title="Kembali ke Daftar Dosen">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+                <h1>Tambah Data Dosen</h1>
+            </div>
+        </header>
+        <div class="data-section">
+            <div id="message" class="message" style="margin-bottom: 20px; display: none;"></div>
+
+            <div class="data-form-container">
+                <h2>Form Data Dosen Baru</h2>
+
+                <form id="addDosenForm" class="data-form form-grid">
+
+                    <div class="form-column">
+                        <div class="form-group">
+                            <label for="input-nidn">NIDN:</label>
+                            <input type="text" id="input-nidn" name="nidn" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="input-nip">NIP:</label>
+                            <input type="text" id="input-nip" name="nip">
+                        </div>
+                        <div class="form-group">
+                            <label for="input-nama">Nama Lengkap:</label>
+                            <input type="text" id="input-nama" name="nama" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="input-email">Email:</label>
+                            <input type="email" id="input-email" name="email" required>
+                        </div>
+                    </div>
+
+                    <div class="form-column">
+                        <div class="form-group">
+                            <label for="input-jabatan">Jabatan:</label>
+                            <input type="text" id="input-jabatan" name="jabatan" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="input-prodi">Prodi:</label>
+                            <input type="text" id="input-prodi" name="prodi" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="input-pendidikan">Pendidikan Terakhir:</label>
+                            <input type="text" id="input-pendidikan" name="pendidikan">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Foto Profil (Pilih salah satu):</label>
+
+                            <div class="input-group-file">
+                                <label for="input-file-foto">Pilih **File dari Desktop**:</label>
+                                <input type="file" id="input-file-foto" name="foto_file" accept="image/*">
+                            </div>
+
+                            <div class="input-group-url">
+                                <label for="input-link-foto">Atau, Masukkan **Link URL Foto**:</label>
+                                <input type="text" id="input-link-foto" name="foto_path_url"
+                                    placeholder="https://website.com/foto.jpg">
+                            </div>
+                            <small>File unggahan (Desktop) akan diutamakan jika keduanya diisi.</small>
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="input-matkul">Mata Kuliah Diampu:</label>
+                            <textarea id="input-matkul" name="mata_kuliah" rows="3"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-actions full-width">
+                        <button type="submit" class="submit-button"><i class="fas fa-save"></i> Simpan Dosen</button>
+                        <a href="dosen.html" class="cancel-button"><i class="fas fa-times"></i> Batal</a>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+    <div id="logoutModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <h3>Konfirmasi Logout</h3>
+            <p>Apakah Anda yakin ingin keluar dari sesi Admin?</p>
+            <div class="modal-actions">
+                <button id="cancelLogout" class="cancel-button">Batal</button>
+                <button id="confirmLogout" class="submit-button">Logout</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- LOGIKA LOGOUT ---
+        const logoutTrigger = document.getElementById('logoutTrigger');
+        const logoutModal = document.getElementById('logoutModal');
+        const cancelLogoutBtn = document.getElementById('cancelLogout');
+        const confirmLogoutBtn = document.getElementById('confirmLogout');
+
+        logoutTrigger.addEventListener('click', (e) => {
+            e.preventDefault();
+            logoutModal.style.display = 'flex';
+        });
+
+        cancelLogoutBtn.addEventListener('click', () => {
+            logoutModal.style.display = 'none';
+        });
+
+        confirmLogoutBtn.addEventListener('click', async () => {
+            const url = '../../../backend/api/auth/logout.php';
+            try {
+                await fetch(url, { method: 'POST' });
+                window.location.href = '../../public/index.html';
+            } catch (error) {
+                console.error('Logout Error:', error);
+                window.location.href = '../../public/index.html';
+            }
+        });
+
+        window.addEventListener('click', (e) => {
+            if (e.target === logoutModal) {
+                logoutModal.style.display = 'none';
+            }
+        });
+
+        // --- FUNGSI TAMBAH DOSEN (CREATE) ---
+        const form = document.getElementById('addDosenForm');
+        const messageDiv = document.getElementById('message');
+        const inputFileFoto = document.getElementById('input-file-foto');
+        const inputLinkFoto = document.getElementById('input-link-foto');
+
+        function displayMessage(type, text) {
+            messageDiv.textContent = text;
+            messageDiv.className = `alert alert-${type}`;
+            messageDiv.style.display = 'block';
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+                messageDiv.className = 'message';
+            }, 5000);
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const url = '../../../backend/api/dosen/create.php';
+            let formData = new FormData(form);
+
+            // =========================================================
+            // LOGIKA FOTO: Memastikan hanya satu field foto yang valid yang dikirim
+            // =========================================================
+            const file = inputFileFoto.files[0];
+            const urlLink = inputLinkFoto.value.trim();
+
+            // Hapus kedua field placeholder yang tidak digunakan di backend
+            formData.delete('foto_file');
+            formData.delete('foto_path_url');
+
+            if (file) {
+                // PRIORITAS 1: File diunggah (kirim sebagai 'foto_file')
+                formData.append('foto_file', file);
+            } else if (urlLink !== "") {
+                // PRIORITAS 2: Link URL dimasukkan (kirim sebagai 'foto_path')
+                formData.append('foto_path', urlLink);
+            }
+            // Jika tidak ada foto (baik file maupun URL), maka field foto tidak terkirim.
+
+            // =========================================================
+            // END LOGIKA FOTO
+            // =========================================================
+
+            // Tombol Loading
+            const submitButton = form.querySelector('.submit-button');
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    displayMessage('success', result.message || 'Dosen berhasil ditambahkan!');
+                    form.reset();
+
+                    setTimeout(() => {
+                        window.location.href = 'dosen.html'; // Redirect
+                    }, 1500);
+
+                } else {
+                    displayMessage('error', result.message || 'Gagal menambahkan Dosen.');
+                }
+
+            } catch (error) {
+                console.error('Error adding Dosen:', error);
+                displayMessage('error', 'Terjadi kesalahan jaringan/server saat menambahkan Dosen.');
+            } finally {
+                submitButton.disabled = false;
+                submitButton.innerHTML = '<i class="fas fa-save"></i> Simpan Dosen';
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,83 +1,108 @@
 <?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 header("Content-Type: application/json");
-require_once __DIR__ . "/../models/Dosen.php";
-require_once __DIR__ . "/../config/auth.php";
-require_role(['admin', 'dosen']); 
+ini_set('display_errors', 0);
+error_reporting(E_ALL);
 
-$dosenModel = new Dosen();
+try {
+    // FIX PATH: Gunakan ../../
+    require_once __DIR__ . "/../../models/Dosen.php";
+    require_once __DIR__ . "/../../config/auth.php";
 
-// Validasi harus ada NIDN
-if (!isset($_POST['nidn'])) {
-    echo json_encode([
-        'success' => false,
-        'message' => 'NIDN tidak ditemukan'
-    ]);
-    exit;
-}
+    if (function_exists('require_role')) {
+        require_role(['admin', 'dosen']);
+    }
 
-$nidn = $_POST['nidn']; // PK Dosen
+    $dosenModel = new Dosen();
 
-// Ambil dosen untuk validasi/default values
-$currentDosen = $dosenModel->find($nidn);
+    // Validasi NIDN
+    if (!isset($_POST['nidn'])) {
+        throw new Exception('NIDN tidak ditemukan.');
+    }
 
-if (!$currentDosen) {
-    echo json_encode([
-        'success' => false,
-        'message' => 'Dosen tidak ditemukan'
-    ]);
-    exit;
-}
+    $nidn = $_POST['nidn'];
 
-// Ambil data baru dari POST.
-$new_nama = trim($_POST['nama'] ?? $currentDosen['nama']);
-$new_jabatan = trim($_POST['jabatan'] ?? $currentDosen['jabatan']);
-$new_email = trim($_POST['email'] ?? $currentDosen['email']);
-$new_foto_path = trim($_POST['foto_path'] ?? $currentDosen['foto_path']);
-$new_researchgate_url = trim($_POST['researchgate_url'] ?? $currentDosen['researchgate_url']);
-$new_scholar_url = trim($_POST['scholar_url'] ?? $currentDosen['scholar_url']);
-$new_sinta_url = trim($_POST['sinta_url'] ?? $currentDosen['sinta_url']);
-$new_nip = trim($_POST['nip'] ?? $currentDosen['nip']);
-$new_prodi = trim($_POST['prodi'] ?? $currentDosen['prodi']);
-$new_pendidikan = trim($_POST['pendidikan'] ?? $currentDosen['pendidikan']);
-$new_sertifikasi = trim($_POST['sertifikasi'] ?? $currentDosen['sertifikasi']);
-$new_mata_kuliah = trim($_POST['mata_kuliah'] ?? $currentDosen['mata_kuliah']);
+    // 1. AMBIL DATA LAMA DULU (Penting untuk fallback foto)
+    $currentDosen = $dosenModel->find($nidn);
+    if (!$currentDosen) {
+        throw new Exception('Data Dosen tidak ditemukan di database.');
+    }
 
-// Data update
-$data = [
-    'nama' => $new_nama,
-    'jabatan' => $new_jabatan,
-    'email' => $new_email,
-    'foto_path' => $new_foto_path,
-    'researchgate_url' => $new_researchgate_url,
-    'scholar_url' => $new_scholar_url,
-    'sinta_url' => $new_sinta_url,
-    'nip' => $new_nip,
-    'prodi' => $new_prodi,
-    'pendidikan' => $new_pendidikan,
-    'sertifikasi' => $new_sertifikasi,
-    'mata_kuliah' => $new_mata_kuliah,
-];
+    // =========================================================================
+    // LOGIKA UPDATE FOTO (File vs Link vs Lama)
+    // =========================================================================
+    
+    // Default: Pakai foto lama (biar gak hilang kalau user gak ganti foto)
+    $final_foto_path = $currentDosen['foto_path'];
 
-// Validasi penting
-if ($new_jabatan === "" || $new_prodi === "" || $new_email === "" || $new_mata_kuliah === "") {
-    echo json_encode([
-        'success' => false,
-        'message' => 'Jabatan, Prodi, Email, dan Mata Kuliah tidak boleh kosong.'
-    ]);
-    exit;
-}
+    // Cek 1: Apakah User Mengupload File Baru?
+    if (isset($_FILES['foto_file']) && $_FILES['foto_file']['error'] === UPLOAD_ERR_OK) {
+        $fileTmpPath = $_FILES['foto_file']['tmp_name'];
+        $fileName = $_FILES['foto_file']['name'];
+        $fileNameCmps = explode(".", $fileName);
+        $fileExtension = strtolower(end($fileNameCmps));
 
-$success = $dosenModel->update($nidn, $data);
+        $allowedfileExtensions = array('jpg', 'gif', 'png', 'jpeg', 'webp');
+        if (in_array($fileExtension, $allowedfileExtensions)) {
+            // Nama file baru (unik pakai timestamp)
+            $newFileName = $nidn . '_' . time() . '.' . $fileExtension;
+            
+            // Folder tujuan (Relative dari file ini)
+            $uploadFileDir = __DIR__ . '/../../../frontend/assets/uploads/dosen/';
+            
+            if (!is_dir($uploadFileDir)) {
+                mkdir($uploadFileDir, 0777, true);
+            }
 
-if ($success) {
-    echo json_encode([
-        'status' => 'success',
-        'message' => 'Dosen berhasil diperbarui'
-    ]);
-} else {
-    echo json_encode([
-        'status' => 'error',
-        'message' => 'Gagal memperbarui dosen'
-    ]);
+            $dest_path = $uploadFileDir . $newFileName;
+
+            if(move_uploaded_file($fileTmpPath, $dest_path)) {
+                // Simpan path relatif untuk database
+                $final_foto_path = 'assets/uploads/dosen/' . $newFileName;
+            } else {
+                throw new Exception("Gagal mengupload file foto.");
+            }
+        }
+    } 
+    // Cek 2: Jika tidak upload file, apakah user memasukkan Link URL Baru?
+    elseif (!empty($_POST['foto_path'])) {
+        $final_foto_path = trim($_POST['foto_path']);
+    }
+    // Jika dua-duanya kosong, $final_foto_path tetap pakai data lama.
+
+    // =========================================================================
+    // END LOGIKA FOTO
+    // =========================================================================
+
+    // Siapkan Data Update
+    $data = [
+        'nama'          => trim($_POST['nama'] ?? $currentDosen['nama']),
+        'jabatan'       => trim($_POST['jabatan'] ?? $currentDosen['jabatan']),
+        'email'         => trim($_POST['email'] ?? $currentDosen['email']),
+        'foto_path'     => $final_foto_path, // <--- Pakai variabel hasil logika di atas
+        'researchgate_url' => trim($_POST['researchgate_url'] ?? $currentDosen['researchgate_url']),
+        'scholar_url'   => trim($_POST['scholar_url'] ?? $currentDosen['scholar_url']),
+        'sinta_url'     => trim($_POST['sinta_url'] ?? $currentDosen['sinta_url']),
+        'nip'           => trim($_POST['nip'] ?? $currentDosen['nip']),
+        'prodi'         => trim($_POST['prodi'] ?? $currentDosen['prodi']),
+        'pendidikan'    => trim($_POST['pendidikan'] ?? $currentDosen['pendidikan']),
+        'sertifikasi'   => trim($_POST['sertifikasi'] ?? $currentDosen['sertifikasi']),
+        'mata_kuliah'   => trim($_POST['mata_kuliah'] ?? $currentDosen['mata_kuliah']),
+    ];
+
+    $success = $dosenModel->update($nidn, $data);
+
+    if ($success) {
+        echo json_encode(['success' => true, 'message' => 'Dosen berhasil diperbarui']);
+    } else {
+        throw new Exception('Gagal memperbarui data dosen.');
+    }
+
+} catch (Exception $e) {
+    http_response_code(500);
+    echo json_encode(['success' => false, 'message' => $e->getMessage()]);
 }
 ?>

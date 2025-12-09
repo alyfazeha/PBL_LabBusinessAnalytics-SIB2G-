@@ -1,14 +1,27 @@
 <?php
-require_once __DIR__ . "/../models/Publikasi.php";
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
-$id = $_GET['publikasi_id'] ?? null;
+header('Content-Type: application/json');
+
+require_once __DIR__ . "/../../config/koneksi.php";
+require_once __DIR__ . "/../../models/Publikasi.php";
+
+$id = $_GET['id'] ?? null;
 
 if (!$id) {
-    echo json_encode(['error' => 'publikasi_id required']);
-    exit;
+    http_response_code(400);
+    exit(json_encode(['status' => 'error', 'message' => 'ID required']));
 }
 
 $model = new Publikasi();
-$data = $model->find($id);
+$data = $model->getById($id);
 
-echo json_encode($data);
+if ($data) {
+    echo json_encode(['status' => 'success', 'data' => $data]);
+} else {
+    http_response_code(404);
+    echo json_encode(['status' => 'error', 'message' => 'Data tidak ditemukan']);
+}
+?>
