@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Publikasi | Admin</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../assets/css/cssadmin.css">
+    <link rel="stylesheet" href="../../assets/css/cssmahasiswa.css">
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <div class="logo-area">
+            <h3>Lab Admin</h3>
+        </div>
+        <nav>
+            <a href="../admin.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="../peminjaman/peminjaman.html"><i class="fas fa-calendar-alt"></i> Peminjaman</a>
+            <a href="../konten/konten.html"><i class="fas fa-newspaper"></i> Berita & Konten</a>
+            <a href="publikasi.html" class="active"><i class="fas fa-newspaper"></i> Publikasi</a>
+            <a href="../dosen/dosen.html"><i class="fas fa-users"></i> Data Dosen</a>
+            <a href="../mahasiswa/mahasiswa.html"><i class="fas fa-user-graduate"></i> Data Mahasiswa</a>
+            <a href="#" id="logoutTrigger"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <header>
+            <a href="publikasi.html" class="back-link"><i class="fas fa-arrow-left"></i> Kembali ke Daftar Publikasi</a>
+            <h2>Edit Publikasi</h2>
+        </header>
+
+        <section class="content-area">
+            <div id="messageContainer" class="message-container"></div>
+            <form id="publikasiForm" class="data-form">
+                <input type="hidden" id="publikasi_id" name="id">
+
+                <div class="form-group">
+                    <label for="judul">Judul Publikasi *</label>
+                    <input type="text" id="judul" name="judul" required>
+                </div>
+                <div class="form-group">
+                    <label for="external_link">Link Eksternal (URL)</label>
+                    <input type="url" id="external_link" name="external_link">
+                </div>
+                <div class="form-group">
+                    <label for="kategori_id">Kategori *</label>
+                    <select id="kategori_id" name="kategori_id" required>
+                        <option value="">Pilih Kategori</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="dosen_nidn">Dosen Penanggung Jawab (NIDN) *</label>
+                    <select id="dosen_nidn" name="dosen_nidn" required>
+                        <option value="">Pilih Dosen</option>
+                    </select>
+                </div>
+
+                <button type="submit" id="submitBtn" class="button primary-button"><i class="fas fa-save"></i> Simpan
+                    Perubahan</button>
+            </form>
+        </section>
+
+        <div id="logoutModal" class="modal">
+            <div class="modal-content">
+                <h4>Konfirmasi Logout</h4>
+                <p>Apakah Anda yakin ingin keluar dari sistem?</p>
+                <div class="modal-actions">
+                    <button id="cancelLogoutBtn" class="button secondary-button">Batal</button>
+                    <button id="confirmLogoutBtn" class="button primary-button">Logout</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = '../../../backend/api/publikasi/';
+
+        function displayMessage(type, message) {
+            const container = document.getElementById('messageContainer');
+            container.innerHTML = `<div class="alert ${type === 'success' ? 'alert-success' : 'alert-error'}">${message}</div>`;
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 5000);
+        }
+
+        function getPublikasiIdFromUrl() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('id');
+        }
+
+        // FIX: Kombinasikan fetch Kategori dan Dosen untuk memuat form
+        async function fetchKategoriAndDosen(publikasiData = null) {
+            const kategoriSelect = document.getElementById('kategori_id');
+            const dosenSelect = document.getElementById('dosen_nidn');
+            kategoriSelect.innerHTML = '<option value="">Pilih Kategori</option>';
+            dosenSelect.innerHTML = '<option value="">Pilih Dosen</option>';
+
+            // 1. Fetch Kategori
+            try {
+                const katResponse = await fetch(API_BASE_URL + 'kategori_list.php');
+                const katResult = await katResponse.json();
+                if (katResult.status === 'success' && katResult.data) {
+                    katResult.data.forEach(kategori => {
+                        const option = document.createElement('option');
+                        option.value = kategori.id;
+                        option.textContent = kategori.nama;
+                        kategoriSelect.appendChild(option);
+                    });
+                    if (publikasiData && publikasiData.kategori_id) {
+                        kategoriSelect.value = publikasiData.kategori_id;
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching kategori:', error);
+                displayMessage('error', 'Gagal memuat daftar Kategori.');
+            }
+
+            // 2. Fetch Dosen
+            try {
+                // Asumsi: API Dosen berada di ../../../backend/api/dosen/list.php
+                const dosResponse = await fetch('../../../backend/api/dosen/list.php');
+                const dosResult = await dosResponse.json();
+                const dataDosen = Array.isArray(dosResult) ? dosResult : (dosResult.data || []);
+
+                if (dataDosen.length > 0) {
+                    dataDosen.forEach(dosen => {
+                        const option = document.createElement('option');
+                        option.value = dosen.nidn;
+                        option.textContent = `${dosen.nama} (${dosen.nidn})`;
+                        dosenSelect.appendChild(option);
+                    });
+                    if (publikasiData && publikasiData.dosen_nidn) {
+                        dosenSelect.value = publikasiData.dosen_nidn;
+                    }
+                } else {
+                    console.warn('Daftar Dosen kosong.');
+                }
+            } catch (error) {
+                console.error('Error fetching dosen:', error);
+                displayMessage('error', 'Gagal memuat daftar Dosen.');
+            }
+        }
+
+        async function fetchDetail() {
+            const publikasiId = getPublikasiIdFromUrl();
+            if (!publikasiId) {
+                displayMessage('error', 'ID publikasi tidak ditemukan di URL. Tidak bisa melakukan edit.');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}detail.php?id=${publikasiId}`);
+                const result = await response.json();
+
+                if (result.status === 'success' && result.data) {
+                    const data = result.data;
+                    document.getElementById('publikasi_id').value = data.id; // Hidden ID
+                    document.getElementById('judul').value = data.judul;
+                    document.getElementById('external_link').value = data.external_link;
+
+                    // Panggil fungsi untuk memuat kategori/dosen dan pre-select
+                    await fetchKategoriAndDosen(data);
+
+                } else {
+                    displayMessage('error', result.message || 'Data publikasi tidak ditemukan.');
+                }
+            } catch (error) {
+                displayMessage('error', 'Gagal mengambil data publikasi.');
+                console.error('Fetch detail error:', error);
+            }
+        }
+
+        const kontenForm = document.getElementById('publikasiForm');
+        const submitBtn = document.getElementById('submitBtn');
+
+        kontenForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+
+            const formData = new FormData(kontenForm);
+
+            // Tambahkan ID yang sudah ada di hidden input
+            formData.append('publikasi_id', document.getElementById('publikasi_id').value);
+
+            try {
+                const response = await fetch(API_BASE_URL + 'update.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+
+                if (response.ok && result.status === 'success') {
+                    displayMessage('success', result.message);
+                    // Refresh data/preview setelah update
+                    fetchDetail();
+                } else {
+                    displayMessage('error', result.message || 'Gagal menyimpan perubahan.');
+                }
+            } catch (error) {
+                displayMessage('error', 'Terjadi kesalahan server.');
+                console.error('Submit error:', error);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-save"></i> Simpan Perubahan';
+            }
+        });
+
+        // Jalankan saat load
+        document.addEventListener('DOMContentLoaded', fetchDetail);
+
+        // --- LOGOUT (DIPERTAHANKAN) ---\
+        const logoutModal = document.getElementById('logoutModal');
+        const logoutTrigger = document.getElementById('logoutTrigger');
+        const cancelLogoutBtn = document.getElementById('cancelLogoutBtn');
+        const confirmLogoutBtn = document.getElementById('confirmLogoutBtn');
+
+        if (logoutTrigger) logoutTrigger.onclick = (e) => { e.preventDefault(); logoutModal.classList.add('show'); };
+        if (cancelLogoutBtn) cancelLogoutBtn.onclick = () => logoutModal.classList.remove('show');
+        if (confirmLogoutBtn) confirmLogoutBtn.onclick = async () => {
+            await fetch('../../../backend/api/auth/logout.php', { method: 'POST' });
+            window.location.href = '../../public/index.html';
+        };
+    </script>
+</body>
+
+</html>
