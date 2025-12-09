@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Publikasi | Admin</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../assets/css/cssadmin.css">
+    <link rel="stylesheet" href="../../assets/css/cssmahasiswa.css">
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <div class="logo-area">
+            <h3>Lab Admin</h3>
+        </div>
+        <nav>
+            <a href="../admin.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="../peminjaman/peminjaman.html"><i class="fas fa-calendar-alt"></i> Peminjaman</a>
+            <a href="../konten/konten.html"><i class="fas fa-newspaper"></i> Berita & Konten</a>
+            <a href="publikasi.html" class="active"><i class="fas fa-newspaper"></i> Publikasi</a>
+            <a href="../dosen/dosen.html"><i class="fas fa-users"></i> Data Dosen</a>
+            <a href="../mahasiswa/mahasiswa.html"><i class="fas fa-user-graduate"></i> Data Mahasiswa</a>
+            <a href="#" id="logoutTrigger"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <header>
+            <h2>Data Publikasi</h2>
+            <div class="action-buttons">
+                <a href="tambah_publikasi.html" class="button primary-button"><i class="fas fa-plus"></i> Tambah
+                    Publikasi</a>
+            </div>
+        </header>
+
+        <section class="content-area">
+            <div id="messageContainer" class="message-container"></div>
+
+            <div class="data-table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Judul Publikasi</th>
+                            <th>Kategori</th>
+                            <th>Dosen (NIDN)</th>
+                            <th>Link Eksternal</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="publikasiTableBody">
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="noDataMessage" style="text-align: center; margin-top: 20px; display: none;">
+                Tidak ada data publikasi yang ditemukan.
+            </div>
+
+        </section>
+
+        <div id="logoutModal" class="modal">
+            <div class="modal-content">
+                <h4>Konfirmasi Logout</h4>
+                <p>Apakah Anda yakin ingin keluar dari sistem?</p>
+                <div class="modal-actions">
+                    <button id="cancelLogoutBtn" class="button secondary-button">Batal</button>
+                    <button id="confirmLogoutBtn" class="button primary-button">Logout</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = '../../../backend/api/publikasi/';
+
+        function displayMessage(type, message) {
+            const container = document.getElementById('messageContainer');
+            container.innerHTML = `<div class="alert ${type === 'success' ? 'alert-success' : 'alert-error'}">${message}</div>`;
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 5000);
+        }
+
+        async function fetchPublikasi() {
+            const tbody = document.getElementById('publikasiTableBody');
+            const noDataMsg = document.getElementById('noDataMessage');
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">Memuat data...</td></tr>';
+            noDataMsg.style.display = 'none';
+
+            try {
+                const response = await fetch(API_BASE_URL + 'list.php');
+                const result = await response.json();
+
+                if (result.status === 'success' && result.data && result.data.length > 0) {
+                    renderPublikasi(result.data);
+                } else {
+                    tbody.innerHTML = '';
+                    noDataMsg.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Fetch error:', error);
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: red;">Gagal memuat data. Periksa koneksi API.</td></tr>';
+            }
+        }
+
+        function renderPublikasi(data) {
+            const tbody = document.getElementById('publikasiTableBody');
+            tbody.innerHTML = '';
+
+            data.forEach(item => {
+                const row = tbody.insertRow();
+                row.insertCell().textContent = item.id;
+                row.insertCell().textContent = item.judul;
+                row.insertCell().textContent = item.kategori_nama;
+                row.insertCell().textContent = `${item.dosen_nama} (${item.dosen_nidn})`;
+
+                // Link Eksternal
+                const linkCell = row.insertCell();
+                if (item.external_link) {
+                    const link = document.createElement('a');
+                    link.href = item.external_link;
+                    link.target = '_blank';
+                    link.textContent = 'Lihat Link';
+                    linkCell.appendChild(link);
+                } else {
+                    linkCell.textContent = '-';
+                }
+
+                // Aksi
+                const actionCell = row.insertCell();
+                actionCell.innerHTML = `
+                    <a href="edit_publikasi.html?id=${item.id}" class="button action-button edit-button"><i class="fas fa-edit"></i> Edit</a>
+                    <button data-id="${item.id}" class="button action-button delete-button"><i class="fas fa-trash"></i> Hapus</button>
+                `;
+            });
+
+            // Event listener untuk tombol hapus
+            document.querySelectorAll('.delete-button').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const id = e.target.closest('button').dataset.id;
+                    if (confirm('Apakah Anda yakin ingin menghapus publikasi ini?')) {
+                        deletePublikasi(id);
+                    }
+                });
+            });
+        }
+
+        async function deletePublikasi(id) {
+            try {
+                const formData = new FormData();
+                formData.append('publikasi_id', id);
+
+                const response = await fetch(API_BASE_URL + 'delete.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+
+                if (response.ok && result.status === 'success') {
+                    displayMessage('success', result.message);
+                    fetchPublikasi(); // Muat ulang data
+                } else {
+                    displayMessage('error', result.message || 'Gagal menghapus publikasi.');
+                }
+
+            } catch (error) {
+                console.error('Delete error:', error);
+                displayMessage('error', 'Terjadi kesalahan jaringan.');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', fetchPublikasi);
+
+
+        // --- LOGIKA LOGOUT ---
+        const logoutModal = document.getElementById('logoutModal');
+        const logoutTrigger = document.getElementById('logoutTrigger');
+        const cancelLogoutBtn = document.getElementById('cancelLogoutBtn');
+        const confirmLogoutBtn = document.getElementById('confirmLogoutBtn');
+
+        if (logoutTrigger) {
+            logoutTrigger.addEventListener('click', (e) => {
+                e.preventDefault();
+                logoutModal.classList.add('show');
+            });
+        }
+
+        if (cancelLogoutBtn) {
+            cancelLogoutBtn.addEventListener('click', () => {
+                logoutModal.classList.remove('show');
+            });
+        }
+
+        if (confirmLogoutBtn) {
+            confirmLogoutBtn.addEventListener('click', async () => {
+                const url = '../../../backend/api/auth/logout.php';
+                try {
+                    await fetch(url, { method: 'POST' });
+                    // Redirect ke login/landing page
+                    window.location.href = '../../public/index.html';
+                } catch (error) {
+                    console.error('Logout Error:', error);
+                    window.location.href = '../../public/index.html';
+                }
+            });
+        }
+
+        window.addEventListener('click', (e) => {
+            if (e.target === logoutModal) {
+                logoutModal.classList.remove('show');
+            }
+        });
+    </script>
+</body>
+
+</html>

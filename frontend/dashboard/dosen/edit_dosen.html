@@ -18,8 +18,9 @@
         </div>
         <nav>
             <a href="../admin.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-            <a href="../peminjaman.html"><i class="fas fa-calendar-alt"></i> Peminjaman</a>
-            <a href="../konten.html"><i class="fas fa-newspaper"></i> Berita & Konten</a>
+            <a href="../peminjaman/peminjaman.html"><i class="fas fa-calendar-alt"></i> Peminjaman</a>
+            <a href="../konten/konten.html"><i class="fas fa-newspaper"></i> Berita & Konten</a>
+            <a href="../publikasi/publikasi.html"><i class="fas fa-newspaper"></i> Publikasi</a>
             <a href="dosen.html" class="active"><i class="fas fa-users"></i> Data Dosen</a>
             <a href="../mahasiswa/mahasiswa.html"><i class="fas fa-user-graduate"></i> Data Mahasiswa</a>
             <a href="#" id="logoutTrigger"><i class="fas fa-sign-out-alt"></i> Logout</a>
@@ -94,7 +95,7 @@
                             </div>
 
                             <label for="input-foto">Ganti Foto Profil:</label>
-                            <input type="file" id="input-foto" name="foto_profil" accept="image/jpeg,image/png">
+                            <input type="file" id="input-foto" name="foto_file" accept="image/jpeg,image/png">
                             <small>Kosongkan jika tidak ingin mengubah foto.</small>
                         </div>
 
@@ -128,11 +129,9 @@
 
 
     <script>
-        // Logika Logout (Sama dengan dosen.html)
+        // Logika Logout
         const logoutTrigger = document.getElementById('logoutTrigger');
         const logoutModal = document.getElementById('logoutModal');
-        // KARENA MODAL DIHAPUS DARI HTML, KITA HARUS MEMBUAT ELEMENT INI SECARA DINAMIS JIKA TIDAK ADA
-        // Atau asumsikan modal di atas sudah dimasukkan kembali (seperti yang saya lakukan di atas)
         const cancelLogoutBtn = document.getElementById('cancelLogout');
         const confirmLogoutBtn = document.getElementById('confirmLogout');
 
@@ -146,10 +145,11 @@
         });
 
         confirmLogoutBtn.addEventListener('click', async () => {
-            // PATH LOGOUT SUDAH BENAR
+            // Path API Logout sudah benar (Mundur 3 langkah ke backend)
             const url = '../../../backend/api/auth/logout.php';
             try {
                 await fetch(url, { method: 'POST' });
+                // Path Redirect sudah benar (Mundur 2 langkah ke public)
                 window.location.href = '../../public/index.html';
             } catch (error) {
                 console.error('Logout Error:', error);
@@ -168,7 +168,6 @@
         // =======================================================
         const form = document.getElementById('editDosenForm');
         const messageDiv = document.getElementById('message');
-        // KOREKSI: Gunakan ID yang sudah ditambahkan di HTML
         const dosenNidnDisplay = document.getElementById('dosen-nidn-display');
         const currentFoto = document.getElementById('current-foto');
         const noFotoText = document.getElementById('no-foto-text');
@@ -190,16 +189,16 @@
 
         // --- FUNGSI MUAT DATA LAMA (DETAIL) ---
         async function fetchDosenDetail(nidn) {
-            // PATH API DETAIL SUDAH BENAR
+            // Path API Detail sudah benar
             const url = `../../../backend/api/dosen/detail.php?nidn=${nidn}`;
-            console.log('Fetching Dosen Detail from URL:', url); // DEBUG LOG
+            console.log('Fetching Dosen Detail from URL:', url);
             try {
                 const response = await fetch(url);
                 const data = await response.json();
 
                 if (data && data.nidn) {
                     // Isi Form
-                    document.getElementById('input-nidn-key').value = data.nidn; // Hidden Key
+                    document.getElementById('input-nidn-key').value = data.nidn;
                     document.getElementById('input-nidn').value = data.nidn;
                     document.getElementById('input-user_id').value = data.user_id;
                     document.getElementById('input-nip').value = data.nip;
@@ -211,14 +210,20 @@
                     document.getElementById('input-matkul').value = data.mata_kuliah;
 
                     if (dosenNidnDisplay) {
-                        dosenNidnDisplay.textContent = `(${data.nidn})`; // Tampilkan NIDN di judul
+                        dosenNidnDisplay.textContent = `(${data.nidn})`;
                     }
 
-                    // LOGIKA PREVIEW FOTO
+                    // --- PERBAIKAN 2: LOGIKA PREVIEW FOTO PINTAR ---
                     const fotoPath = data.foto_path;
-                    if (fotoPath) {
-                        // KOREKSI PATH FOTO: Menggunakan ../../ untuk naik 2 level ke frontend/
-                        currentFoto.src = `../../${fotoPath}`;
+                    if (fotoPath && fotoPath !== "") {
+                        if (fotoPath.startsWith('http')) {
+                            // Jika Link Online (http...), pakai langsung
+                            currentFoto.src = fotoPath;
+                        } else {
+                            // Jika File Lokal (assets/...), mundur 2 langkah ke frontend/
+                            currentFoto.src = `../../${fotoPath}`;
+                        }
+
                         currentFoto.style.display = 'block';
                         noFotoText.style.display = 'none';
                     } else {
@@ -239,7 +244,7 @@
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            // PATH API UPDATE SUDAH BENAR
+            // Path API Update sudah benar
             const url = '../../../backend/api/dosen/update.php';
             const formData = new FormData(form);
 
@@ -247,11 +252,10 @@
             submitButton.disabled = true;
             submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
 
-
             try {
                 const response = await fetch(url, {
                     method: 'POST',
-                    body: formData // Kirim FormData (termasuk file)
+                    body: formData // Kirim FormData (termasuk file jika ada)
                 });
 
                 const result = await response.json();

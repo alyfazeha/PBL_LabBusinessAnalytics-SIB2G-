@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Berita & Konten | Admin</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../assets/css/cssadmin.css">
+    <link rel="stylesheet" href="../../assets/css/cssmahasiswa.css">
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <div class="logo-area">
+            <h3>Lab Admin</h3>
+        </div>
+        <nav>
+            <a href="../admin.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="../peminjaman/peminjaman.html"><i class="fas fa-calendar-alt"></i> Peminjaman</a>
+            <a href="konten.html" class="active"><i class="fas fa-newspaper"></i> Berita & Konten</a>
+            <a href="../publikasi/publikasi.html"><i class="fas fa-newspaper"></i> Publikasi</a>
+            <a href="../dosen/dosen.html"><i class="fas fa-users"></i> Data Dosen</a>
+            <a href="../mahasiswa/mahasiswa.html"><i class="fas fa-user-graduate"></i> Data Mahasiswa</a>
+            <a href="#" id="logoutTrigger"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <header>
+            <h1>Kelola Berita & Konten</h1>
+        </header>
+
+        <div class="data-section">
+            <div id="message" class="message-area" style="display: none;"></div>
+
+            <a href="tambah_konten.html" class="add-button"><i class="fas fa-plus"></i> Tambah Konten</a>
+
+            <div class="data-table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Foto</th>
+                            <th>Judul</th>
+                            <th>Kategori</th>
+                            <th>Penulis</th>
+                            <th>Tgl. Publikasi</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="kontenTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="logoutModal" class="modal">
+        <div class="modal-content">
+            <h2>Konfirmasi Logout</h2>
+            <p>Apakah Anda yakin ingin keluar dari Dashboard Admin?</p>
+            <button id="confirmLogoutBtn" class="btn btn-danger">Logout</button>
+            <button id="cancelLogoutBtn" class="btn btn-secondary">Batal</button>
+        </div>
+    </div>
+
+    <script>
+        function displayMessage(type, message) {
+            const messageArea = document.getElementById('message');
+            messageArea.textContent = message;
+            messageArea.className = 'message-area ' + type;
+            messageArea.style.display = 'block';
+            setTimeout(() => {
+                messageArea.style.display = 'none';
+            }, 5000);
+        }
+
+        const kontenTableBody = document.getElementById('kontenTableBody');
+
+        async function fetchKonten() {
+            // Pastikan path ini benar sesuai struktur folder
+            const url = '../../../backend/api/contents/list.php';
+            try {
+                const response = await fetch(url);
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    renderKontenTable(result.data);
+                } else {
+                    displayMessage('error', 'Gagal memuat data konten: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Fetch error:', error);
+                displayMessage('error', 'Terjadi kesalahan jaringan saat memuat data konten.');
+            }
+        }
+
+        function renderKontenTable(kontenList) {
+            kontenTableBody.innerHTML = '';
+
+            if (kontenList.length === 0) {
+                kontenTableBody.innerHTML = '<tr><td colspan="8" style="text-align:center;">Belum ada data konten.</td></tr>';
+                return;
+            }
+
+            kontenList.forEach(konten => {
+                const row = kontenTableBody.insertRow();
+
+                // Cek status published (bisa boolean true/false atau string 't'/'f' atau '1'/'0')
+                const isPub = konten.is_published === true || konten.is_published === 't' || konten.is_published === '1';
+                const statusClass = isPub ? 'status-published' : 'status-pending';
+
+                // Logika Gambar Kecil
+                let imgDisplay = '<span style="color:#ccc; font-size: 0.8em;">No Img</span>';
+                if (konten.featured_image && konten.featured_image.trim() !== '') {
+                    imgDisplay = `<img src="${konten.featured_image}" alt="Img" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; border: 1px solid #ddd;">`;
+                }
+
+                // Logika ID & Penulis
+                // Gunakan content_id (bukan id) karena database pakai content_id
+                const id = konten.content_id;
+                const penulis = konten.user_name || 'Admin'; // Fallback jika user_name kosong
+
+                row.innerHTML = `
+                    <td>${id}</td>
+                    <td>${imgDisplay}</td>
+                    <td>${konten.title}</td>
+                    <td>${konten.category_name || '-'}</td>
+                    <td>${penulis}</td>
+                    <td>${konten.created_at}</td>
+                    <td><span class="${statusClass}">${isPub ? 'Published' : 'Pending'}</span></td>
+                    <td>
+                        <a href="edit_konten.html?id=${id}" class="btn btn-warning btn-sm" title="Edit"><i class="fas fa-edit"></i></a>
+                        
+                        <button onclick="deleteKonten(${id}, '${konten.title}')" class="btn btn-danger btn-sm" title="Hapus"><i class="fas fa-trash-alt"></i></button>
+                        
+                        <button onclick="togglePublish(${id}, ${isPub})" 
+                                class="btn btn-sm ${isPub ? 'btn-secondary' : 'btn-success'}" 
+                                title="${isPub ? 'Unpublish' : 'Publish'}">
+                            <i class="fas ${isPub ? 'fa-eye-slash' : 'fa-eye'}"></i>
+                        </button>
+                    </td>
+                `;
+            });
+        }
+
+        async function deleteKonten(id, title) {
+            if (!confirm(`Apakah Anda yakin ingin menghapus konten:\n"${title}"?`)) {
+                return;
+            }
+
+            const url = '../../../backend/api/contents/delete.php';
+            const formData = new FormData();
+            formData.append('content_id', id);
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    displayMessage('success', result.message);
+                    fetchKonten(); // Muat ulang tabel
+                } else {
+                    displayMessage('error', result.message);
+                }
+            } catch (error) {
+                console.error('Delete error:', error);
+                displayMessage('error', 'Terjadi kesalahan jaringan saat menghapus konten.');
+            }
+        }
+
+        async function togglePublish(id, currentStatus) {
+            const newStatus = !currentStatus; // Balik status
+
+            const url = '../../../backend/api/contents/publish.php';
+            const formData = new FormData();
+            formData.append('content_id', id);
+            formData.append('status', newStatus ? '1' : '0');
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+
+                if (result.status === true || result.status === 'success') {
+                    displayMessage('success', result.message);
+                    fetchKonten();
+                } else {
+                    displayMessage('error', result.message);
+                }
+            } catch (error) {
+                console.error('Publish error:', error);
+                displayMessage('error', 'Terjadi kesalahan jaringan saat mengubah status.');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', fetchKonten);
+
+        // --- LOGIKA LOGOUT ---
+        const logoutModal = document.getElementById('logoutModal');
+        const logoutTrigger = document.getElementById('logoutTrigger');
+        const cancelLogoutBtn = document.getElementById('cancelLogoutBtn');
+        const confirmLogoutBtn = document.getElementById('confirmLogoutBtn');
+
+        if (logoutTrigger) {
+            logoutTrigger.addEventListener('click', (e) => {
+                e.preventDefault();
+                logoutModal.classList.add('show');
+            });
+        }
+
+        if (cancelLogoutBtn) {
+            cancelLogoutBtn.addEventListener('click', () => {
+                logoutModal.classList.remove('show');
+            });
+        }
+
+        if (confirmLogoutBtn) {
+            confirmLogoutBtn.addEventListener('click', async () => {
+                const url = '../../../backend/api/auth/logout.php';
+                try {
+                    await fetch(url, { method: 'POST' });
+                    // Redirect ke login/landing page
+                    window.location.href = '../../public/index.html';
+                } catch (error) {
+                    console.error('Logout Error:', error);
+                    window.location.href = '../../public/index.html';
+                }
+            });
+        }
+
+        window.addEventListener('click', (e) => {
+            if (e.target === logoutModal) {
+                logoutModal.classList.remove('show');
+            }
+        });
+    </script>
+</body>
+
+</html>

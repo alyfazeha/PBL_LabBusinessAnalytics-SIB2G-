@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Konten | Admin</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../assets/css/cssadmin.css">
+    <link rel="stylesheet" href="../../assets/css/cssmahasiswa.css">
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <div class="logo-area">
+            <h3>Lab Admin</h3>
+        </div>
+        <nav>
+            <a href="../admin.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="../peminjaman/peminjaman.html"><i class="fas fa-calendar-alt"></i> Peminjaman</a>
+            <a href="konten.html" class="active"><i class="fas fa-newspaper"></i> Berita & Konten</a>
+            <a href="../publikasi/publikasi.html"><i class="fas fa-newspaper"></i> Publikasi</a>
+            <a href="../dosen/dosen.html"><i class="fas fa-users"></i> Data Dosen</a>
+            <a href="../mahasiswa/mahasiswa.html"><i class="fas fa-user-graduate"></i> Data Mahasiswa</a>
+            <a href="#" id="logoutTrigger"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <header>
+            <a href="konten.html" class="back-link"><i class="fas fa-arrow-left"></i> Kembali</a>
+            <h1>Edit Konten</h1>
+        </header>
+
+        <div class="data-section">
+            <div id="message" class="message-area" style="display: none;"></div>
+
+            <form id="kontenForm" class="data-form" enctype="multipart/form-data">
+                <input type="hidden" id="content_id" name="content_id">
+
+                <div class="form-group">
+                    <label for="title">Judul Konten <span class="required">*</span></label>
+                    <input type="text" id="title" name="title" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="category_id">Kategori <span class="required">*</span></label>
+                    <select id="category_id" name="category_id" required>
+                        <option value="">-- Sedang memuat... --</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="currentImageContainer" style="display:none;">
+                    <label>Gambar Saat Ini:</label>
+                    <div>
+                        <img id="currentImagePreview" src="" alt="Preview"
+                            style="max-width: 200px; border-radius: 5px; border: 1px solid #ddd;">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="featured_image_url">Ganti dengan URL (Link)</label>
+                    <input type="url" id="featured_image_url" name="featured_image_url" placeholder="https://...">
+                </div>
+
+                <div class="form-group">
+                    <label for="featured_image_file">Ganti dengan Upload File</label>
+                    <input type="file" id="featured_image_file" name="featured_image_file" accept="image/*">
+                    <small>Biarkan kosong jika tidak ingin mengubah gambar.</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="excerpt">Ringkasan</label>
+                    <textarea id="excerpt" name="excerpt" rows="3"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="body">Isi Konten <span class="required">*</span></label>
+                    <textarea id="body" name="body" rows="10" required></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary" id="submitBtn"><i class="fas fa-save"></i> Simpan
+                        Perubahan</button>
+                    <a href="konten.html" class="btn btn-secondary">Batal</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="logoutModal" class="modal">
+        <div class="modal-content">
+            <h2>Konfirmasi Logout</h2>
+            <p>Apakah Anda yakin ingin keluar dari Dashboard Admin?</p>
+            <button id="confirmLogoutBtn" class="btn btn-danger">Logout</button>
+            <button id="cancelLogoutBtn" class="btn btn-secondary">Batal</button>
+        </div>
+    </div>
+
+    <script>
+        function displayMessage(type, message) {
+            const messageArea = document.getElementById('message');
+            messageArea.textContent = message;
+            messageArea.className = 'message-area ' + type;
+            messageArea.style.display = 'block';
+            setTimeout(() => { messageArea.style.display = 'none'; }, 5000);
+        }
+
+        // Ambil ID dari URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const contentId = urlParams.get('id');
+
+        // 1. Fetch Kategori Dulu
+        async function fetchKategori(selectedId = null) {
+            try {
+                const response = await fetch('../../../backend/api/contents/kategori_list.php');
+                const result = await response.json();
+                const select = document.getElementById('category_id');
+                select.innerHTML = '<option value="">-- Pilih Kategori --</option>';
+
+                if (result.status === 'success' && result.data) {
+                    result.data.forEach(cat => {
+                        const option = document.createElement('option');
+                        option.value = cat.category_id || cat.id;
+                        option.textContent = cat.category_name || cat.nama;
+                        if (option.value == selectedId) option.selected = true;
+                        select.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error('Kategori Error:', error);
+            }
+        }
+
+        // 2. Fetch Detail Konten
+        async function fetchDetail() {
+            if (!contentId) {
+                displayMessage('error', 'ID tidak ditemukan!');
+                return;
+            }
+
+            try {
+                const response = await fetch(`../../../backend/api/contents/detail.php?id=${contentId}`);
+                const result = await response.json();
+
+                if (result.status === 'success' && result.data) {
+                    const data = result.data;
+
+                    // Isi Form
+                    document.getElementById('content_id').value = data.content_id || data.id;
+                    document.getElementById('title').value = data.title;
+                    document.getElementById('excerpt').value = data.excerpt || '';
+                    document.getElementById('body').value = data.body;
+
+                    // Logic Gambar Preview
+                    if (data.featured_image) {
+                        document.getElementById('currentImageContainer').style.display = 'block';
+                        document.getElementById('currentImagePreview').src = data.featured_image;
+
+                        // Jika gambar lama adalah URL, isi kolom URL (Opsional)
+                        if (data.featured_image.startsWith('http')) {
+                            document.getElementById('featured_image_url').value = data.featured_image;
+                        }
+                    }
+
+                    // Load kategori dan set yang terpilih
+                    fetchKategori(data.category_id);
+
+                } else {
+                    displayMessage('error', 'Gagal memuat data konten.');
+                }
+            } catch (error) {
+                console.error('Detail Error:', error);
+                displayMessage('error', 'Terjadi kesalahan jaringan.');
+            }
+        }
+
+        // 3. Submit Form Update
+        const kontenForm = document.getElementById('kontenForm');
+        kontenForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = 'Menyimpan...';
+
+            const formData = new FormData(kontenForm);
+
+            try {
+                const response = await fetch('../../../backend/api/contents/update.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    displayMessage('success', result.message);
+                    // Refresh data/preview setelah update
+                    fetchDetail();
+                } else {
+                    displayMessage('error', result.message);
+                }
+            } catch (error) {
+                displayMessage('error', 'Terjadi kesalahan server.');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-save"></i> Simpan Perubahan';
+            }
+        });
+
+        // Jalankan saat load
+        document.addEventListener('DOMContentLoaded', fetchDetail);
+
+        // --- LOGOUT ---
+        const logoutModal = document.getElementById('logoutModal');
+        const logoutTrigger = document.getElementById('logoutTrigger');
+        const cancelLogoutBtn = document.getElementById('cancelLogoutBtn');
+        const confirmLogoutBtn = document.getElementById('confirmLogoutBtn');
+
+        if (logoutTrigger) logoutTrigger.onclick = (e) => { e.preventDefault(); logoutModal.classList.add('show'); };
+        if (cancelLogoutBtn) cancelLogoutBtn.onclick = () => logoutModal.classList.remove('show');
+        if (confirmLogoutBtn) confirmLogoutBtn.onclick = async () => {
+            await fetch('../../../backend/api/auth/logout.php', { method: 'POST' });
+            window.location.href = '../../public/index.html';
+        };
+    </script>
+</body>
+
+</html>

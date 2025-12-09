@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tambah Peminjaman | Admin</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../assets/css/cssadmin.css">
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <div class="logo-area">
+            <h3>Lab Admin</h3>
+        </div>
+        <nav>
+            <a href="../admin.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="peminjaman.html" class="active"><i class="fas fa-calendar-alt"></i> Peminjaman</a>
+            <a href="../konten/konten.html"><i class="fas fa-newspaper"></i> Berita & Konten</a>
+            <a href="../publikasi/publikasi.html"><i class="fas fa-newspaper"></i> Publikasi</a>
+            <a href="../dosen/dosen.html"><i class="fas fa-users"></i> Data Dosen</a>
+            <a href="../mahasiswa/mahasiswa.html"><i class="fas fa-user-graduate"></i> Data Mahasiswa</a>
+            <a href="#" id="logoutTrigger"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <header>
+            <div class="header-title">
+                <h2>Tambah Peminjaman</h2>
+                <a href="peminjaman.html" class="back-link"><i class="fas fa-arrow-left"></i> Kembali</a>
+            </div>
+        </header>
+
+        <main>
+            <div id="statusMessage" class="status-message" style="display:none; padding: 10px; margin-bottom: 20px;">
+            </div>
+
+            <div class="card">
+                <form id="formPeminjaman" class="data-form">
+
+                    <div class="form-group">
+                        <label for="sarana_id">Sarana / Ruangan *</label>
+                        <select id="sarana_id" name="sarana_id" required>
+                            <option value="">Memuat Sarana...</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tanggal">Tanggal *</label>
+                        <input type="date" id="tanggal" name="tanggal" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="nim">NIM (Kosongkan jika Dosen)</label>
+                            <input type="text" id="nim" name="nim" placeholder="Isi jika Mahasiswa">
+                        </div>
+                        <div class="form-group">
+                            <label for="nidn">NIDN (Kosongkan jika Mahasiswa)</label>
+                            <input type="text" id="nidn" name="nidn" placeholder="Isi jika Dosen">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sks">Mata Kuliah / SKS *</label>
+                        <input type="text" id="sks" name="sks" required placeholder="Contoh: Pemrograman Web (4 SKS)">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="start_time">Waktu Mulai *</label>
+                            <input type="time" id="start_time" name="start_time" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="end_time">Waktu Selesai *</label>
+                            <input type="time" id="end_time" name="end_time" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="keperluan">Keperluan / Keterangan *</label>
+                        <textarea id="keperluan" name="keperluan" rows="4" required
+                            placeholder="Jelaskan kebutuhan Anda"></textarea>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" id="submitBtn" class="btn btn-primary"><i class="fas fa-save"></i> Ajukan
+                            Peminjaman</button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <div id="logoutModal" class="modal"
+        style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4); justify-content: center; align-items: center;">
+        <div class="modal-content"
+            style="background-color: #fefefe; margin: auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 400px; border-radius: 10px;">
+            <span class="close-btn" onclick="logoutModal.style.display='none';">&times;</span>
+            <p>Anda yakin ingin keluar?</p>
+            <button id="confirmLogoutBtn" class="btn btn-danger">Ya, Logout</button>
+            <button id="cancelLogoutBtn" class="btn btn-secondary">Batal</button>
+        </div>
+    </div>
+
+    <script>
+        const BASE_API_URL = '../../../backend/api/peminjaman/';
+        // !!! PASTIKAN PATH INI SESUAI DENGAN API SARANA ANDA !!!
+        const SARANA_API_URL = '../../../backend/api/sarana/list.php';
+
+        // --- FUNGSI UTILITY ---
+        function showStatusMessage(message, type = 'error') {
+            const statusDiv = document.getElementById('statusMessage');
+            statusDiv.textContent = message;
+            statusDiv.style.backgroundColor = type === 'success' ? '#4CAF50' : '#f44336';
+            statusDiv.style.color = 'white';
+            statusDiv.style.padding = '10px';
+            statusDiv.style.marginBottom = '20px';
+            statusDiv.style.borderRadius = '5px';
+            statusDiv.style.display = 'block';
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // --- 1. FUNGSI MENGISI DROPDOWN SARANA ---
+        async function fetchSarana() {
+            const saranaSelect = document.getElementById('sarana_id');
+            saranaSelect.innerHTML = '<option value="">Memuat sarana...</option>';
+
+            try {
+                const response = await fetch(SARANA_API_URL);
+                const result = await response.json();
+
+                // Asumsi API Sarana mengembalikan { status: 'success', data: [...] } atau array langsung
+                const data = result.data || result;
+
+                if (Array.isArray(data)) {
+                    saranaSelect.innerHTML = '<option value="">Pilih Sarana</option>';
+                    data.forEach(sarana => {
+                        // Sesuaikan nama kolom sarana_id dan nama_sarana
+                        saranaSelect.innerHTML += `<option value="${sarana.sarana_id}">${sarana.nama_sarana}</option>`;
+                    });
+                } else {
+                    saranaSelect.innerHTML = '<option value="">Gagal memuat sarana</option>';
+                    showStatusMessage('Gagal memuat daftar sarana. Cek path API.');
+                }
+
+            } catch (error) {
+                console.error('Fetch Sarana Error:', error);
+                saranaSelect.innerHTML = '<option value="">Error jaringan</option>';
+                showStatusMessage('Error jaringan saat memuat Sarana.');
+            }
+        }
+
+        // --- 2. FUNGSI SUBMIT FORM TAMBAH PEMINJAMAN ---
+        const formPeminjaman = document.getElementById('formPeminjaman');
+        formPeminjaman.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const submitBtn = document.getElementById('submitBtn');
+            const originalBtnText = submitBtn.innerHTML;
+
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+            submitBtn.disabled = true;
+
+            try {
+                const formData = new FormData(this);
+
+                // Validasi sederhana: minimal harus ada NIM atau NIDN
+                const nim = formData.get('nim');
+                const nidn = formData.get('nidn');
+
+                if (!nim && !nidn) {
+                    showStatusMessage('Anda harus mengisi NIM (jika Mahasiswa) atau NIDN (jika Dosen).');
+                    return;
+                }
+
+                const response = await fetch(BASE_API_URL + 'create.php', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showStatusMessage('Peminjaman berhasil diajukan! Menunggu persetujuan.', 'success');
+                    this.reset();
+                    // Redirect ke halaman daftar setelah 2 detik
+                    setTimeout(() => {
+                        window.location.href = 'peminjaman.html';
+                    }, 2000);
+                } else {
+                    // Tampilkan pesan error dari backend (termasuk bentrok atau blokir)
+                    showStatusMessage(`Gagal mengajukan peminjaman: ${result.message}`);
+                }
+
+            } catch (error) {
+                console.error('Submit Error:', error);
+                showStatusMessage('Terjadi kesalahan jaringan saat mengajukan peminjaman.');
+            } finally {
+                submitBtn.innerHTML = originalBtnText;
+                submitBtn.disabled = false;
+            }
+        });
+
+        // --- LOGIKA UTAMA & LOGOUT ---
+        document.addEventListener('DOMContentLoaded', fetchSarana);
+
+        // Logika Logout (disederhanakan)
+        const logoutModal = document.getElementById('logoutModal');
+        const logoutTrigger = document.getElementById('logoutTrigger');
+        const cancelLogoutBtn = document.getElementById('cancelLogoutBtn');
+        const confirmLogoutBtn = document.getElementById('confirmLogoutBtn');
+
+        logoutTrigger.addEventListener('click', (e) => {
+            e.preventDefault();
+            logoutModal.style.display = 'flex';
+        });
+
+        cancelLogoutBtn.addEventListener('click', () => {
+            logoutModal.style.display = 'none';
+        });
+
+        confirmLogoutBtn.addEventListener('click', async () => {
+            const url = '../../../backend/api/auth/logout.php';
+            try {
+                await fetch(url, { method: 'POST' });
+                window.location.href = '../../public/index.html';
+            } catch (error) {
+                window.location.href = '../../public/index.html';
+            }
+        });
+
+    </script>
+</body>
+
+</html>

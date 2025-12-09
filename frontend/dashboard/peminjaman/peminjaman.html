@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Peminjaman | Admin</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../assets/css/cssadmin.css">
+    <style>
+        /* CSS tambahan untuk tampilan status */
+        .status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.9em;
+            display: inline-block;
+        }
+
+        .PENDING {
+            background-color: #ffc107;
+            color: #333;
+        }
+
+        .DISETUJUI {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .DITOLAK {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        /* Gaya untuk Modal (Pop-up) */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 10px;
+            animation-name: animatetop;
+            animation-duration: 0.4s
+        }
+
+        @keyframes animatetop {
+            from {
+                top: -300px;
+                opacity: 0
+            }
+
+            to {
+                top: 0;
+                opacity: 1
+            }
+        }
+
+        .close-btn {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close-btn:hover,
+        .close-btn:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="sidebar">
+        <div class="logo-area">
+            <h3>Lab Admin</h3>
+        </div>
+        <nav>
+            <a href="../admin.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="peminjaman.html" class="active"><i class="fas fa-calendar-alt"></i> Peminjaman</a>
+            <a href="../konten/konten.html"><i class="fas fa-newspaper"></i> Berita & Konten</a>
+            <a href="../publikasi/publikasi.html"><i class="fas fa-newspaper"></i> Publikasi</a>
+            <a href="../dosen/dosen.html"><i class="fas fa-users"></i> Data Dosen</a>
+            <a href="../mahasiswa/mahasiswa.html"><i class="fas fa-user-graduate"></i> Data Mahasiswa</a>
+            <a href="#" id="logoutTrigger"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <header>
+            <div class="header-title">
+                <h2>Kelola Peminjaman</h2>
+            </div>
+        </header>
+
+        <main>
+            <div id="statusMessage" class="status-message" style="display:none; padding: 10px; margin-bottom: 20px;">
+            </div>
+
+            <div class="section-header">
+                <h3>Daftar Peminjaman Sarana Lab</h3>
+                <a href="tambah_peminjaman.html" class="btn btn-add"><i class="fas fa-plus"></i> Tambah Peminjaman</a>
+            </div>
+
+            <div class="data-table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Peminjam</th>
+                            <th>Sarana</th>
+                            <th>Tanggal</th>
+                            <th>Waktu</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="peminjamanTableBody">
+                        <tr>
+                            <td colspan="7">Memuat data...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <div id="rejectModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeRejectModal()">&times;</span>
+            <h4>Tolak Peminjaman</h4>
+            <p>Anda akan menolak peminjaman dengan ID: <span id="rejectIdDisplay"></span>. Masukkan alasan penolakan:
+            </p>
+            <textarea id="rejectionReason" rows="4" style="width: 100%; padding: 10px; margin-bottom: 15px;"
+                placeholder="Alasan penolakan wajib diisi"></textarea>
+            <button class="btn btn-danger" onclick="rejectPeminjaman()">Tolak Permanen</button>
+            <button class="btn btn-secondary" onclick="closeRejectModal()">Batal</button>
+        </div>
+    </div>
+
+    <div id="approveModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeApproveModal()">&times;</span>
+            <h4>Setujui Peminjaman</h4>
+            <p>Anda yakin ingin menyetujui peminjaman dengan ID: <span id="approveIdDisplay"></span>?</p>
+            <button class="btn btn-action" onclick="approvePeminjaman()">Ya, Setujui</button>
+            <button class="btn btn-secondary" onclick="closeApproveModal()">Batal</button>
+        </div>
+    </div>
+
+    <div id="logoutModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="logoutModal.style.display='none';">&times;</span>
+            <p>Anda yakin ingin keluar?</p>
+            <button id="confirmLogoutBtn" class="btn btn-danger">Ya, Logout</button>
+            <button id="cancelLogoutBtn" class="btn btn-secondary">Batal</button>
+        </div>
+    </div>
+
+    <script>
+        const BASE_API_URL = '../../../backend/api/peminjaman/';
+
+        // --- FUNGSI UTILITY ---
+        function showStatusMessage(message, type = 'error') {
+            const statusDiv = document.getElementById('statusMessage');
+            statusDiv.textContent = message;
+            // Gunakan class atau style untuk warna
+            statusDiv.style.backgroundColor = type === 'success' ? '#4CAF50' : '#f44336';
+            statusDiv.style.color = 'white';
+            statusDiv.style.padding = '10px';
+            statusDiv.style.marginBottom = '20px';
+            statusDiv.style.borderRadius = '5px';
+            statusDiv.style.display = 'block';
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // --- FUNGSI FETCH DATA PEMINJAMAN ---
+        async function fetchPeminjaman() {
+            const tableBody = document.getElementById('peminjamanTableBody');
+            tableBody.innerHTML = '<tr><td colspan="7" class="loading-state">Memuat data...</td></tr>';
+
+            try {
+                const response = await fetch(BASE_API_URL + 'list.php');
+                const result = await response.json();
+
+                if (!response.ok || result.error) {
+                    const errorMessage = result.error || result.message || `Gagal memuat data. Status: ${response.status}.`;
+                    showStatusMessage(errorMessage);
+                    tableBody.innerHTML = '<tr><td colspan="7" style="color: red;">Error: Data gagal dimuat. Cek Console.</td></tr>';
+                    return;
+                }
+
+                // Asumsi backend mengembalikan array data
+                const data = result;
+
+                if (Array.isArray(data)) {
+                    tableBody.innerHTML = '';
+
+                    if (data.length === 0) {
+                        tableBody.innerHTML = '<tr><td colspan="7" class="loading-state">Tidak ada data peminjaman.</td></tr>';
+                        return;
+                    }
+
+                    data.forEach(item => {
+                        const row = tableBody.insertRow();
+
+                        // Menyesuaikan dengan output dari list.php (BookingController)
+                        row.insertCell().textContent = item.booking_id;
+                        row.insertCell().textContent = item.peminjam;     // dari join users u.username
+                        row.insertCell().textContent = item.nama_sarana;  // dari join sarana s.nama_sarana
+                        row.insertCell().textContent = item.tanggal;
+                        row.insertCell().textContent = `${item.start_time.substring(0, 5)} - ${item.end_time.substring(0, 5)}`;
+
+                        const statusCell = row.insertCell();
+                        const statusClass = item.status.toUpperCase();
+                        statusCell.innerHTML = `<span class="status ${statusClass}">${statusClass}</span>`;
+
+                        const actionCell = row.insertCell();
+                        actionCell.innerHTML = `
+                            <button class="btn btn-detail" onclick="window.location.href='edit_peminjaman.html?id=${item.booking_id}'">Detail</button>
+                            ${item.status === 'pending' ? `<button class="btn btn-action" onclick="showApproveModal(${item.booking_id})">Setuju</button>` : ''}
+                            ${item.status === 'pending' ? `<button class="btn btn-danger" onclick="showRejectModal(${item.booking_id})">Tolak</button>` : ''}
+                        `;
+                    });
+                } else {
+                    showStatusMessage('Format data dari server tidak valid.');
+                }
+
+            } catch (error) {
+                console.error('Fetch Error:', error);
+                showStatusMessage(`Terjadi kesalahan jaringan: ${error.message}`);
+                tableBody.innerHTML = '<tr><td colspan="7" style="color: red;">Error Jaringan: Gagal terhubung ke API.</td></tr>';
+            }
+        }
+
+        // --- FUNGSI AKSI (APPROVE/REJECT) ---
+        let currentBookingId = null;
+
+        function showApproveModal(id) {
+            currentBookingId = id;
+            document.getElementById('approveIdDisplay').textContent = id;
+            document.getElementById('approveModal').style.display = 'flex';
+        }
+
+        function closeApproveModal() {
+            document.getElementById('approveModal').style.display = 'none';
+        }
+
+        function showRejectModal(id) {
+            currentBookingId = id;
+            document.getElementById('rejectIdDisplay').textContent = id;
+            document.getElementById('rejectionReason').value = ''; // Reset alasan
+            document.getElementById('rejectModal').style.display = 'flex';
+        }
+
+        function closeRejectModal() {
+            document.getElementById('rejectModal').style.display = 'none';
+        }
+
+        async function approvePeminjaman() {
+            if (!currentBookingId) return;
+
+            const formData = new FormData();
+            formData.append('booking_id', currentBookingId);
+
+            closeApproveModal(); // Tutup modal saat proses dimulai
+
+            try {
+                const response = await fetch(BASE_API_URL + 'approve.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    showStatusMessage('Peminjaman berhasil disetujui.', 'success');
+                    fetchPeminjaman(); // Muat ulang data
+                } else {
+                    showStatusMessage(`Gagal menyetujui: ${result.message}`);
+                }
+
+            } catch (error) {
+                console.error('Approve Error:', error);
+                showStatusMessage('Error jaringan saat menyetujui peminjaman.');
+            }
+        }
+
+        async function rejectPeminjaman() {
+            if (!currentBookingId) return;
+
+            const reason = document.getElementById('rejectionReason').value.trim();
+            if (reason.length < 5) {
+                alert("Alasan penolakan harus diisi minimal 5 karakter.");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('booking_id', currentBookingId);
+            formData.append('reason', reason);
+
+            closeRejectModal(); // Tutup modal saat proses dimulai
+
+            try {
+                const response = await fetch(BASE_API_URL + 'reject.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    showStatusMessage('Peminjaman berhasil ditolak.', 'success');
+                    fetchPeminjaman(); // Muat ulang data
+                } else {
+                    showStatusMessage(`Gagal menolak: ${result.message}`);
+                }
+
+            } catch (error) {
+                console.error('Reject Error:', error);
+                showStatusMessage('Error jaringan saat menolak peminjaman.');
+            }
+        }
+
+        // --- LOGIKA UTAMA & LOGOUT ---
+        document.addEventListener('DOMContentLoaded', fetchPeminjaman);
+
+        // Logika Logout
+        const logoutModal = document.getElementById('logoutModal');
+        const logoutTrigger = document.getElementById('logoutTrigger');
+        const cancelLogoutBtn = document.getElementById('cancelLogoutBtn');
+        const confirmLogoutBtn = document.getElementById('confirmLogoutBtn');
+
+        logoutTrigger.addEventListener('click', (e) => {
+            e.preventDefault();
+            logoutModal.style.display = 'flex';
+        });
+
+        cancelLogoutBtn.addEventListener('click', () => {
+            logoutModal.style.display = 'none';
+        });
+
+        confirmLogoutBtn.addEventListener('click', async () => {
+            const url = '../../../backend/api/auth/logout.php';
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                });
+                // Tidak perlu cek result, langsung redirect
+                window.location.href = '../../public/index.html';
+
+            } catch (error) {
+                console.error('Logout Error:', error);
+                window.location.href = '../../public/index.html';
+            }
+        });
+
+        // Tutup modal jika klik di luar area modal
+        window.addEventListener('click', (e) => {
+            if (e.target === logoutModal) {
+                logoutModal.style.display = 'none';
+            }
+            if (e.target === rejectModal) {
+                rejectModal.style.display = 'none';
+            }
+            if (e.target === approveModal) {
+                approveModal.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+
+</html>
