@@ -24,7 +24,8 @@
         .data-table th,
         .data-table td {
             white-space: normal;
-            vertical-align: middle; /* Foto lebih rapi dengan middle */
+            vertical-align: middle;
+            /* Foto lebih rapi dengan middle */
             padding: 10px;
         }
 
@@ -48,19 +49,48 @@
         }
 
         /* Mengatur lebar spesifik untuk kolom */
-        .data-table th:nth-child(1), .data-table td:nth-child(1) { width: 60px; text-align: center; }
-        .data-table th:nth-child(2), .data-table td:nth-child(2) { width: 100px; word-break: break-all; }
-        .data-table th:nth-child(3), .data-table td:nth-child(3) { width: 120px; word-break: break-all; }
-        .data-table th:nth-child(4), .data-table td:nth-child(4) { width: 180px; }
-        .data-table th:nth-child(5), .data-table td:nth-child(5) { width: 150px; font-size: 0.9em; word-break: break-all; }
-        .data-table th:nth-child(8), .data-table td:nth-child(8) { width: 140px; text-align: center; }
+        .data-table th:nth-child(1),
+        .data-table td:nth-child(1) {
+            width: 60px;
+            text-align: center;
+        }
+
+        .data-table th:nth-child(2),
+        .data-table td:nth-child(2) {
+            width: 100px;
+            word-break: break-all;
+        }
+
+        .data-table th:nth-child(3),
+        .data-table td:nth-child(3) {
+            width: 120px;
+            word-break: break-all;
+        }
+
+        .data-table th:nth-child(4),
+        .data-table td:nth-child(4) {
+            width: 180px;
+        }
+
+        .data-table th:nth-child(5),
+        .data-table td:nth-child(5) {
+            width: 150px;
+            font-size: 0.9em;
+            word-break: break-all;
+        }
+
+        .data-table th:nth-child(8),
+        .data-table td:nth-child(8) {
+            width: 140px;
+            text-align: center;
+        }
 
         .action-buttons {
             display: flex;
             justify-content: center;
             gap: 5px;
         }
-        
+
         .action-buttons button {
             cursor: pointer;
             padding: 5px 10px;
@@ -68,9 +98,14 @@
             border-radius: 4px;
             color: white;
         }
-        
-        .edit-btn { background-color: #f39c12; }
-        .delete-btn { background-color: #e74c3c; }
+
+        .edit-btn {
+            background-color: #f39c12;
+        }
+
+        .delete-btn {
+            background-color: #e74c3c;
+        }
     </style>
 
 </head>
@@ -83,7 +118,7 @@
         </div>
         <nav>
             <a href="../admin.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-            <a href="../peminjaman.html"><i class="fas fa-calendar-alt"></i> Peminjaman</a>
+            <a href="../peminjaman/peminjaman.html"><i class="fas fa-calendar-alt"></i> Peminjaman</a>
             <a href="../konten/konten.html"><i class="fas fa-newspaper"></i> Berita & Konten</a>
             <a href="dosen.html" class="active"><i class="fas fa-users"></i> Data Dosen</a>
             <a href="../mahasiswa/mahasiswa.html"><i class="fas fa-user-graduate"></i> Data Mahasiswa</a>
@@ -263,7 +298,7 @@
         // --- FUNGSI FETCH DATA (READ) ---
         async function fetchDosen() {
             dosenTableBody.innerHTML = `<tr><td colspan="8" style="text-align: center;">Memuat data...</td></tr>`;
-            
+
             // Path API: Mundur 3 langkah (Sesuai struktur folder dalam)
             const url = '../../../backend/api/dosen/list.php';
 
