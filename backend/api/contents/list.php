@@ -14,4 +14,3 @@ require_role(['admin']);
 $model = new Content();
 $data = $model->getAll(); // Pastikan fungsi getAll() ada di Models/Content.php
 echo json_encode(['status' => 'success', 'data' => $data]);
-?>

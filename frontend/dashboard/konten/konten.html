@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../../assets/css/cssadmin.css">
+    <link rel="stylesheet" href="../../assets/css/cssmahasiswa.css">
 </head>
 
 <body>
@@ -17,8 +18,8 @@
             <h3>Lab Admin</h3>
         </div>
         <nav>
-            <a href="admin.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-            <a href="peminjaman.html"><i class="fas fa-calendar-alt"></i> Peminjaman</a>
+            <a href="../admin.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="../peminjaman.html"><i class="fas fa-calendar-alt"></i> Peminjaman</a>
             <a href="konten.html" class="active"><i class="fas fa-newspaper"></i> Berita & Konten</a>
             <a href="../dosen/dosen.html"><i class="fas fa-users"></i> Data Dosen</a>
             <a href="../mahasiswa/mahasiswa.html"><i class="fas fa-user-graduate"></i> Data Mahasiswa</a>
@@ -32,72 +33,170 @@
         </header>
 
         <div class="data-section">
-            <button class="btn-action create-new"><i class="fas fa-plus"></i> Tambah Berita Baru</button>
-            <table class="data-table">
-                <h2>Semua Konten Publik</h2>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Judul</th>
-                        <th>Kategori</th>
-                        <th>Tanggal Posting</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>5</td>
-                        <td>5 Langkah Sederhana Menuju Riset Efektif</td>
-                        <td>Berita</td>
-                        <td>2025-11-20</td>
-                        <td>
-                            <button class="btn-action edit">Edit</button>
-                            <button class="btn-action delete">Hapus</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>4</td>
-                        <td>Struktur Organisasi Lab BA</td>
-                        <td>Konten Statis</td>
-                        <td>2025-09-15</td>
-                        <td>
-                            <button class="btn-action edit">Edit</button>
-                            <button class="btn-action delete">Hapus</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-    <div id="logoutModal" class="modal-overlay">
-        <div class="modal-content">
-            <h2>Konfirmasi Logout</h2>
-            <p>Apakah Anda yakin ingin keluar dari sesi administrator?</p>
-            <div class="modal-actions">
-                <button id="cancelLogout" class="btn-modal-cancel">Batal</button>
-                <button id="confirmLogout" class="btn-modal-confirm">Ya, Logout</button>
+            <div id="message" class="message-area" style="display: none;"></div>
+
+            <a href="tambah_konten.html" class="add-button"><i class="fas fa-plus"></i> Tambah Konten</a>
+
+            <div class="data-table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Judul</th>
+                            <th>Kategori</th>
+                            <th>Penulis</th>
+                            <th>Tgl. Publikasi</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="kontenTableBody">
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
+
+    <div id="logoutModal" class="modal">
+        <div class="modal-content">
+            <h2>Konfirmasi Logout</h2>
+            <p>Apakah Anda yakin ingin keluar dari Dashboard Admin?</p>
+            <button id="confirmLogoutBtn" class="btn btn-danger">Logout</button>
+            <button id="cancelLogoutBtn" class="btn btn-secondary">Batal</button>
+        </div>
+    </div>
+
     <script>
-        const logoutTrigger = document.getElementById('logoutTrigger');
+        function displayMessage(type, message) {
+            const messageArea = document.getElementById('message');
+            messageArea.textContent = message;
+            messageArea.className = 'message-area ' + type;
+            messageArea.style.display = 'block';
+            setTimeout(() => {
+                messageArea.style.display = 'none';
+            }, 5000);
+        }
+
+        const kontenTableBody = document.getElementById('kontenTableBody');
+
+        async function fetchKonten() {
+            const url = '../../../backend/api/contents/list.php';
+            try {
+                const response = await fetch(url);
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    renderKontenTable(result.data);
+                } else {
+                    displayMessage('error', 'Gagal memuat data konten: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Fetch error:', error);
+                displayMessage('error', 'Terjadi kesalahan jaringan saat memuat data konten.');
+            }
+        }
+
+        function renderKontenTable(kontenList) {
+            kontenTableBody.innerHTML = '';
+            kontenList.forEach(konten => {
+                const row = kontenTableBody.insertRow();
+                const statusClass = konten.is_published === '1' ? 'status-published' : 'status-pending';
+
+                row.innerHTML = `
+                    <td>${konten.id}</td>
+                    <td>${konten.title}</td>
+                    <td>${konten.category_name}</td>
+                    <td>${konten.user_name}</td>
+                    <td>${konten.created_at}</td>
+                    <td><span class="${statusClass}">${konten.is_published === '1' ? 'Published' : 'Pending'}</span></td>
+                    <td>
+                        <a href="edit_konten.html?id=${konten.id}" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i> Edit</a>
+                        <button onclick="deleteKonten(${konten.id}, '${konten.title}')" class="btn btn-danger btn-sm"><i class="fas fa-trash-alt"></i> Hapus</button>
+                        <button onclick="togglePublish(${konten.id}, ${konten.is_published})" 
+                                class="btn btn-sm ${konten.is_published === '1' ? 'btn-secondary' : 'btn-success'}">
+                            <i class="fas ${konten.is_published === '1' ? 'fa-eye-slash' : 'fa-eye'}"></i> 
+                            ${konten.is_published === '1' ? 'Unpublish' : 'Publish'}
+                        </button>
+                    </td>
+                `;
+            });
+        }
+
+        async function deleteKonten(id, title) {
+            if (!confirm(`Apakah Anda yakin ingin menghapus konten: "${title}"?`)) {
+                return;
+            }
+
+            const url = '../../../backend/api/contents/delete.php';
+            const formData = new FormData();
+            formData.append('content_id', id);
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    displayMessage('success', result.message);
+                    fetchKonten(); // Muat ulang data
+                } else {
+                    displayMessage('error', result.message);
+                }
+            } catch (error) {
+                console.error('Delete error:', error);
+                displayMessage('error', 'Terjadi kesalahan jaringan saat menghapus konten.');
+            }
+        }
+
+        async function togglePublish(id, currentStatus) {
+            const newStatus = currentStatus == 1 ? 'false' : 'true'; // Kirim string 'true' atau 'false'
+            const url = '../../../backend/api/contents/publish.php';
+            const formData = new FormData();
+            formData.append('content_id', id);
+            formData.append('status', newStatus);
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+
+                if (result.status === true) {
+                    displayMessage('success', result.message);
+                    fetchKonten(); // Muat ulang data
+                } else {
+                    displayMessage('error', result.message);
+                }
+            } catch (error) {
+                console.error('Publish error:', error);
+                displayMessage('error', 'Terjadi kesalahan jaringan saat mengubah status.');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', fetchKonten);
+
+
+        // --- LOGIKA LOGOUT (PERBAIKAN) ---
         const logoutModal = document.getElementById('logoutModal');
-        const cancelLogoutBtn = document.getElementById('cancelLogout');
-        const confirmLogoutBtn = document.getElementById('confirmLogout');
+        const logoutTrigger = document.getElementById('logoutTrigger');
+        const cancelLogoutBtn = document.getElementById('cancelLogoutBtn');
+        const confirmLogoutBtn = document.getElementById('confirmLogoutBtn');
 
         logoutTrigger.addEventListener('click', (e) => {
             e.preventDefault();
-            logoutModal.style.display = 'flex';
+            // GANTI style.display = 'flex' DENGAN classList.add('show')
+            logoutModal.classList.add('show');
         });
 
         cancelLogoutBtn.addEventListener('click', () => {
-            logoutModal.style.display = 'none';
+            // GANTI style.display = 'none' DENGAN classList.remove('show')
+            logoutModal.classList.remove('show');
         });
 
-        // ... (Skrip yang sudah ada di admin.html)
-
         confirmLogoutBtn.addEventListener('click', async () => {
-            // Path ke PHP: dari frontend/ ke backend/api/auth/logout.php
             const url = '../../../backend/api/auth/logout.php';
 
             try {
@@ -107,26 +206,21 @@
                 const result = await response.json();
 
                 if (result.success) {
-                    // Logout berhasil di server
-                    logoutModal.style.display = 'none';
-                    window.location.href = '../../public/index.html'; // Redirect ke halaman utama
+                    logoutModal.classList.remove('show');
+                    window.location.href = '../../public/index.html';
                 } else {
-                    // Jika ada masalah logout di server, tetap redirect agar user tidak terjebak
                     window.location.href = '../../public/index.html';
                 }
 
             } catch (error) {
-                // Jika terjadi error jaringan/server, tetap redirect
                 console.error('Logout Error:', error);
                 window.location.href = '../../public/index.html';
             }
         });
 
-        // ... (Skrip yang sudah ada di admin.html)
-
         window.addEventListener('click', (e) => {
             if (e.target === logoutModal) {
-                logoutModal.style.display = 'none';
+                logoutModal.classList.remove('show');
             }
         });
     </script>
