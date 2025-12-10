@@ -1,12 +1,15 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) { session_start(); }
+header('Content-Type: application/json');
 
 require_once __DIR__ . "/../../config/auth.php";
 require_once __DIR__ . "/BookingController.php";
 
-// PERBAIKAN: Gunakan format standar require_role
-if (function_exists('require_role')) {
-    require_role(['admin']);
+require_admin();
+
+if (!isset($_POST['booking_id']) || !isset($_POST['reason'])) {
+    http_response_code(400);
+    echo json_encode(["success" => false, "message" => "ID booking dan alasan wajib diisi."]);
+    exit;
 }
 
 $controller = new BookingController();

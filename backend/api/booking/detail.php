@@ -2,23 +2,19 @@
 require_once __DIR__ . "/../../config/database.php";
 require_once __DIR__ . "/../../config/auth.php";
 
-// Cek Login (Semua role boleh lihat detail asalkan login)
-if (session_status() === PHP_SESSION_NONE) { session_start(); }
-if (!isset($_SESSION['user_id'])) {
-    die(json_encode(["error" => "Unauthorized"]));
-}
-
-// PERBAIKAN KONEKSI
-$conn = Database::getInstance();
+require_admin();
 
 if (!isset($_GET['id'])) {
     die(json_encode(["error" => "ID booking tidak ditemukan."]));
 }
 
+// PERBAIKAN KONEKSI
+$conn = Database::getInstance();
+
 $id = $_GET['id'];
 
 // Pastikan tabel vw_peminjaman_history ada, kalau tidak, ganti 'bookings'
-$sql = "SELECT * FROM bookings WHERE booking_id = :id"; 
+$sql = "SELECT * FROM vw_peminjaman_history WHERE booking_id = :id"; 
 $stmt = $conn->prepare($sql);
 $stmt->bindParam(":id", $id);
 $stmt->execute();

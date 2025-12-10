@@ -1,13 +1,10 @@
 <?php
-ini_set('display_errors', 0);
-error_reporting(E_ALL);
-
 header('Content-Type: application/json');
 header("Access-Control-Allow-Origin: *");
 
 require_once __DIR__ . "/../../config/database.php";
-
-session_start();
+require_once __DIR__ . "/../../config/auth.php"; 
+require_login_json();
 
 if (!isset($_SESSION['user_id'])) {
     http_response_code(401);
