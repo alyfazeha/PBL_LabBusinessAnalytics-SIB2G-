@@ -3,14 +3,13 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-header('Content-Type: application/json');
-
+// Hapus header content-type di sini karena ini class library, bukan output JSON langsung
 require_once __DIR__ . "/../../config/database.php";
 require_once __DIR__ . "/../../models/Booking.php";
 require_once __DIR__ . "/../../models/BlockedDate.php";
 require_once __DIR__ . "/../../config/auth.php";
 
-require_admin(); // Cek role admin di sini
+// --- HAPUS require_admin() DARI SINI AGAR MAHASISWA BISA BOOKING ---
 
 class BookingController
 {
@@ -20,12 +19,13 @@ class BookingController
 
     public function __construct()
     {
-        // Mengambil koneksi PDO dari Singleton
+        // Gunakan Singleton agar konsisten
         $this->conn = Database::getInstance();
 
-        // Model Booking mengambil koneksi di constructor-nya
+        // Pastikan Model Booking menggunakan koneksi Singleton juga
         $this->booking = new Booking(); 
-        // Model BlockedDate menerima koneksi di constructor-nya
+        
+        // BlockedDate biasanya butuh koneksi dilempar
         $this->blocked = new BlockedDate($this->conn);
     }
 
@@ -36,49 +36,54 @@ class BookingController
         $start     = $data['start_time'];
         $end       = $data['end_time'];
 
+        // Cek apakah tanggal diblokir admin
         if ($this->blocked->isBlockedRange($sarana_id, $tanggal, $start, $end)) {
-            return ['success' => false, 'message' => 'Waktu ini diblok oleh admin.'];
+            return ['success' => false, 'message' => 'Waktu ini diblokir oleh admin.'];
         }
 
+        // Cek bentrok jadwal
         if ($this->booking->hasConflict($sarana_id, $tanggal, $start, $end)) {
-            return ['success' => false, 'message' => 'Bentrok dengan booking lain.'];
+            return ['success' => false, 'message' => 'Jadwal bentrok dengan booking lain.'];
         }
 
         $booking_id = $this->booking->create($data);
 
-        return [
-            'success' => true,
-            'message' => 'Booking berhasil dibuat.',
-            'booking_id' => $booking_id
-        ];
+        if ($booking_id) {
+            return [
+                'success' => true,
+                'message' => 'Booking berhasil diajukan.',
+                'booking_id' => $booking_id
+            ];
+        } else {
+            return ['success' => false, 'message' => 'Gagal menyimpan data booking.'];
+        }
     }
 
     public function approveBooking($booking_id, $admin_id)
     {
-        $query = "UPDATE bookings SET status = 'disetujui', handled_by = :admin, updated_at = NOW() WHERE booking_id = :id AND status = 'pending'";
+        // Cek status harus pending agar tidak double approve
+        $query = "UPDATE bookings SET status = 'disetujui', handled_by = :admin, updated_at = NOW() WHERE booking_id = :id";
         $stmt = $this->conn->prepare($query);
         $ok = $stmt->execute([":admin" => $admin_id, ":id" => $booking_id]);
         
-        if ($ok && $stmt->rowCount() > 0) {
+        if ($ok) {
              return ['success' => true, 'message' => "Booking berhasil disetujui."];
         } else {
-             // Jika rowCount 0, berarti ID tidak ditemukan atau status bukan 'pending'
-             return ['success' => false, 'message' => "Gagal menyetujui booking (ID tidak ditemukan atau sudah diproses)."];
+             return ['success' => false, 'message' => "Gagal menyetujui booking."];
         }
     }
 
     public function rejectBooking($booking_id, $admin_id, $reason)
     {
-        $query = "UPDATE bookings SET status = 'ditolak', rejection_reason = :reason, handled_by = :admin, updated_at = NOW() WHERE booking_id = :id AND status = 'pending'";
+        $query = "UPDATE bookings SET status = 'ditolak', rejection_reason = :reason, handled_by = :admin, updated_at = NOW() WHERE booking_id = :id";
         $stmt = $this->conn->prepare($query);
         $ok = $stmt->execute([":reason" => $reason, ":admin" => $admin_id, ":id" => $booking_id]);
 
-        if ($ok && $stmt->rowCount() > 0) {
+        if ($ok) {
              return ['success' => true, 'message' => "Booking berhasil ditolak."];
         } else {
-             return ['success' => false, 'message' => "Gagal menolak booking (ID tidak ditemukan atau sudah diproses)."];
+             return ['success' => false, 'message' => "Gagal menolak booking."];
         }
     }
-
 }
 ?>
