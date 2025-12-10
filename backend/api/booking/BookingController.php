@@ -1,12 +1,15 @@
 <?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+header('Content-Type: application/json');
+
 require_once __DIR__ . "/../../config/database.php";
 require_once __DIR__ . "/../../models/Booking.php";
 require_once __DIR__ . "/../../models/BlockedDate.php";
 require_once __DIR__ . "/../../config/auth.php";
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
 require_admin(); // Cek role admin di sini
 
 class BookingController
@@ -17,10 +20,12 @@ class BookingController
 
     public function __construct()
     {
-        $db = new Database();
-        $this->conn = $db->getConnection();
+        // Mengambil koneksi PDO dari Singleton
+        $this->conn = Database::getInstance();
 
-        $this->booking = new Booking();
+        // Model Booking mengambil koneksi di constructor-nya
+        $this->booking = new Booking(); 
+        // Model BlockedDate menerima koneksi di constructor-nya
         $this->blocked = new BlockedDate($this->conn);
     }
 
@@ -50,20 +55,30 @@ class BookingController
 
     public function approveBooking($booking_id, $admin_id)
     {
-        $query = "UPDATE bookings SET status = 'disetujui', handled_by = :admin, updated_at = NOW() WHERE booking_id = :id";
+        $query = "UPDATE bookings SET status = 'disetujui', handled_by = :admin, updated_at = NOW() WHERE booking_id = :id AND status = 'pending'";
         $stmt = $this->conn->prepare($query);
-        $stmt->execute([":admin" => $admin_id, ":id" => $booking_id]);
-
-        return ['success' => true, 'message' => "Booking berhasil disetujui."];
+        $ok = $stmt->execute([":admin" => $admin_id, ":id" => $booking_id]);
+        
+        if ($ok && $stmt->rowCount() > 0) {
+             return ['success' => true, 'message' => "Booking berhasil disetujui."];
+        } else {
+             // Jika rowCount 0, berarti ID tidak ditemukan atau status bukan 'pending'
+             return ['success' => false, 'message' => "Gagal menyetujui booking (ID tidak ditemukan atau sudah diproses)."];
+        }
     }
 
     public function rejectBooking($booking_id, $admin_id, $reason)
     {
-        $query = "UPDATE bookings SET status = 'ditolak', rejection_reason = :reason, handled_by = :admin, updated_at = NOW() WHERE booking_id = :id";
+        $query = "UPDATE bookings SET status = 'ditolak', rejection_reason = :reason, handled_by = :admin, updated_at = NOW() WHERE booking_id = :id AND status = 'pending'";
         $stmt = $this->conn->prepare($query);
-        $stmt->execute([":reason" => $reason, ":admin" => $admin_id, ":id" => $booking_id]);
+        $ok = $stmt->execute([":reason" => $reason, ":admin" => $admin_id, ":id" => $booking_id]);
 
-        return ['success' => true, 'message' => "Booking berhasil ditolak."];
+        if ($ok && $stmt->rowCount() > 0) {
+             return ['success' => true, 'message' => "Booking berhasil ditolak."];
+        } else {
+             return ['success' => false, 'message' => "Gagal menolak booking (ID tidak ditemukan atau sudah diproses)."];
+        }
     }
+
 }
 ?>
