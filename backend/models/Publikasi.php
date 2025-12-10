@@ -1,142 +1,109 @@
 <?php
-// File: models/Publikasi.php
+require_once __DIR__ . '/../config/database.php';
 
 class Publikasi {
     private $db;
 
     public function __construct() {
-        global $koneksi;
-        $this->db = $koneksi;
+        $this->db = Database::getInstance();
     }
 
     // ==========================================================
-    // BAGIAN 1: FUNGSI UNTUK PUBLIC (Halaman Depan)
+    // BAGIAN 1: FUNGSI UNTUK PUBLIC
     // ==========================================================
 
-    // 1. Ambil HANYA yang statusnya 'published' (Untuk List Public)
     public function getPublishedOnly() {
+        // Query untuk halaman depan (Public)
+        // PERUBAHAN: JOIN langsung ke research_focus menggunakan p.focus_id
         $query = "SELECT p.id, p.judul, p.external_link, p.created_at, 
                          k.nama_kategori, 
-                         d.nama AS nama_dosen, d.nidn AS dosen_nidn
+                         d.nama AS nama_dosen, d.nidn AS dosen_nidn,
+                         r.nama_fokus -- Ini sekarang diambil dari inputan publikasi
                   FROM publikasi p
                   LEFT JOIN kategori_publikasi k ON p.kategori_id = k.id
                   LEFT JOIN dosen d ON p.dosen_nidn = d.nidn
-                  WHERE p.status = 'published' -- FILTER STATUS
+                  LEFT JOIN research_focus r ON p.focus_id = r.focus_id -- DIRECT JOIN
+                  WHERE p.status = 'published'
                   ORDER BY p.id DESC";
 
-        $result = pg_query($this->db, $query);
-        $data = [];
-        while ($row = pg_fetch_assoc($result)) {
-            $data[] = $row;
-        }
-        return $data;
-    }
-
-    // 2. Filter Berdasarkan FOKUS RISET
-    public function getByFocusId($focus_id) {
-        // Query ini menggabungkan Publikasi -> Dosen -> Dosen Focus
-        $query = "SELECT p.id, p.judul, p.external_link, p.created_at, 
-                         k.nama_kategori, 
-                         d.nama AS nama_dosen
-                  FROM publikasi p
-                  JOIN dosen d ON p.dosen_nidn = d.nidn
-                  JOIN dosen_focus df ON d.nidn = df.nidn
-                  LEFT JOIN kategori_publikasi k ON p.kategori_id = k.id
-                  
-                  WHERE p.status = 'published'      -- Hanya tampilkan yang sudah publish
-                  AND df.focus_id = $1              -- Filter berdasarkan ID Fokus (AI, IoT, dll)
-                  
-                  ORDER BY p.id DESC";
-
-        $result = pg_query_params($this->db, $query, [$focus_id]);
-        
-        $data = [];
-        while ($row = pg_fetch_assoc($result)) {
-            $data[] = $row;
-        }
-        return $data;
+        $stmt = $this->db->query($query);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     // ==========================================================
-    // BAGIAN 2: FUNGSI UNTUK ADMIN (Dashboard)
+    // BAGIAN 2: FUNGSI UNTUK ADMIN
     // ==========================================================
 
-    // 3. Ambil SEMUA Data (Termasuk yang Pending)
     public function getAll() {
-        $query = "SELECT p.id, p.judul, p.external_link, p.created_at, p.status, -- Tambah status
+        // Query untuk Admin Dashboard (Data Publikasi)
+        // PERUBAHAN: JOIN langsung ke research_focus menggunakan p.focus_id
+        $query = "SELECT p.id, p.judul, p.external_link, p.created_at, p.status,
                          k.nama_kategori, k.id as kategori_id,
-                         d.nama AS nama_dosen, d.nidn AS dosen_nidn
+                         d.nama AS nama_dosen, d.nidn AS dosen_nidn,
+                         r.nama_fokus -- Ini sekarang diambil dari inputan publikasi
                   FROM publikasi p
                   LEFT JOIN kategori_publikasi k ON p.kategori_id = k.id
                   LEFT JOIN dosen d ON p.dosen_nidn = d.nidn
+                  LEFT JOIN research_focus r ON p.focus_id = r.focus_id -- DIRECT JOIN
                   ORDER BY p.id DESC";
         
-        $result = pg_query($this->db, $query);
-        $data = [];
-        while ($row = pg_fetch_assoc($result)) {
-            $data[] = $row;
-        }
-        return $data;
+        $stmt = $this->db->query($query);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // 4. Ambil 1 Data by ID (Untuk Form Edit)
     public function getById($id) {
-        $query = "SELECT * FROM publikasi WHERE id = $1";
-        $result = pg_query_params($this->db, $query, [$id]);
-        return pg_fetch_assoc($result);
+        $query = "SELECT * FROM publikasi WHERE id = ?";
+        $stmt = $this->db->prepare($query);
+        $stmt->execute([$id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    // 5. Tambah Data Baru
     public function create($data) {
-        // Default status biasanya 'pending' (diatur di database atau di sini)
-        $query = "INSERT INTO publikasi (judul, external_link, kategori_id, dosen_nidn, status) 
-                  VALUES ($1, $2, $3, $4, 'pending') RETURNING id";
-                  
+        // PERUBAHAN: Menambahkan focus_id ke INSERT
+        $query = "INSERT INTO publikasi (judul, external_link, kategori_id, dosen_nidn, focus_id, status) 
+                  VALUES (?, ?, ?, ?, ?, 'pending') RETURNING id";  
         $params = [
             $data['judul'], 
             $data['external_link'], 
             $data['kategori_id'], 
-            $data['dosen_nidn']
+            $data['dosen_nidn'],
+            $data['focus_id'] // Simpan Topik Riset yang dipilih
         ];
-        
-        $result = pg_query_params($this->db, $query, $params);
-        if ($result) {
-            $row = pg_fetch_assoc($result);
+        $stmt = $this->db->prepare($query);
+        if ($stmt->execute($params)) {
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
             return $row['id'];
         }
         return false;
     }
 
-    // 6. Update Data
     public function update($id, $data) {
+        // PERUBAHAN: Menambahkan focus_id ke UPDATE
         $query = "UPDATE publikasi 
-                  SET judul = $1, external_link = $2, kategori_id = $3, dosen_nidn = $4, updated_at = NOW()
-                  WHERE id = $5";
-                  
+                  SET judul = ?, external_link = ?, kategori_id = ?, dosen_nidn = ?, focus_id = ?, updated_at = NOW()
+                  WHERE id = ?";
         $params = [
             $data['judul'], 
             $data['external_link'], 
             $data['kategori_id'], 
             $data['dosen_nidn'], 
+            $data['focus_id'], // Update Topik Riset
             $id
         ];
-        
-        $result = pg_query_params($this->db, $query, $params);
-        return $result;
+        $stmt = $this->db->prepare($query);
+        return $stmt->execute($params);
     }
 
-    // 7. Update Status (Khusus Verify Admin)
     public function changeStatus($id, $status) {
-        $query = "UPDATE publikasi SET status = $1, updated_at = NOW() WHERE id = $2";
-        $result = pg_query_params($this->db, $query, [$status, $id]);
-        return ($result && pg_affected_rows($result) > 0);
+        $query = "UPDATE publikasi SET status = ?, updated_at = NOW() WHERE id = ?";
+        $stmt = $this->db->prepare($query);
+        return $stmt->execute([$status, $id]);
     }
 
-    // 8. Hapus Data
     public function delete($id) {
-        $query = "DELETE FROM publikasi WHERE id = $1";
-        $result = pg_query_params($this->db, $query, [$id]);
-        return ($result && pg_affected_rows($result) > 0);
+        $query = "DELETE FROM publikasi WHERE id = ?";
+        $stmt = $this->db->prepare($query);
+        return $stmt->execute([$id]);
     }
 }
 ?>

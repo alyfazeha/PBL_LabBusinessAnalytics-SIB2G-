@@ -5,10 +5,10 @@ header("Access-Control-Allow-Origin: *");
 
 // Panggil Model yang baru kita perbaiki di atas
 require_once __DIR__ . "/../../config/database.php";
-require_once __DIR__ . "/../../models/PublikasiCategory.php"; 
+require_once __DIR__ . "/../../models/ResearchFocus.php"; 
 
 try {
-    $model = new PublikasiCategory(); 
+    $model = new ResearchFocus();
     $data = $model->getAll(); // Memanggil fungsi dari Model
     
     if (!$data) $data = [];

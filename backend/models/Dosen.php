@@ -10,6 +10,7 @@ class Dosen
         $this->db = Database::getInstance();
     }
 
+    // --- BAGIAN INI TIDAK DIUBAH (SAMA PERSIS DENGAN KODE ASLI) ---
     public function create($data)
     {
         $sql = "INSERT INTO dosen (
@@ -42,16 +43,23 @@ class Dosen
         ]);
     }
 
+    // --- BAGIAN INI DIMODIFIKASI SEDIKIT (AMAN) ---
+    // Ditambahkan JOIN ke research_focus agar Fitur Publikasi bisa filter dosen
     public function all()
     {
-        $sql = "SELECT d.*, u.username
+        // Tetap mengambil d.* (semua data dosen) agar halaman Dosen tidak error
+        // Ditambah r.nama_fokus untuk keperluan halaman Publikasi
+        $sql = "SELECT d.*, u.username, r.nama_fokus
                 FROM dosen d
                 LEFT JOIN users u ON u.user_id = d.user_id
+                LEFT JOIN dosen_focus df ON d.nidn = df.nidn      
+                LEFT JOIN research_focus r ON df.focus_id = r.focus_id 
                 ORDER BY d.nidn DESC";
 
         return $this->db->query($sql)->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    // --- BAGIAN INI TIDAK DIUBAH (SAMA PERSIS DENGAN KODE ASLI) ---
     public function find($nidn)
     {
         $sql = "SELECT d.*, u.username
@@ -64,6 +72,8 @@ class Dosen
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    // --- BAGIAN INI TIDAK DIUBAH (SAMA PERSIS DENGAN KODE ASLI) ---
+    // Kolom pendidikan, mata_kuliah, dll TETAP ADA
     public function update($nidn, $data)
     {
         $sql = "UPDATE dosen SET
@@ -100,10 +110,18 @@ class Dosen
         ]);
     }
 
+    // --- BAGIAN INI DIMODIFIKASI SEDIKIT (AMAN) ---
     public function delete($nidn)
     {
+        // 1. Hapus dulu relasi di dosen_focus agar tidak error database
+        $sqlFocus = "DELETE FROM dosen_focus WHERE nidn = :nidn";
+        $stmtFocus = $this->db->prepare($sqlFocus);
+        $stmtFocus->execute([':nidn' => $nidn]);
+
+        // 2. Baru hapus data dosen (Kode Asli)
         $sql = "DELETE FROM dosen WHERE nidn = :nidn";
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([':nidn' => $nidn]);
     }
 }
+?>

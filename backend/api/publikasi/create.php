@@ -1,42 +1,53 @@
 <?php
-// 1. Cek Session
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+// Matikan semua output error HTML agar tidak merusak JSON
+ini_set('display_errors', 0);
+error_reporting(E_ALL);
 
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
 header('Content-Type: application/json');
+header("Access-Control-Allow-Origin: *");
 
-require_once __DIR__ . "/../../config/koneksi.php";
+require_once __DIR__ . "/../../config/database.php";
 require_once __DIR__ . "/../../models/Publikasi.php";
 require_once __DIR__ . "/../../config/auth.php";
 
-require_role(['admin', 'dosen']);
-
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    http_response_code(405);
-    exit(json_encode(['status' => 'error', 'message' => 'Method Not Allowed']));
+// ======================================================
+// PERUBAHAN: Tambahkan Pengecekan Role (Admin & Dosen)
+// ======================================================
+if (function_exists('require_role')) {
+    require_role(['admin', 'dosen']);
 }
 
-$data = [
-    'judul'         => $_POST['judul'] ?? null,
-    'external_link' => $_POST['external_link'] ?? null,
-    'kategori_id'   => $_POST['kategori_id'] ?? null,
-    'dosen_nidn'    => $_POST['dosen_nidn'] ?? null
-];
+try {
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        throw new Exception('Method Not Allowed');
+    }
 
-if (!$data['judul'] || !$data['kategori_id'] || !$data['dosen_nidn']) {
-    http_response_code(400);
-    exit(json_encode(['status' => 'error', 'message' => 'Data tidak lengkap (Judul, Kategori, NIDN wajib)']));
-}
+    // Tangkap Data
+    $data = [
+        'judul'         => $_POST['judul'] ?? null,
+        'external_link' => $_POST['external_link'] ?? null,
+        'kategori_id'   => $_POST['kategori_id'] ?? null,
+        'dosen_nidn'    => $_POST['dosen_nidn'] ?? null,
+        'focus_id'      => $_POST['focus_id'] ?? null 
+    ];
 
-$model = new Publikasi();
-$id = $model->create($data);
+    // Validasi
+    if (!$data['judul'] || !$data['kategori_id'] || !$data['dosen_nidn'] || !$data['focus_id']) {
+        throw new Exception('Data tidak lengkap. Cek Judul, Kategori, Topik, dan Dosen.');
+    }
 
-if ($id) {
-    http_response_code(201);
-    echo json_encode(['status' => 'success', 'message' => 'Berhasil disimpan', 'data' => ['id' => $id]]);
-} else {
+    $model = new Publikasi();
+    $id = $model->create($data);
+
+    if ($id) {
+        echo json_encode(['status' => 'success', 'message' => 'Berhasil disimpan', 'id' => $id]);
+    } else {
+        throw new Exception("Gagal menyimpan ke database (Model return false).");
+    }
+
+} catch (Exception $e) {
     http_response_code(500);
-    echo json_encode(['status' => 'error', 'message' => 'Gagal menyimpan data']);
+    echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
 }
 ?>

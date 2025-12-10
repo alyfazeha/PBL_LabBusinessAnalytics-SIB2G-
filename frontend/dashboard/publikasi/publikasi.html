@@ -4,11 +4,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kelola Publikasi | Admin</title>
+    <title>Data Publikasi | Admin</title>
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../../assets/css/cssadmin.css">
     <link rel="stylesheet" href="../../assets/css/cssmahasiswa.css">
+    <style>
+        .filter-container { display: flex; gap: 15px; margin-bottom: 20px; align-items: center; background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #e9ecef; }
+        .filter-group { display: flex; flex-direction: column; }
+        .filter-group label { font-size: 12px; font-weight: 600; margin-bottom: 5px; color: #666; }
+        .filter-select { padding: 8px; border: 1px solid #ddd; border-radius: 4px; min-width: 200px; }
+    </style>
 </head>
 
 <body>
@@ -20,8 +26,8 @@
         <nav>
             <a href="../admin.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
             <a href="../peminjaman/peminjaman.html"><i class="fas fa-calendar-alt"></i> Peminjaman</a>
-            <a href="../konten/konten.html"><i class="fas fa-newspaper"></i> Berita & Konten</a>
-            <a href="publikasi.html" class="active"><i class="fas fa-newspaper"></i> Publikasi</a>
+            <a href="konten.html"><i class="fas fa-newspaper"></i> Berita & Konten</a>
+            <a href="publikasi.html" class="active"><i class="fas fa-book"></i> Publikasi</a>
             <a href="../dosen/dosen.html"><i class="fas fa-users"></i> Data Dosen</a>
             <a href="../mahasiswa/mahasiswa.html"><i class="fas fa-user-graduate"></i> Data Mahasiswa</a>
             <a href="#" id="logoutTrigger"><i class="fas fa-sign-out-alt"></i> Logout</a>
@@ -30,15 +36,30 @@
 
     <div class="main-content">
         <header>
-            <h2>Data Publikasi</h2>
-            <div class="action-buttons">
-                <a href="tambah_publikasi.html" class="button primary-button"><i class="fas fa-plus"></i> Tambah
-                    Publikasi</a>
-            </div>
+            <h1>Data Publikasi</h1>
         </header>
 
-        <section class="content-area">
-            <div id="messageContainer" class="message-container"></div>
+        <div class="data-section">
+            <div id="message" class="message-area" style="display: none;"></div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <a href="tambah_publikasi.html" class="add-button"><i class="fas fa-plus"></i> Tambah Publikasi</a>
+            </div>
+
+            <div class="filter-container">
+                <div class="filter-group">
+                    <label for="filterFocus">Filter Berdasarkan Fokus Riset:</label>
+                    <select id="filterFocus" class="filter-select">
+                        <option value="">-- Tampilkan Semua --</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filterKategori">Filter Berdasarkan Kategori:</label>
+                    <select id="filterKategori" class="filter-select">
+                        <option value="">-- Tampilkan Semua --</option>
+                    </select>
+                </div>
+            </div>
 
             <div class="data-table-container">
                 <table class="data-table">
@@ -47,175 +68,194 @@
                             <th>ID</th>
                             <th>Judul Publikasi</th>
                             <th>Kategori</th>
+                            <th>Fokus Riset</th> 
                             <th>Dosen (NIDN)</th>
-                            <th>Link Eksternal</th>
+                            <th>Status</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody id="publikasiTableBody">
+                        <tr><td colspan="7" style="text-align:center;">Sedang memuat data...</td></tr>
                     </tbody>
                 </table>
-            </div>
-
-            <div id="noDataMessage" style="text-align: center; margin-top: 20px; display: none;">
-                Tidak ada data publikasi yang ditemukan.
-            </div>
-
-        </section>
-
-        <div id="logoutModal" class="modal">
-            <div class="modal-content">
-                <h4>Konfirmasi Logout</h4>
-                <p>Apakah Anda yakin ingin keluar dari sistem?</p>
-                <div class="modal-actions">
-                    <button id="cancelLogoutBtn" class="button secondary-button">Batal</button>
-                    <button id="confirmLogoutBtn" class="button primary-button">Logout</button>
-                </div>
             </div>
         </div>
     </div>
 
-    <script>
-        const API_BASE_URL = '../../../backend/api/publikasi/';
+    <div id="logoutModal" class="modal">
+        <div class="modal-content">
+            <h2>Konfirmasi Logout</h2>
+            <p>Apakah Anda yakin ingin keluar?</p>
+            <button id="confirmLogoutBtn" class="btn btn-danger">Logout</button>
+            <button id="cancelLogoutBtn" class="btn btn-secondary">Batal</button>
+        </div>
+    </div>
 
+    <script>
         function displayMessage(type, message) {
-            const container = document.getElementById('messageContainer');
-            container.innerHTML = `<div class="alert ${type === 'success' ? 'alert-success' : 'alert-error'}">${message}</div>`;
-            setTimeout(() => {
-                container.innerHTML = '';
-            }, 5000);
+            const messageArea = document.getElementById('message');
+            messageArea.textContent = message;
+            messageArea.className = 'message-area ' + type;
+            messageArea.style.display = 'block';
+            setTimeout(() => { messageArea.style.display = 'none'; }, 5000);
+        }
+
+        const tableBody = document.getElementById('publikasiTableBody');
+        let allPublikasiData = []; 
+
+        async function fetchFilters() {
+            try {
+                // Fetch Research Focus
+                const resFocus = await fetch('../../../backend/api/research/list.php');
+                const dataFocus = await resFocus.json();
+                const selectFocus = document.getElementById('filterFocus');
+                if (dataFocus.status === 'success') {
+                    dataFocus.data.forEach(item => {
+                        const opt = document.createElement('option');
+                        opt.value = item.nama_fokus;
+                        opt.textContent = item.nama_fokus;
+                        selectFocus.appendChild(opt);
+                    });
+                }
+
+                // Fetch Kategori
+                const resKat = await fetch('../../../backend/api/publikasi/kategori_list.php');
+                const dataKat = await resKat.json();
+                const selectKat = document.getElementById('filterKategori');
+                if (dataKat.status === 'success') {
+                    dataKat.data.forEach(item => {
+                        const opt = document.createElement('option');
+                        opt.value = item.nama_kategori;
+                        opt.textContent = item.nama_kategori;
+                        selectKat.appendChild(opt);
+                    });
+                }
+            } catch (error) { console.error('Filter Error:', error); }
         }
 
         async function fetchPublikasi() {
-            const tbody = document.getElementById('publikasiTableBody');
-            const noDataMsg = document.getElementById('noDataMessage');
-            tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">Memuat data...</td></tr>';
-            noDataMsg.style.display = 'none';
-
             try {
-                const response = await fetch(API_BASE_URL + 'list.php');
+                const response = await fetch('../../../backend/api/publikasi/list.php');
                 const result = await response.json();
 
-                if (result.status === 'success' && result.data && result.data.length > 0) {
-                    renderPublikasi(result.data);
+                if (result.status === 'success') {
+                    allPublikasiData = result.data;
+                    renderTable(allPublikasiData);
                 } else {
-                    tbody.innerHTML = '';
-                    noDataMsg.style.display = 'block';
+                    tableBody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Tidak ada data.</td></tr>';
                 }
             } catch (error) {
-                console.error('Fetch error:', error);
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: red;">Gagal memuat data. Periksa koneksi API.</td></tr>';
+                console.error('Fetch Error:', error);
+                tableBody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:red;">Gagal memuat data API.</td></tr>';
             }
         }
 
-        function renderPublikasi(data) {
-            const tbody = document.getElementById('publikasiTableBody');
-            tbody.innerHTML = '';
+        function renderTable(data) {
+            tableBody.innerHTML = '';
+            
+            if (data.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Data tidak ditemukan.</td></tr>';
+                return;
+            }
 
             data.forEach(item => {
-                const row = tbody.insertRow();
-                row.insertCell().textContent = item.id;
-                row.insertCell().textContent = item.judul;
-                row.insertCell().textContent = item.kategori_nama;
-                row.insertCell().textContent = `${item.dosen_nama} (${item.dosen_nidn})`;
+                const row = tableBody.insertRow();
+                const id = item.publikasi_id || item.id; // Support kedua format ID
 
-                // Link Eksternal
-                const linkCell = row.insertCell();
-                if (item.external_link) {
-                    const link = document.createElement('a');
-                    link.href = item.external_link;
-                    link.target = '_blank';
-                    link.textContent = 'Lihat Link';
-                    linkCell.appendChild(link);
-                } else {
-                    linkCell.textContent = '-';
-                }
+                // Badge Status
+                let statusBadge = '<span class="status-pending">Pending</span>';
+                if (item.status === 'published') statusBadge = '<span class="status-published" style="background:#d4edda; color:#155724; padding:2px 8px; border-radius:10px;">Published</span>';
+                else if (item.status === 'rejected') statusBadge = '<span class="status-rejected" style="background:#f8d7da; color:#721c24; padding:2px 8px; border-radius:10px;">Rejected</span>';
 
-                // Aksi
-                const actionCell = row.insertCell();
-                actionCell.innerHTML = `
-                    <a href="edit_publikasi.html?id=${item.id}" class="button action-button edit-button"><i class="fas fa-edit"></i> Edit</a>
-                    <button data-id="${item.id}" class="button action-button delete-button"><i class="fas fa-trash"></i> Hapus</button>
+                const namaFokus = item.nama_fokus ? `<span style="background:#e3f2fd; color:#0d47a1; padding:2px 6px; border-radius:4px; font-size:12px;">${item.nama_fokus}</span>` : '-';
+                const btnLink = item.external_link ? `<a href="${item.external_link}" target="_blank" class="btn btn-sm btn-info" title="Lihat Link"><i class="fas fa-link"></i></a>` : '';
+
+                // --- BAGIAN UTAMA YANG DIPERBAIKI: TOMBOL EDIT ---
+                row.innerHTML = `
+                    <td>${id}</td>
+                    <td>${item.judul}</td>
+                    <td>${item.nama_kategori || '-'}</td>
+                    <td>${namaFokus}</td>
+                    <td>
+                        <strong>${item.nama_dosen || 'Unknown'}</strong><br>
+                        <small style="color:#666;">${item.dosen_nidn || '-'}</small>
+                    </td>
+                    <td>${statusBadge}</td>
+                    <td>
+                        ${btnLink}
+                        <button onclick="verifyPublikasi(${id}, 'published')" class="btn btn-sm btn-success" title="Approve"><i class="fas fa-check"></i></button>
+                        <button onclick="verifyPublikasi(${id}, 'rejected')" class="btn btn-sm btn-secondary" title="Reject"><i class="fas fa-times"></i></button>
+                        
+                        <a href="edit_publikasi.html?id=${id}" class="btn btn-sm btn-warning" title="Edit" style="background-color: #ffc107; border:none; padding: 5px 10px; border-radius: 4px; color:white; text-decoration:none; display:inline-block;">
+                            <i class="fas fa-pencil-alt"></i>
+                        </a>
+
+                        <button onclick="deletePublikasi(${id}, '${item.judul}')" class="btn btn-danger btn-sm" title="Hapus"><i class="fas fa-trash-alt"></i></button>
+                    </td>
                 `;
             });
-
-            // Event listener untuk tombol hapus
-            document.querySelectorAll('.delete-button').forEach(button => {
-                button.addEventListener('click', (e) => {
-                    const id = e.target.closest('button').dataset.id;
-                    if (confirm('Apakah Anda yakin ingin menghapus publikasi ini?')) {
-                        deletePublikasi(id);
-                    }
-                });
-            });
         }
 
-        async function deletePublikasi(id) {
+        function applyFilters() {
+            const focusVal = document.getElementById('filterFocus').value;
+            const katVal = document.getElementById('filterKategori').value;
+
+            const filteredData = allPublikasiData.filter(item => {
+                const matchFocus = focusVal === "" || item.nama_fokus === focusVal;
+                const matchKat = katVal === "" || item.nama_kategori === katVal;
+                return matchFocus && matchKat;
+            });
+
+            renderTable(filteredData);
+        }
+
+        document.getElementById('filterFocus').addEventListener('change', applyFilters);
+        document.getElementById('filterKategori').addEventListener('change', applyFilters);
+
+        async function verifyPublikasi(id, status) {
+            const actionName = status === 'published' ? 'Publish' : 'Reject';
+            if (!confirm(`Ubah status menjadi ${actionName}?`)) return;
+
+            const formData = new FormData();
+            formData.append('publikasi_id', id);
+            formData.append('status', status);
+
             try {
-                const formData = new FormData();
-                formData.append('publikasi_id', id);
-
-                const response = await fetch(API_BASE_URL + 'delete.php', {
-                    method: 'POST',
-                    body: formData
-                });
+                const response = await fetch('../../../backend/api/publikasi/verify.php', { method: 'POST', body: formData });
                 const result = await response.json();
-
-                if (response.ok && result.status === 'success') {
+                if (result.status === 'success') {
                     displayMessage('success', result.message);
-                    fetchPublikasi(); // Muat ulang data
-                } else {
-                    displayMessage('error', result.message || 'Gagal menghapus publikasi.');
-                }
-
-            } catch (error) {
-                console.error('Delete error:', error);
-                displayMessage('error', 'Terjadi kesalahan jaringan.');
-            }
+                    fetchPublikasi();
+                } else { displayMessage('error', result.message); }
+            } catch (error) { displayMessage('error', 'Gagal update status.'); }
         }
 
-        document.addEventListener('DOMContentLoaded', fetchPublikasi);
-
-
-        // --- LOGIKA LOGOUT ---
-        const logoutModal = document.getElementById('logoutModal');
-        const logoutTrigger = document.getElementById('logoutTrigger');
-        const cancelLogoutBtn = document.getElementById('cancelLogoutBtn');
-        const confirmLogoutBtn = document.getElementById('confirmLogoutBtn');
-
-        if (logoutTrigger) {
-            logoutTrigger.addEventListener('click', (e) => {
-                e.preventDefault();
-                logoutModal.classList.add('show');
-            });
+        async function deletePublikasi(id, judul) {
+            if (!confirm(`Hapus publikasi: "${judul}"?`)) return;
+            const formData = new FormData();
+            formData.append('publikasi_id', id);
+            try {
+                const response = await fetch('../../../backend/api/publikasi/delete.php', { method: 'POST', body: formData });
+                const result = await response.json();
+                if (result.status === 'success') {
+                    displayMessage('success', result.message);
+                    fetchPublikasi();
+                } else { displayMessage('error', result.message); }
+            } catch (error) { displayMessage('error', 'Gagal menghapus data.'); }
         }
 
-        if (cancelLogoutBtn) {
-            cancelLogoutBtn.addEventListener('click', () => {
-                logoutModal.classList.remove('show');
-            });
-        }
-
-        if (confirmLogoutBtn) {
-            confirmLogoutBtn.addEventListener('click', async () => {
-                const url = '../../../backend/api/auth/logout.php';
-                try {
-                    await fetch(url, { method: 'POST' });
-                    // Redirect ke login/landing page
-                    window.location.href = '../../public/index.html';
-                } catch (error) {
-                    console.error('Logout Error:', error);
-                    window.location.href = '../../public/index.html';
-                }
-            });
-        }
-
-        window.addEventListener('click', (e) => {
-            if (e.target === logoutModal) {
-                logoutModal.classList.remove('show');
-            }
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchFilters();
+            fetchPublikasi();
         });
+
+        const logoutModal = document.getElementById('logoutModal');
+        document.getElementById('logoutTrigger').onclick = (e) => { e.preventDefault(); logoutModal.classList.add('show'); };
+        document.getElementById('cancelLogoutBtn').onclick = () => logoutModal.classList.remove('show');
+        document.getElementById('confirmLogoutBtn').onclick = async () => {
+            await fetch('../../../backend/api/auth/logout.php', { method: 'POST' });
+            window.location.href = '../../public/index.html';
+        };
     </script>
 </body>
-
 </html>

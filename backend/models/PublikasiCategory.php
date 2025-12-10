@@ -1,23 +1,18 @@
 <?php
-// File: models/PublikasiCategory.php
+require_once __DIR__ . '/../config/database.php';
 
-class PublikasiCategory { // <--- NAMA CLASS DISAMAKAN DENGAN NAMA FILE
+class PublikasiCategory {
     private $db;
 
     public function __construct() {
-        global $koneksi;
-        $this->db = $koneksi;
+        $this->db = Database::getInstance();
     }
 
     public function getAll() {
-        // Query tetap ke tabel 'kategori_publikasi' (sesuai database)
+        // Query ambil kategori
         $query = "SELECT * FROM kategori_publikasi ORDER BY id ASC";
-        $result = pg_query($this->db, $query);
-        $data = [];
-        while ($row = pg_fetch_assoc($result)) {
-            $data[] = $row;
-        }
-        return $data;
+        $stmt = $this->db->query($query);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }
 ?>
