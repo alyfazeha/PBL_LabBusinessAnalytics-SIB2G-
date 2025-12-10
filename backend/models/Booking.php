@@ -7,13 +7,12 @@ class Booking
 
     public function __construct()
     {
-        $db = new Database();
-        $this->conn = $db->getConnection();
+        // Mengambil koneksi PDO dari Singleton
+        $this->conn = Database::getInstance();
     }
 
     /* ======================================================
        CEK KONFLIK DENGAN blocked_dates
-       Jika sarana diblok pada tanggal & jam → booking ditolak
     ====================================================== */
     public function isBlocked($sarana_id, $tanggal, $start_time, $end_time)
     {
@@ -42,7 +41,6 @@ class Booking
 
     /* ======================================================
        CEK KONFLIK SESAMA BOOKING
-       Bentrok jika: tanggal sama, sarana sama, jam overlap
     ====================================================== */
     public function hasConflict($sarana_id, $tanggal, $start_time, $end_time)
     {
@@ -51,7 +49,7 @@ class Booking
             FROM bookings
             WHERE sarana_id = :sarana_id
               AND tanggal = :tanggal
-              AND status IN ('diajukan','disetujui')
+              AND status = 'disetujui' -- HANYA CEK DENGAN BOOKING YANG SUDAH DISETUJUI
               AND (
                     end_time > :start_time
                 AND start_time < :end_time
@@ -75,6 +73,10 @@ class Booking
     ====================================================== */
     public function create($data)
     {
+        // Perhitungan SKS & Durasi jam harus ada
+        $hours_per_sks = 2; // Asumsi konstan
+        $duration_hours = $data['sks'] * $hours_per_sks;
+
         $sql = "
             INSERT INTO bookings (
                 mahasiswa_nim, booking_dosen_nidn,
@@ -97,21 +99,25 @@ class Booking
 
         $stmt = $this->conn->prepare($sql);
 
-        $stmt->execute([
+        $params = [
             ':nim' => $data['nim'],
             ':nidn' => $data['nidn'],
             ':sarana_id' => $data['sarana_id'],
             ':tanggal' => $data['tanggal'],
             ':sks' => $data['sks'],
-            ':hours_per_sks' => 2, // CONSTANT
-            ':duration_hours' => $data['sks'] * 2,
+            ':hours_per_sks' => $hours_per_sks,
+            ':duration_hours' => $duration_hours,
             ':start_time' => $data['start_time'],
             ':end_time' => $data['end_time'],
             ':keperluan' => $data['keperluan'],
             ':created_by' => $data['created_by']
-        ]);
+        ];
 
-        return $stmt->fetchColumn();
+        if ($stmt->execute($params)) {
+            // Menggunakan fetchColumn untuk mengambil hasil dari RETURNING booking_id
+            return $stmt->fetchColumn();
+        }
+        return false;
     }
 }
 ?>
