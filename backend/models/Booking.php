@@ -7,8 +7,21 @@ class Booking
 
     public function __construct()
     {
-        // Mengambil koneksi PDO dari Singleton
-        $this->conn = Database::getInstance();
+        // PERBAIKAN: Sesuaikan dengan database.php yang ada
+        // Ambil instance Database dulu
+        $db = Database::getInstance();
+        
+        // Lalu ambil koneksinya (karena getInstance kamu mengembalikan object Database, bukan PDO langsung)
+        // Jika getInstance kamu mengembalikan PDO langsung, kode ini aman.
+        // Jika getInstance mengembalikan object wrapper, kita perlu properti conn-nya.
+        
+        // PENTING: Cek isi database.php kamu. 
+        // Kalau getInstance() return self::$instance->conn; -> Maka $db adalah PDO.
+        // Kalau getInstance() return self::$instance; -> Maka harus $db->getConnection();
+        
+        // Berdasarkan file database.php terakhirmu, getInstance() return $instance->conn.
+        // Jadi $db di sini ADALAH PDO connection.
+        $this->conn = $db; 
     }
 
     /* ======================================================
@@ -49,7 +62,7 @@ class Booking
             FROM bookings
             WHERE sarana_id = :sarana_id
               AND tanggal = :tanggal
-              AND status = 'disetujui' -- HANYA CEK DENGAN BOOKING YANG SUDAH DISETUJUI
+              AND status != 'ditolak' -- Ubah agar booking pending pun dianggap konflik
               AND (
                     end_time > :start_time
                 AND start_time < :end_time
@@ -100,8 +113,8 @@ class Booking
         $stmt = $this->conn->prepare($sql);
 
         $params = [
-            ':nim' => $data['nim'],
-            ':nidn' => $data['nidn'],
+            ':nim' => $data['nim'] ?: null,
+            ':nidn' => $data['nidn'] ?: null,
             ':sarana_id' => $data['sarana_id'],
             ':tanggal' => $data['tanggal'],
             ':sks' => $data['sks'],
