@@ -1,18 +1,12 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-header('Content-Type: application/json');
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
 
 require_once __DIR__ . "/../../config/auth.php";
 require_once __DIR__ . "/BookingController.php";
-require_admin();
 
-if (!isset($_POST['booking_id']) || !isset($_POST['reason'])) {
-    http_response_code(400);
-    echo json_encode(["success" => false, "message" => "ID booking dan alasan wajib diisi."]);
-    exit;
+// PERBAIKAN: Gunakan format standar require_role
+if (function_exists('require_role')) {
+    require_role(['admin']);
 }
 
 $controller = new BookingController();
@@ -22,11 +16,6 @@ $admin_id   = $_SESSION['user_id'];
 $reason     = $_POST['reason'];
 
 $response = $controller->rejectBooking($booking_id, $admin_id, $reason);
-
-// Kirim response code 400 jika gagal
-if (!$response['success']) {
-    http_response_code(400);
-}
 
 echo json_encode($response);
 ?>

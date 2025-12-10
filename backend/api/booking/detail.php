@@ -1,45 +1,33 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-header('Content-Type: application/json');
-
 require_once __DIR__ . "/../../config/database.php";
 require_once __DIR__ . "/../../config/auth.php";
-require_admin(); // Cek role admin di sini
+
+// Cek Login (Semua role boleh lihat detail asalkan login)
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
+if (!isset($_SESSION['user_id'])) {
+    die(json_encode(["error" => "Unauthorized"]));
+}
+
+// PERBAIKAN KONEKSI
+$conn = Database::getInstance();
 
 if (!isset($_GET['id'])) {
-    http_response_code(400);
-    echo json_encode(["error" => "ID booking wajib diisi."]);
-    exit;
+    die(json_encode(["error" => "ID booking tidak ditemukan."]));
 }
 
 $id = $_GET['id'];
-$conn = Database::getInstance(); // Mengambil koneksi PDO
 
-$sql = "SELECT * FROM vw_peminjaman_history WHERE booking_id = :id"; 
+// Pastikan tabel vw_peminjaman_history ada, kalau tidak, ganti 'bookings'
+$sql = "SELECT * FROM bookings WHERE booking_id = :id"; 
 $stmt = $conn->prepare($sql);
+$stmt->bindParam(":id", $id);
+$stmt->execute();
 
-try {
-    $stmt->execute([":id" => $id]);
-    $data = $stmt->fetch(PDO::FETCH_ASSOC);
-    
-    if (!$data) {
-        http_response_code(404);
-        echo json_encode(["status" => "error", "message" => "Data booking tidak ditemukan."]);
-        exit;
-    }
+$data = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($_SESSION['role'] !== 'admin') {
-        http_response_code(403);
-        echo json_encode(["error" => "Akses dilarang."]);
-        exit;
-    }
-
-    echo json_encode(['status' => 'success', 'data' => $data]);
-} catch (PDOException $e) {
-    http_response_code(500);
-    echo json_encode(["status" => "error", "message" => "Gagal mengambil data detail.", "db_error" => $e->getMessage()]);
+if (!$data) {
+    echo json_encode(["error" => "Data booking tidak ditemukan."]);
+} else {
+    echo json_encode($data);
 }
 ?>
