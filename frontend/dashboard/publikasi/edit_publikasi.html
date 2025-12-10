@@ -14,11 +14,16 @@
 <body>
 
     <div class="sidebar">
-        <div class="logo-area"><h3>Lab Admin</h3></div>
+        <div class="logo-area">
+            <h3>Lab Admin</h3>
+        </div>
         <nav>
             <a href="../admin.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="../peminjaman/peminjaman.html"><i class="fas fa-calendar-alt"></i> Peminjaman</a>
+            <a href="../konten/konten.html"><i class="fas fa-newspaper"></i> Berita & Konten</a>
             <a href="publikasi.html" class="active"><i class="fas fa-book"></i> Publikasi</a>
             <a href="../dosen/dosen.html"><i class="fas fa-users"></i> Data Dosen</a>
+            <a href="../mahasiswa/mahasiswa.html"><i class="fas fa-user-graduate"></i> Data Mahasiswa</a>
             <a href="#" id="logoutTrigger"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </nav>
     </div>
@@ -68,7 +73,8 @@
                 </div>
 
                 <div class="form-actions">
-                    <button type="submit" class="btn btn-primary" id="submitBtn"><i class="fas fa-save"></i> Simpan Perubahan</button>
+                    <button type="submit" class="btn btn-primary" id="submitBtn"><i class="fas fa-save"></i> Simpan
+                        Perubahan</button>
                     <a href="publikasi.html" class="btn btn-secondary">Batal</a>
                 </div>
             </form>
@@ -122,7 +128,7 @@
                 const jsonDos = await resDos.json();
                 const selDos = document.getElementById('dosen_nidn');
                 selDos.innerHTML = '<option value="">-- Pilih Dosen --</option>';
-                
+
                 let dataDosen = [];
                 if (Array.isArray(jsonDos)) dataDosen = jsonDos;
                 else if (jsonDos.status === 'success') dataDosen = jsonDos.data;
@@ -143,7 +149,7 @@
             if (!id) { displayMessage('error', 'ID tidak ditemukan'); return; }
 
             // Tunggu dropdown selesai dimuat dulu agar bisa diset value-nya
-            await loadDropdowns(); 
+            await loadDropdowns();
 
             try {
                 const response = await fetch(`../../../backend/api/publikasi/detail.php?id=${id}`);
@@ -154,13 +160,13 @@
                     document.getElementById('publikasi_id').value = data.id;
                     document.getElementById('judul').value = data.judul;
                     document.getElementById('external_link').value = data.external_link;
-                    
+
                     // Set Value Dropdown
                     document.getElementById('kategori_id').value = data.kategori_id;
                     document.getElementById('dosen_nidn').value = data.dosen_nidn;
-                    
+
                     // Set Value Fokus (Pastikan di DB kolomnya focus_id)
-                    if(data.focus_id) {
+                    if (data.focus_id) {
                         document.getElementById('focus_id').value = data.focus_id;
                     }
                 } else {
@@ -179,10 +185,10 @@
             try {
                 const res = await fetch('../../../backend/api/publikasi/update.php', { method: 'POST', body: formData });
                 const text = await res.text();
-                
+
                 let json;
-                try { json = JSON.parse(text); } 
-                catch(e) { throw new Error("Server Error: " + text); }
+                try { json = JSON.parse(text); }
+                catch (e) { throw new Error("Server Error: " + text); }
 
                 if (json.status === 'success') {
                     displayMessage('success', json.message);
@@ -190,9 +196,9 @@
                 } else {
                     displayMessage('error', json.message);
                 }
-            } catch (err) { 
+            } catch (err) {
                 console.error(err);
-                displayMessage('error', err.message || 'Error server'); 
+                displayMessage('error', err.message || 'Error server');
             }
             finally { btn.disabled = false; btn.innerHTML = '<i class="fas fa-save"></i> Simpan Perubahan'; }
         });
@@ -203,9 +209,10 @@
         document.getElementById('logoutTrigger').onclick = (e) => { e.preventDefault(); document.getElementById('logoutModal').classList.add('show'); };
         document.getElementById('cancelLogoutBtn').onclick = () => document.getElementById('logoutModal').classList.remove('show');
         document.getElementById('confirmLogoutBtn').onclick = async () => {
-            try{ await fetch('../../../backend/api/auth/logout.php', { method: 'POST' }); } catch(e){}
+            try { await fetch('../../../backend/api/auth/logout.php', { method: 'POST' }); } catch (e) { }
             window.location.href = '../../public/index.html';
         };
     </script>
 </body>
+
 </html>
