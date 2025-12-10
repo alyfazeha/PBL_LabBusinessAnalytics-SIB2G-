@@ -23,6 +23,12 @@
             color: #333;
         }
 
+        /* Tambahkan style untuk DIAJUKAN, jika ini statusnya di DB */
+        .DIAJUKAN {
+            background-color: #ffc107;
+            color: #333;
+        }
+
         .DISETUJUI {
             background-color: #28a745;
             color: white;
@@ -203,6 +209,7 @@
                 const response = await fetch(BASE_API_URL + 'list.php');
                 const result = await response.json();
 
+                // 1. Cek respon status HTTP dan error dari API
                 if (!response.ok || result.error) {
                     const errorMessage = result.error || result.message || `Gagal memuat data. Status: ${response.status}.`;
                     showStatusMessage(errorMessage);
@@ -210,10 +217,10 @@
                     return;
                 }
 
-                // Asumsi backend mengembalikan array data
-                const data = result;
+                // 2. Koreksi pengambilan data dari respons (harusnya result.data, bukan seluruh result)
+                if (result.status === 'success' && Array.isArray(result.data)) {
+                    const data = result.data; // Ambil array data dari key 'data'
 
-                if (Array.isArray(data)) {
                     tableBody.innerHTML = '';
 
                     if (data.length === 0) {
@@ -224,26 +231,33 @@
                     data.forEach(item => {
                         const row = tableBody.insertRow();
 
-                        // Menyesuaikan dengan output dari list.php (BookingController)
                         row.insertCell().textContent = item.booking_id;
-                        row.insertCell().textContent = item.peminjam;     // dari join users u.username
-                        row.insertCell().textContent = item.nama_sarana;  // dari join sarana s.nama_sarana
+                        row.insertCell().textContent = item.peminjam;
+                        row.insertCell().textContent = item.nama_sarana;
                         row.insertCell().textContent = item.tanggal;
                         row.insertCell().textContent = `${item.start_time.substring(0, 5)} - ${item.end_time.substring(0, 5)}`;
 
                         const statusCell = row.insertCell();
-                        const statusClass = item.status.toUpperCase();
-                        statusCell.innerHTML = `<span class="status ${statusClass}">${statusClass}</span>`;
+                        // Pastikan status adalah uppercase untuk mencocokkan class CSS
+                        const statusText = item.status.toUpperCase();
+                        statusCell.innerHTML = `<span class="status ${statusText}">${statusText}</span>`;
 
                         const actionCell = row.insertCell();
+
+                        // LOGIKA TOMBOL AKSI (DIPERBAIKI)
+                        // Cek status, biarkan tombol muncul jika status adalah 'pending' ATAU 'diajukan'
+                        const statusLower = item.status.toLowerCase();
+                        const isPending = statusLower === 'pending' || statusLower === 'diajukan'; // Tambahkan 'diajukan'
+
                         actionCell.innerHTML = `
-                            <button class="btn btn-detail" onclick="window.location.href='edit_peminjaman.html?id=${item.booking_id}'">Detail</button>
-                            ${item.status === 'pending' ? `<button class="btn btn-action" onclick="showApproveModal(${item.booking_id})">Setuju</button>` : ''}
-                            ${item.status === 'pending' ? `<button class="btn btn-danger" onclick="showRejectModal(${item.booking_id})">Tolak</button>` : ''}
+                            <button class="btn btn-detail" onclick="window.location.href='detail.php?id=${item.booking_id}'">Detail</button>
+                            ${isPending ? `<button class="btn btn-action" onclick="showApproveModal(${item.booking_id})">Setuju</button>` : ''}
+                            ${isPending ? `<button class="btn btn-danger" onclick="showRejectModal(${item.booking_id})">Tolak</button>` : ''}
                         `;
                     });
                 } else {
-                    showStatusMessage('Format data dari server tidak valid.');
+                    showStatusMessage(result.message || 'Format data dari server tidak valid.');
+                    tableBody.innerHTML = '<tr><td colspan="7" style="color: red;">Error: Data gagal diurai. Cek format backend.</td></tr>';
                 }
 
             } catch (error) {
