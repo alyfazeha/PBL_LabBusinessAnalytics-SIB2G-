@@ -25,7 +25,7 @@ try {
     $researchgate_url = trim($_POST['researchgate_url'] ?? "");
     $scholar_url = trim($_POST['scholar_url'] ?? "");
     $sinta_url = trim($_POST['sinta_url'] ?? "");
-    
+
     // --- PERBAIKAN NIP ---
     $nip = trim($_POST['nip'] ?? "");
     // Jika NIP kosong atau isinya cuma strip (-), ubah jadi NULL agar tidak error Unique
@@ -50,39 +50,61 @@ try {
     // ---------------------------------------------------------
     // 2. LOGIKA UPLOAD FOTO
     // ---------------------------------------------------------
-    $final_foto_path = $foto_path_input;
+    $final_foto_path = $foto_path_input; // Pertahankan path lama jika tidak ada upload baru
 
+    // Cek apakah ada file baru yang diupload dan tidak ada error
     if (isset($_FILES['foto_file']) && $_FILES['foto_file']['error'] === UPLOAD_ERR_OK) {
-        $fileTmpPath = $_FILES['foto_file']['tmp_name'];
-        $fileName = $_FILES['foto_file']['name'];
-        $fileNameCmps = explode(".", $fileName);
-        $fileExtension = strtolower(end($fileNameCmps));
 
-        $allowedfileExtensions = array('jpg', 'gif', 'png', 'jpeg', 'webp');
-        if (in_array($fileExtension, $allowedfileExtensions)) {
-            $newFileName = $nidn . '_' . time() . '.' . $fileExtension;
+        // 1. Tentukan direktori upload absolut menggunakan __DIR__
+        // Asumsi: File PHP ini berada 3 level di bawah direktori frontend/assets/uploads/
+        $uploadDir = __DIR__ . '/../../../frontend/assets/uploads/dosen/';
 
-            // Path Dinamis ke Root Project
-            $projectRoot = dirname(__DIR__, 3); 
-            $uploadFileDir = $projectRoot . '/frontend/assets/uploads/dosen/';
-            
-            if (!is_dir($uploadFileDir)) {
-                if (!mkdir($uploadFileDir, 0777, true)) {
-                    throw new Exception("Gagal membuat folder upload di: " . $uploadFileDir);
-                }
+        // 2. Pastikan folder ada
+        if (!is_dir($uploadDir)) {
+            if (!mkdir($uploadDir, 0777, true)) {
+                http_response_code(500);
+                exit(json_encode(['status' => 'error', 'message' => "Gagal membuat folder upload di: " . $uploadDir]));
+            }
+        }
+
+        $fileNameWithExt = $_FILES['foto_file']['name'];
+        $fileExtension = pathinfo($fileNameWithExt, PATHINFO_EXTENSION);
+        $fileExtensionLower = strtolower($fileExtension);
+
+        $allowedTypes = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+
+        // 3. Cek format file
+        if (in_array($fileExtensionLower, $allowedTypes)) {
+
+            // 4. Buat nama file unik (menggunakan NIDN dan timestamp)
+            // Pastikan variabel $nidn sudah tersedia
+            if (empty($nidn)) {
+                // Jika $nidn tidak tersedia, gunakan id unik saja, atau berikan error
+                $newFileName = 'dosen_' . time() . '_' . uniqid() . '.' . $fileExtensionLower;
+            } else {
+                $newFileName = $nidn . '_' . time() . '.' . $fileExtensionLower;
             }
 
-            $dest_path = $uploadFileDir . $newFileName;
+            $targetFile = $uploadDir . $newFileName;
 
-            if(move_uploaded_file($fileTmpPath, $dest_path)) {
-                $final_foto_path = 'assets/uploads/dosen/' . $newFileName;
+            // 5. Pindahkan file
+            if (move_uploaded_file($_FILES['foto_file']['tmp_name'], $targetFile)) {
+
+                // 6. Simpan path yang dapat dibaca frontend ke database
+                // Path ini relatif dari root frontend ke file gambar
+                $final_foto_path = '../../assets/uploads/dosen/' . $newFileName;
             } else {
-                throw new Exception("Gagal memindahkan file. Cek izin folder.");
+                // Jika gagal upload, kirim error API
+                http_response_code(500);
+                exit(json_encode(['status' => 'error', 'message' => 'Gagal memindahkan file upload. Cek izin folder.']));
             }
         } else {
-            throw new Exception("Format foto tidak didukung.");
+            // Jika format tidak didukung, kirim error API
+            http_response_code(400);
+            exit(json_encode(['status' => 'error', 'message' => 'Format foto tidak didukung.']));
         }
     }
+    // Variabel $final_foto_path sekarang siap digunakan untuk query database.
 
     // 3. Mulai Transaksi Database
     $db = Database::getInstance();
@@ -129,7 +151,7 @@ try {
                         :researchgate_url, :scholar_url, :sinta_url,
                         :nip, :prodi, :pendidikan, :sertifikasi, :mata_kuliah
                     )";
-        
+
         $stmtDosen = $db->prepare($sqlDosen);
         $stmtDosen->execute([
             ':nidn' => $nidn,
@@ -150,12 +172,10 @@ try {
 
         $db->commit();
         echo json_encode(['success' => true, 'message' => 'Berhasil menyimpan data dosen!']);
-
     } catch (Exception $ex) {
         $db->rollBack();
         throw $ex;
     }
-
 } catch (Exception $e) {
     http_response_code(500);
     if (strpos($e->getMessage(), 'Duplicate entry') !== false) {
@@ -165,4 +185,3 @@ try {
         echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
     }
 }
-?>
