@@ -10,10 +10,35 @@
     <link rel="stylesheet" href="../../assets/css/cssadmin.css">
     <link rel="stylesheet" href="../../assets/css/cssmahasiswa.css">
     <style>
-        .filter-container { display: flex; gap: 15px; margin-bottom: 20px; align-items: center; background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #e9ecef; }
-        .filter-group { display: flex; flex-direction: column; }
-        .filter-group label { font-size: 12px; font-weight: 600; margin-bottom: 5px; color: #666; }
-        .filter-select { padding: 8px; border: 1px solid #ddd; border-radius: 4px; min-width: 200px; }
+        .filter-container {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            align-items: center;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-group label {
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #666;
+        }
+
+        .filter-select {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            min-width: 200px;
+        }
     </style>
 </head>
 
@@ -26,7 +51,7 @@
         <nav>
             <a href="../admin.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
             <a href="../peminjaman/peminjaman.html"><i class="fas fa-calendar-alt"></i> Peminjaman</a>
-            <a href="konten.html"><i class="fas fa-newspaper"></i> Berita & Konten</a>
+            <a href="../konten/konten.html"><i class="fas fa-newspaper"></i> Berita & Konten</a>
             <a href="publikasi.html" class="active"><i class="fas fa-book"></i> Publikasi</a>
             <a href="../dosen/dosen.html"><i class="fas fa-users"></i> Data Dosen</a>
             <a href="../mahasiswa/mahasiswa.html"><i class="fas fa-user-graduate"></i> Data Mahasiswa</a>
@@ -68,14 +93,16 @@
                             <th>ID</th>
                             <th>Judul Publikasi</th>
                             <th>Kategori</th>
-                            <th>Fokus Riset</th> 
+                            <th>Fokus Riset</th>
                             <th>Dosen (NIDN)</th>
                             <th>Status</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody id="publikasiTableBody">
-                        <tr><td colspan="7" style="text-align:center;">Sedang memuat data...</td></tr>
+                        <tr>
+                            <td colspan="7" style="text-align:center;">Sedang memuat data...</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -101,7 +128,7 @@
         }
 
         const tableBody = document.getElementById('publikasiTableBody');
-        let allPublikasiData = []; 
+        let allPublikasiData = [];
 
         async function fetchFilters() {
             try {
@@ -152,7 +179,7 @@
 
         function renderTable(data) {
             tableBody.innerHTML = '';
-            
+
             if (data.length === 0) {
                 tableBody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Data tidak ditemukan.</td></tr>';
                 return;
@@ -258,4 +285,5 @@
         };
     </script>
 </body>
+
 </html>
