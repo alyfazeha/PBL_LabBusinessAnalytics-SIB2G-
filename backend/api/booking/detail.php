@@ -1,29 +1,52 @@
 <?php
+// backend/api/peminjaman/detail.php
+ini_set('display_errors', 0);
+header('Content-Type: application/json');
+
 require_once __DIR__ . "/../../config/database.php";
 require_once __DIR__ . "/../../config/auth.php";
 
-require_admin();
+// HAPUS require_admin(); agar mahasiswa bisa lihat
+require_login_json(); // Ganti jadi require login biasa
 
 if (!isset($_GET['id'])) {
-    die(json_encode(["error" => "ID booking tidak ditemukan."]));
+    http_response_code(400);
+    echo json_encode(["error" => "ID booking wajib diisi."]);
+    exit;
 }
 
-// PERBAIKAN KONEKSI
-$conn = Database::getInstance();
+try {
+    $id = $_GET['id'];
+    $conn = Database::getInstance();
 
-$id = $_GET['id'];
+    // Query Detail
+    $sql = "SELECT b.*, s.nama_sarana, u.username as peminjam 
+            FROM bookings b
+            LEFT JOIN sarana s ON b.sarana_id = s.sarana_id
+            LEFT JOIN users u ON b.created_by = u.user_id
+            WHERE booking_id = :id";
+            
+    $stmt = $conn->prepare($sql);
+    $stmt->execute([":id" => $id]);
+    $data = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    if (!$data) {
+        http_response_code(404);
+        echo json_encode(["status" => "error", "message" => "Data tidak ditemukan."]);
+        exit;
+    }
 
-// Pastikan tabel vw_peminjaman_history ada, kalau tidak, ganti 'bookings'
-$sql = "SELECT * FROM vw_peminjaman_history WHERE booking_id = :id"; 
-$stmt = $conn->prepare($sql);
-$stmt->bindParam(":id", $id);
-$stmt->execute();
+    // PROTEKSI: Hanya Admin ATAU Pemilik Booking yang boleh lihat
+    if ($_SESSION['role'] !== 'admin' && $_SESSION['user_id'] != $data['created_by']) {
+        http_response_code(403);
+        echo json_encode(["status" => "error", "message" => "Anda tidak berhak melihat data ini."]);
+        exit;
+    }
 
-$data = $stmt->fetch(PDO::FETCH_ASSOC);
+    echo json_encode($data); // Kirim data langsung (sesuai JS kamu)
 
-if (!$data) {
-    echo json_encode(["error" => "Data booking tidak ditemukan."]);
-} else {
-    echo json_encode($data);
+} catch (Exception $e) {
+    http_response_code(500);
+    echo json_encode(["status" => "error", "message" => $e->getMessage()]);
 }
 ?>

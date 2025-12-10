@@ -1,19 +1,23 @@
 <?php
+// Matikan error HTML
+ini_set('display_errors', 0);
+error_reporting(E_ALL);
+
 header('Content-Type: application/json');
 header("Access-Control-Allow-Origin: *");
 
 require_once __DIR__ . "/../../config/database.php";
-require_once __DIR__ . "/../../config/auth.php"; 
-require_login_json();
+
+session_start();
 
 if (!isset($_SESSION['user_id'])) {
     http_response_code(401);
-    echo json_encode(["error" => "Unauthorized access."]);
+    echo json_encode(["status" => "error", "message" => "Unauthorized access."]);
     exit;
 }
 
 try {
-    // PERBAIKAN KONEKSI
+    // 1. Gunakan Singleton
     $db = Database::getInstance(); 
 
     $user_id = $_SESSION['user_id'];
@@ -21,6 +25,7 @@ try {
     $nidn    = $_SESSION['nidn'] ?? null;
     $nim     = $_SESSION['nim'] ?? null;
 
+    // 2. Query berdasarkan Role
     if ($role === 'admin') {
         $sql = "SELECT b.*, s.nama_sarana, u.username AS peminjam
                 FROM bookings b
@@ -52,10 +57,18 @@ try {
     }
 
     $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    echo json_encode($rows);
+
+    // 3. Output Format yang Benar
+    echo json_encode([
+        "status" => "success",
+        "data" => $rows
+    ]);
 
 } catch (Exception $e) {
     http_response_code(500);
-    echo json_encode(["error" => "Server Error: " . $e->getMessage()]);
+    echo json_encode([
+        "status" => "error", 
+        "message" => "Server Error: " . $e->getMessage()
+    ]);
 }
 ?>
