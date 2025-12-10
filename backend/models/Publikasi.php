@@ -14,15 +14,15 @@ class Publikasi {
 
     public function getPublishedOnly() {
         // Query untuk halaman depan (Public)
+        // PERUBAHAN: JOIN langsung ke research_focus menggunakan p.focus_id
         $query = "SELECT p.id, p.judul, p.external_link, p.created_at, 
                          k.nama_kategori, 
                          d.nama AS nama_dosen, d.nidn AS dosen_nidn,
-                         r.nama_fokus -- Tambahan: Nama Fokus
+                         r.nama_fokus -- Ini sekarang diambil dari inputan publikasi
                   FROM publikasi p
                   LEFT JOIN kategori_publikasi k ON p.kategori_id = k.id
                   LEFT JOIN dosen d ON p.dosen_nidn = d.nidn
-                  LEFT JOIN dosen_focus df ON d.nidn = df.nidn
-                  LEFT JOIN research_focus r ON df.focus_id = r.focus_id
+                  LEFT JOIN research_focus r ON p.focus_id = r.focus_id -- DIRECT JOIN
                   WHERE p.status = 'published'
                   ORDER BY p.id DESC";
 
@@ -36,16 +36,15 @@ class Publikasi {
 
     public function getAll() {
         // Query untuk Admin Dashboard (Data Publikasi)
-        // Kita JOIN ke research_focus agar admin bisa filter berdasarkan topik
+        // PERUBAHAN: JOIN langsung ke research_focus menggunakan p.focus_id
         $query = "SELECT p.id, p.judul, p.external_link, p.created_at, p.status,
                          k.nama_kategori, k.id as kategori_id,
                          d.nama AS nama_dosen, d.nidn AS dosen_nidn,
-                         r.nama_fokus -- Tambahan: Nama Fokus Riset
+                         r.nama_fokus -- Ini sekarang diambil dari inputan publikasi
                   FROM publikasi p
                   LEFT JOIN kategori_publikasi k ON p.kategori_id = k.id
                   LEFT JOIN dosen d ON p.dosen_nidn = d.nidn
-                  LEFT JOIN dosen_focus df ON d.nidn = df.nidn
-                  LEFT JOIN research_focus r ON df.focus_id = r.focus_id
+                  LEFT JOIN research_focus r ON p.focus_id = r.focus_id -- DIRECT JOIN
                   ORDER BY p.id DESC";
         
         $stmt = $this->db->query($query);
@@ -60,13 +59,15 @@ class Publikasi {
     }
 
     public function create($data) {
-        $query = "INSERT INTO publikasi (judul, external_link, kategori_id, dosen_nidn, status) 
-                  VALUES (?, ?, ?, ?, 'pending') RETURNING id";  
+        // PERUBAHAN: Menambahkan focus_id ke INSERT
+        $query = "INSERT INTO publikasi (judul, external_link, kategori_id, dosen_nidn, focus_id, status) 
+                  VALUES (?, ?, ?, ?, ?, 'pending') RETURNING id";  
         $params = [
             $data['judul'], 
             $data['external_link'], 
             $data['kategori_id'], 
-            $data['dosen_nidn']
+            $data['dosen_nidn'],
+            $data['focus_id'] // Simpan Topik Riset yang dipilih
         ];
         $stmt = $this->db->prepare($query);
         if ($stmt->execute($params)) {
@@ -77,14 +78,16 @@ class Publikasi {
     }
 
     public function update($id, $data) {
+        // PERUBAHAN: Menambahkan focus_id ke UPDATE
         $query = "UPDATE publikasi 
-                  SET judul = ?, external_link = ?, kategori_id = ?, dosen_nidn = ?, updated_at = NOW()
+                  SET judul = ?, external_link = ?, kategori_id = ?, dosen_nidn = ?, focus_id = ?, updated_at = NOW()
                   WHERE id = ?";
         $params = [
             $data['judul'], 
             $data['external_link'], 
             $data['kategori_id'], 
             $data['dosen_nidn'], 
+            $data['focus_id'], // Update Topik Riset
             $id
         ];
         $stmt = $this->db->prepare($query);

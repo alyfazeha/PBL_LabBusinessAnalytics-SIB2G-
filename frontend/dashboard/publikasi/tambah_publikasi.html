@@ -51,22 +51,18 @@
                     </select>
                 </div>
 
-                <div class="form-group" style="background: #e9ecef; padding: 15px; border-radius: 8px; border: 1px solid #ced4da;">
-                    <label for="filter_focus" style="color: #495057; font-weight:bold;">
-                        <i class="fas fa-filter"></i> Filter Dosen Berdasarkan Keahlian:
-                    </label>
-                    <select id="filter_focus" style="margin-top: 5px;">
-                        <option value="">-- Tampilkan Semua Bidang --</option>
+                <div class="form-group">
+                    <label for="focus_id">Topik / Fokus Riset <span class="required">*</span></label>
+                    <select id="focus_id" name="focus_id" required>
+                        <option value="">-- Pilih Topik Riset --</option>
                     </select>
-                    <small style="display:block; margin-top:5px; color:#666;">
-                        Pilih bidang riset di atas untuk memudahkan pencarian nama dosen di bawah.
-                    </small>
+                    <small>Pilih topik yang sesuai dengan judul publikasi ini.</small>
                 </div>
 
                 <div class="form-group">
                     <label for="dosen_nidn">Pilih Dosen Penulis <span class="required">*</span></label>
                     <select id="dosen_nidn" name="dosen_nidn" required>
-                        <option value="">-- Pilih Dosen --</option>
+                        <option value="">-- Sedang memuat dosen... --</option>
                     </select>
                     <small>Format: Nama Dosen (NIDN)</small>
                 </div>
@@ -94,15 +90,14 @@
     </div>
 
     <script>
+        // Fungsi Menampilkan Pesan
         function displayMessage(type, message) {
             const messageArea = document.getElementById('message');
             messageArea.textContent = message;
-            messageArea.className = 'message-area ' + type;
+            messageArea.className = 'message-area ' + type; // Pastikan CSS memiliki class .success dan .error
             messageArea.style.display = 'block';
             setTimeout(() => { messageArea.style.display = 'none'; }, 5000);
         }
-
-        let allDosenData = []; // Menyimpan data dosen mentah
 
         // 1. Fetch Kategori
         async function fetchKategori() {
@@ -114,98 +109,76 @@
 
                 if (result.status === 'success' && result.data) {
                     result.data.forEach(item => {
-                        const option = document.createElement('option');
-                        option.value = item.id; 
-                        option.textContent = item.nama_kategori;
-                        select.appendChild(option);
+                        select.innerHTML += `<option value="${item.id}">${item.nama_kategori}</option>`;
                     });
                 }
-            } catch (error) { console.error('Kategori Error:', error); }
+            } catch (error) { 
+                console.error('Kategori Error:', error); 
+                document.getElementById('kategori_id').innerHTML = '<option value="">Error koneksi kategori</option>';
+            }
         }
 
-        // 2. Fetch Research Focus (Untuk Filter)
+        // 2. Fetch Research Focus
         async function fetchFocus() {
             try {
                 const response = await fetch('../../../backend/api/research/list.php');
                 const result = await response.json();
-                const select = document.getElementById('filter_focus');
+                const select = document.getElementById('focus_id');
+                select.innerHTML = '<option value="">-- Pilih Topik Riset --</option>';
                 
                 if (result.status === 'success' && result.data) {
                     result.data.forEach(item => {
-                        const option = document.createElement('option');
-                        option.value = item.nama_fokus; 
-                        option.textContent = item.nama_fokus;
-                        select.appendChild(option);
+                        // Value menggunakan focus_id agar tersimpan relasinya di DB
+                        select.innerHTML += `<option value="${item.focus_id}">${item.nama_fokus}</option>`;
                     });
                 }
             } catch (error) { console.error('Focus Error:', error); }
         }
 
-        // 3. Fetch Dosen
+        // 3. Fetch Dosen (Support Format Array / Object)
         async function fetchDosen() {
             try {
                 const response = await fetch('../../../backend/api/dosen/list.php');
                 const result = await response.json();
+                const select = document.getElementById('dosen_nidn');
+                select.innerHTML = '<option value="">-- Pilih Dosen --</option>';
                 
-                if (result.status === 'success' && result.data) {
-                    allDosenData = result.data; // Simpan ke variabel global
-                    renderDosenDropdown(allDosenData); // Tampilkan semua di awal
+                let dataDosen = [];
+                // Cek format respons API (Array langsung atau Object {data: ...})
+                if (Array.isArray(result)) {
+                    dataDosen = result;
+                } else if (result.status === 'success' && Array.isArray(result.data)) {
+                    dataDosen = result.data;
                 }
-            } catch (error) { console.error('Dosen Error:', error); }
+
+                if (dataDosen.length > 0) {
+                    const seen = new Set();
+                    dataDosen.forEach(dosen => {
+                        if (!seen.has(dosen.nidn)) {
+                            seen.add(dosen.nidn);
+                            select.innerHTML += `<option value="${dosen.nidn}">${dosen.nama} (${dosen.nidn})</option>`;
+                        }
+                    });
+                } else {
+                    select.innerHTML = '<option value="">Data Dosen Kosong</option>';
+                }
+
+            } catch (error) { 
+                console.error('Dosen Error:', error);
+                document.getElementById('dosen_nidn').innerHTML = '<option value="">Gagal memuat dosen</option>';
+            }
         }
 
-        // Fungsi Render Dropdown Dosen
-        function renderDosenDropdown(dosenList) {
-            const select = document.getElementById('dosen_nidn');
-            
-            if (dosenList.length === 0) {
-                select.innerHTML = '<option value="">-- Tidak ada dosen sesuai filter --</option>';
-                return;
-            }
-
-            select.innerHTML = '<option value="">-- Pilih Dosen --</option>';
-            
-            // Hapus duplikat NIDN (jika 1 dosen punya 2 fokus, namanya muncul 2x di database)
-            const uniqueDosen = [];
-            const seenNIDN = new Set();
-
-            dosenList.forEach(dosen => {
-                if (!seenNIDN.has(dosen.nidn)) {
-                    seenNIDN.add(dosen.nidn);
-                    uniqueDosen.push(dosen);
-                }
-            });
-
-            uniqueDosen.forEach(dosen => {
-                const option = document.createElement('option');
-                option.value = dosen.nidn;
-                // Tampilan: Nama (NIDN)
-                option.textContent = `${dosen.nama} (${dosen.nidn})`; 
-                select.appendChild(option);
-            });
-        }
-
-        // 4. EVENT LISTENER: Saat Filter Fokus Berubah
-        document.getElementById('filter_focus').addEventListener('change', function() {
-            const selectedFocus = this.value;
-            
-            if (selectedFocus === "") {
-                // Reset: Tampilkan semua dosen
-                renderDosenDropdown(allDosenData);
-            } else {
-                // Filter: Cari dosen yang nama_fokus-nya sama dengan pilihan
-                const filtered = allDosenData.filter(d => d.nama_fokus === selectedFocus);
-                renderDosenDropdown(filtered);
-            }
-        });
-
-        // 5. Submit Form
+        // 4. Submit Form (LOGIKA DIPERBAIKI)
         const publikasiForm = document.getElementById('publikasiForm');
         publikasiForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const submitBtn = document.getElementById('submitBtn');
+            const messageArea = document.getElementById('message');
+            
             submitBtn.disabled = true;
             submitBtn.innerHTML = 'Menyimpan...';
+            messageArea.style.display = 'none'; 
 
             const formData = new FormData(publikasiForm);
             
@@ -214,38 +187,51 @@
                     method: 'POST',
                     body: formData
                 });
-                const result = await response.json();
 
-                if (response.ok && result.status === 'success') {
-                    displayMessage('success', result.message);
-                    publikasiForm.reset();
-                    // Kembalikan dropdown dosen ke kondisi awal (semua)
-                    document.getElementById('filter_focus').value = "";
-                    renderDosenDropdown(allDosenData); 
-                } else {
-                    displayMessage('error', result.message || 'Gagal menyimpan.');
+                // Ambil respons sebagai Text dulu (Debugging Aman)
+                const text = await response.text();
+                let result;
+
+                try {
+                    result = JSON.parse(text);
+                } catch (err) {
+                    // Jika error parsing JSON, berarti ada error PHP (Warning/Fatal)
+                    console.error("Server Error (Raw):", text);
+                    throw new Error("Terjadi kesalahan di server. Cek Console (F12) untuk detail.");
                 }
+
+                if (response.ok && (result.status === 'success' || result.id)) {
+                    displayMessage('success', result.message || 'Publikasi berhasil disimpan!');
+                    publikasiForm.reset();
+                    // Reset dropdown ke posisi default
+                    document.getElementById('dosen_nidn').value = "";
+                    document.getElementById('focus_id').value = "";
+                } else {
+                    throw new Error(result.message || 'Gagal menyimpan data.');
+                }
+
             } catch (error) {
-                displayMessage('error', 'Terjadi kesalahan server.');
+                console.error("Submit Error:", error);
+                displayMessage('error', error.message || 'Kesalahan jaringan.');
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = '<i class="fas fa-save"></i> Simpan Publikasi';
             }
         });
 
-        // Load Data Awal
+        // Load Data Saat Halaman Dibuka
         document.addEventListener('DOMContentLoaded', () => {
             fetchKategori();
             fetchFocus();
             fetchDosen();
         });
 
-        // Logout
+        // Logout Logic
         const logoutModal = document.getElementById('logoutModal');
         document.getElementById('logoutTrigger').onclick = (e) => { e.preventDefault(); logoutModal.classList.add('show'); };
         document.getElementById('cancelLogoutBtn').onclick = () => logoutModal.classList.remove('show');
         document.getElementById('confirmLogoutBtn').onclick = async () => {
-            await fetch('../../../backend/api/auth/logout.php', { method: 'POST' });
+            try { await fetch('../../../backend/api/auth/logout.php', { method: 'POST' }); } catch(e){}
             window.location.href = '../../public/index.html';
         };
     </script>

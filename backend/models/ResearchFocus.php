@@ -1,22 +1,18 @@
 <?php
-// backend/api/research/list.php
+require_once __DIR__ . '/../config/database.php';
 
-if (session_status() === PHP_SESSION_NONE) { session_start(); }
-header('Content-Type: application/json');
-header("Access-Control-Allow-Origin: *");
+class ResearchFocus {
+    private $db;
 
-require_once __DIR__ . "/../../config/database.php";
-require_once __DIR__ . "/../../models/ResearchFocus.php"; // Pastikan model ini ada
+    public function __construct() {
+        $this->db = Database::getInstance();
+    }
 
-try {
-    $model = new ResearchFocus();
-    $data = $model->getAll();
-    
-    if (!$data) $data = [];
-    
-    echo json_encode(['status' => 'success', 'data' => $data]);
-} catch (Exception $e) {
-    http_response_code(500);
-    echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+    public function getAll() {
+        // Query ambil data fokus riset
+        $query = "SELECT focus_id, nama_fokus FROM research_focus ORDER BY nama_fokus ASC";
+        $stmt = $this->db->query($query);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
 ?>

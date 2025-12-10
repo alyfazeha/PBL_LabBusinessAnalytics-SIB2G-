@@ -10,33 +10,10 @@
     <link rel="stylesheet" href="../../assets/css/cssadmin.css">
     <link rel="stylesheet" href="../../assets/css/cssmahasiswa.css">
     <style>
-        /* Style Tambahan untuk Filter */
-        .filter-container {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-            align-items: center;
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid #e9ecef;
-        }
-        .filter-group {
-            display: flex;
-            flex-direction: column;
-        }
-        .filter-group label {
-            font-size: 12px;
-            font-weight: 600;
-            margin-bottom: 5px;
-            color: #666;
-        }
-        .filter-select {
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            min-width: 200px;
-        }
+        .filter-container { display: flex; gap: 15px; margin-bottom: 20px; align-items: center; background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #e9ecef; }
+        .filter-group { display: flex; flex-direction: column; }
+        .filter-group label { font-size: 12px; font-weight: 600; margin-bottom: 5px; color: #666; }
+        .filter-select { padding: 8px; border: 1px solid #ddd; border-radius: 4px; min-width: 200px; }
     </style>
 </head>
 
@@ -91,7 +68,8 @@
                             <th>ID</th>
                             <th>Judul Publikasi</th>
                             <th>Kategori</th>
-                            <th>Fokus Riset</th> <th>Dosen (NIDN)</th>
+                            <th>Fokus Riset</th> 
+                            <th>Dosen (NIDN)</th>
                             <th>Status</th>
                             <th>Aksi</th>
                         </tr>
@@ -123,16 +101,14 @@
         }
 
         const tableBody = document.getElementById('publikasiTableBody');
-        let allPublikasiData = []; // Simpan data mentah untuk filter
+        let allPublikasiData = []; 
 
-        // 1. Fetch Data Filter (Fokus Riset & Kategori)
         async function fetchFilters() {
             try {
-                // Ambil Research Focus
+                // Fetch Research Focus
                 const resFocus = await fetch('../../../backend/api/research/list.php');
                 const dataFocus = await resFocus.json();
                 const selectFocus = document.getElementById('filterFocus');
-                
                 if (dataFocus.status === 'success') {
                     dataFocus.data.forEach(item => {
                         const opt = document.createElement('option');
@@ -142,11 +118,10 @@
                     });
                 }
 
-                // Ambil Kategori
+                // Fetch Kategori
                 const resKat = await fetch('../../../backend/api/publikasi/kategori_list.php');
                 const dataKat = await resKat.json();
                 const selectKat = document.getElementById('filterKategori');
-                
                 if (dataKat.status === 'success') {
                     dataKat.data.forEach(item => {
                         const opt = document.createElement('option');
@@ -155,19 +130,17 @@
                         selectKat.appendChild(opt);
                     });
                 }
-
             } catch (error) { console.error('Filter Error:', error); }
         }
 
-        // 2. Fetch Publikasi Utama
         async function fetchPublikasi() {
             try {
                 const response = await fetch('../../../backend/api/publikasi/list.php');
                 const result = await response.json();
 
                 if (result.status === 'success') {
-                    allPublikasiData = result.data; // Simpan ke variabel global
-                    renderTable(allPublikasiData);  // Tampilkan semua
+                    allPublikasiData = result.data;
+                    renderTable(allPublikasiData);
                 } else {
                     tableBody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Tidak ada data.</td></tr>';
                 }
@@ -177,7 +150,6 @@
             }
         }
 
-        // 3. Render Tabel (Bisa menerima data yang sudah difilter)
         function renderTable(data) {
             tableBody.innerHTML = '';
             
@@ -188,20 +160,19 @@
 
             data.forEach(item => {
                 const row = tableBody.insertRow();
-                
+                const id = item.publikasi_id || item.id; // Support kedua format ID
+
                 // Badge Status
                 let statusBadge = '<span class="status-pending">Pending</span>';
                 if (item.status === 'published') statusBadge = '<span class="status-published" style="background:#d4edda; color:#155724; padding:2px 8px; border-radius:10px;">Published</span>';
                 else if (item.status === 'rejected') statusBadge = '<span class="status-rejected" style="background:#f8d7da; color:#721c24; padding:2px 8px; border-radius:10px;">Rejected</span>';
 
-                // Tampilkan Nama Fokus (Jika null, tulis Umum)
                 const namaFokus = item.nama_fokus ? `<span style="background:#e3f2fd; color:#0d47a1; padding:2px 6px; border-radius:4px; font-size:12px;">${item.nama_fokus}</span>` : '-';
+                const btnLink = item.external_link ? `<a href="${item.external_link}" target="_blank" class="btn btn-sm btn-info" title="Lihat Link"><i class="fas fa-link"></i></a>` : '';
 
-                // Tombol Link
-                const btnLink = item.external_link ? `<a href="${item.external_link}" target="_blank" class="btn btn-sm btn-info"><i class="fas fa-link"></i></a>` : '';
-
+                // --- BAGIAN UTAMA YANG DIPERBAIKI: TOMBOL EDIT ---
                 row.innerHTML = `
-                    <td>${item.publikasi_id || item.id}</td>
+                    <td>${id}</td>
                     <td>${item.judul}</td>
                     <td>${item.nama_kategori || '-'}</td>
                     <td>${namaFokus}</td>
@@ -212,15 +183,19 @@
                     <td>${statusBadge}</td>
                     <td>
                         ${btnLink}
-                        <button onclick="verifyPublikasi(${item.id || item.publikasi_id}, 'published')" class="btn btn-sm btn-success" title="Approve"><i class="fas fa-check"></i></button>
-                        <button onclick="verifyPublikasi(${item.id || item.publikasi_id}, 'rejected')" class="btn btn-sm btn-secondary" title="Reject"><i class="fas fa-times"></i></button>
-                        <button onclick="deletePublikasi(${item.id || item.publikasi_id}, '${item.judul}')" class="btn btn-danger btn-sm" title="Hapus"><i class="fas fa-trash-alt"></i></button>
+                        <button onclick="verifyPublikasi(${id}, 'published')" class="btn btn-sm btn-success" title="Approve"><i class="fas fa-check"></i></button>
+                        <button onclick="verifyPublikasi(${id}, 'rejected')" class="btn btn-sm btn-secondary" title="Reject"><i class="fas fa-times"></i></button>
+                        
+                        <a href="edit_publikasi.html?id=${id}" class="btn btn-sm btn-warning" title="Edit" style="background-color: #ffc107; border:none; padding: 5px 10px; border-radius: 4px; color:white; text-decoration:none; display:inline-block;">
+                            <i class="fas fa-pencil-alt"></i>
+                        </a>
+
+                        <button onclick="deletePublikasi(${id}, '${item.judul}')" class="btn btn-danger btn-sm" title="Hapus"><i class="fas fa-trash-alt"></i></button>
                     </td>
                 `;
             });
         }
 
-        // 4. Logika Filter
         function applyFilters() {
             const focusVal = document.getElementById('filterFocus').value;
             const katVal = document.getElementById('filterKategori').value;
@@ -234,11 +209,9 @@
             renderTable(filteredData);
         }
 
-        // Event Listeners
         document.getElementById('filterFocus').addEventListener('change', applyFilters);
         document.getElementById('filterKategori').addEventListener('change', applyFilters);
 
-        // Fungsi Lain (Verify & Delete)
         async function verifyPublikasi(id, status) {
             const actionName = status === 'published' ? 'Publish' : 'Reject';
             if (!confirm(`Ubah status menjadi ${actionName}?`)) return;
@@ -276,7 +249,6 @@
             fetchPublikasi();
         });
 
-        // Logout
         const logoutModal = document.getElementById('logoutModal');
         document.getElementById('logoutTrigger').onclick = (e) => { e.preventDefault(); logoutModal.classList.add('show'); };
         document.getElementById('cancelLogoutBtn').onclick = () => logoutModal.classList.remove('show');
