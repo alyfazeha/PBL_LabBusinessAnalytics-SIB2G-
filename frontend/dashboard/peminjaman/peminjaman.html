@@ -111,7 +111,7 @@
             <a href="../admin.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
             <a href="peminjaman.html" class="active"><i class="fas fa-calendar-alt"></i> Peminjaman</a>
             <a href="../konten/konten.html"><i class="fas fa-newspaper"></i> Berita & Konten</a>
-            <a href="../publikasi/publikasi.html"><i class="fas fa-newspaper"></i> Publikasi</a>
+            <a href="../publikasi/publikasi.html"><i class="fas fa-book"></i> Publikasi</a>
             <a href="../dosen/dosen.html"><i class="fas fa-users"></i> Data Dosen</a>
             <a href="../mahasiswa/mahasiswa.html"><i class="fas fa-user-graduate"></i> Data Mahasiswa</a>
             <a href="#" id="logoutTrigger"><i class="fas fa-sign-out-alt"></i> Logout</a>
@@ -268,7 +268,7 @@
                         const isPending = statusLower === 'pending' || statusLower === 'diajukan'; // Tambahkan 'diajukan'
 
                         actionCell.innerHTML = `
-                            <a href="edit_peminjaman.html?id=${item.booking_id}" class="btn btn-detail">Detail</a>
+                            <a href="detail_peminjaman.html?id=${item.booking_id}" class="btn btn-detail">Detail</a>
                             ${isPending ? `<button class="btn btn-action" onclick="showApproveModal(${item.booking_id})">Setuju</button>` : ''}
                             ${isPending ? `<button class="btn btn-danger" onclick="showRejectModal(${item.booking_id})">Tolak</button>` : ''}
                         `;
