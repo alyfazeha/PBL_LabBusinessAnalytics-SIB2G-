@@ -190,7 +190,7 @@ class BookingController
 
         // 5. Lakukan UPDATE: Ubah status menjadi 'disetujui'
         // Perhatikan penambahan AND status = 'diajukan' di WHERE clause untuk atomicity.
-        $query = "UPDATE bookings SET status = 'disetujui', handled_by = :admin, updated_at = NOW() WHERE booking_id = :id AND status = 'diajukan'";
+        $query = "UPDATE bookings SET status = 'disetujui', handled_by = :admin, created_at = NOW() WHERE booking_id = :id AND status = 'diajukan'";
         $stmt = $this->conn->prepare($query);
         $ok = $stmt->execute([":admin" => $admin_id, ":id" => $booking_id]);
 
@@ -203,7 +203,7 @@ class BookingController
 
     public function rejectBooking($booking_id, $admin_id, $reason){
         // Tambahkan kondisi AND status = 'diajukan'
-        $query = "UPDATE bookings SET status = 'ditolak', rejection_reason = :reason, handled_by = :admin, updated_at = NOW() WHERE booking_id = :id AND status = 'diajukan'"; 
+        $query = "UPDATE bookings SET status = 'ditolak', admin_response = :reason, handled_by = :admin, created_at = NOW() WHERE booking_id = :id AND status = 'diajukan'"; 
         $stmt = $this->conn->prepare($query);
         $ok = $stmt->execute([":reason" => $reason, ":admin" => $admin_id, ":id" => $booking_id]);
 
