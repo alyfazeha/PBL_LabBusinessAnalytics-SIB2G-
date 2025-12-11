@@ -38,10 +38,10 @@ try {
 
     $join_tables = "
         FROM bookings b
-        LEFT JOIN sarana s ON b.sarana_id = s.sarana_id
-        LEFT JOIN users u ON b.created_by = u.user_id
-        LEFT JOIN dosen d ON b.booking_dosen_nidn = d.nidn
-        LEFT JOIN mahasiswa m ON b.mahasiswa_nim = m.nim
+        JOIN sarana s ON b.sarana_id = s.sarana_id
+        JOIN users u ON b.created_by = u.user_id
+        JOIN dosen d ON b.booking_dosen_nidn = d.nidn
+        JOIN mahasiswa m ON b.mahasiswa_nim = m.nim
     ";
 
     $order_by = "ORDER BY b.booking_id DESC";

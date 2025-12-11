@@ -1,13 +1,10 @@
 <?php
-// backend/api/peminjaman/detail.php
-ini_set('display_errors', 0);
 header('Content-Type: application/json');
 
 require_once __DIR__ . "/../../config/database.php";
 require_once __DIR__ . "/../../config/auth.php";
 
-// HAPUS require_admin(); agar mahasiswa bisa lihat
-require_login_json(); // Ganti jadi require login biasa
+require_login_json();
 
 if (!isset($_GET['id'])) {
     http_response_code(400);
@@ -18,12 +15,19 @@ if (!isset($_GET['id'])) {
 try {
     $id = $_GET['id'];
     $conn = Database::getInstance();
-
+    
     // Query Detail
-    $sql = "SELECT b.*, s.nama_sarana, u.username as peminjam 
+    $sql = "SELECT 
+                b.*, 
+                s.nama_sarana, 
+                u.username as peminjam,
+                d.nama AS nama_dosen, 
+                m.nama AS nama_mahasiswa
             FROM bookings b
-            LEFT JOIN sarana s ON b.sarana_id = s.sarana_id
-            LEFT JOIN users u ON b.created_by = u.user_id
+            JOIN sarana s ON b.sarana_id = s.sarana_id
+            JOIN users u ON b.created_by = u.user_id
+            JOIN dosen d ON b.booking_dosen_nidn = d.nidn
+            JOIN mahasiswa m ON b.mahasiswa_nim = m.nim
             WHERE booking_id = :id";
             
     $stmt = $conn->prepare($sql);
