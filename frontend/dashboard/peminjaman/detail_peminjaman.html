@@ -9,48 +9,180 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../../assets/css/cssadmin.css">
     <style>
+        /* Menggunakan style dari cssadmin.css dan menambahkan sedikit perbaikan spesifik */
+
+        .detail-card-container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            margin-top: 20px;
+            /* Jarak dari header */
+        }
+
         .detail-group {
-            margin-bottom: 15px;
-            padding: 10px;
-            border-left: 3px solid #4A90E2;
-            background-color: #f9f9f9;
+            margin-bottom: 20px;
+            padding: 15px;
+            border-left: 5px solid var(--primary-blue);
+            /* Garis biru tebal */
+            background-color: var(--light-bg);
+            /* Latar belakang abu muda */
+            border-radius: 5px;
         }
 
         .detail-group label {
-            font-weight: 600;
+            font-weight: 700;
+            /* Label lebih tebal */
             display: block;
-            margin-bottom: 5px;
-            color: #333;
+            margin-bottom: 8px;
+            color: var(--dark-grey);
+            font-size: 0.9em;
+            text-transform: uppercase;
         }
 
         .detail-group p {
             margin: 0;
-            padding: 5px 0;
-            font-size: 1em;
+            font-size: 1.1em;
             color: #555;
             word-wrap: break-word;
         }
 
         .status-display {
             font-weight: 700;
-            padding: 5px 10px;
-            border-radius: 4px;
+            padding: 7px 15px;
+            border-radius: 20px;
+            /* Bentuk pil */
             display: inline-block;
+            text-transform: uppercase;
         }
 
+        /* Menggunakan warna yang lebih cerah untuk status */
         .status-PENDING {
-            background-color: #ffc107;
-            color: #333;
+            background-color: #FFC107;
+            color: var(--dark-grey);
         }
 
         .status-DISETUJUI {
-            background-color: #28a745;
+            background-color: #28A745;
             color: white;
         }
 
         .status-DITOLAK {
-            background-color: #dc3545;
+            background-color: #DC3545;
             color: white;
+        }
+
+        .action-area {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            margin-top: 30px;
+            border: 1px solid #ddd;
+        }
+
+        .btn-action-approve {
+            background-color: #28A745;
+            color: #fff;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .btn-action-approve:hover {
+            background-color: #1e7e34;
+            transform: translateY(-1px);
+        }
+
+        .btn-action-reject {
+            background-color: #DC3545;
+            color: #fff;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .btn-action-reject:hover {
+            background-color: #c82333;
+            transform: translateY(-1px);
+        }
+
+        /* Styling Modal agar konsisten dengan cssadmin.css */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content-custom {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .modal-actions-custom {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-modal-custom {
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1em;
+            padding: 12px 25px;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+
+        .btn-modal-confirm-red {
+            background-color: #dc3545;
+            color: #fff;
+        }
+
+        .btn-modal-confirm-red:hover {
+            background-color: #c82333;
+            transform: translateY(-2px);
+        }
+
+        .btn-modal-confirm-green {
+            background-color: #28a745;
+            color: #fff;
+        }
+
+        .btn-modal-confirm-green:hover {
+            background-color: #1e7e34;
+            transform: translateY(-2px);
+        }
+
+        .btn-modal-cancel-gray {
+            background-color: #ccc;
+            color: var(--dark-grey);
+        }
+
+        .btn-modal-cancel-gray:hover {
+            background-color: #b3b3b3;
+            transform: translateY(-2px);
         }
     </style>
 </head>
@@ -72,71 +204,67 @@
         </nav>
     </div>
 
-    <div class="main-content">
+    <div class="main-content-dosen">
         <header>
-            <div class="header-title">
-                <h2>Detail Peminjaman #<span id="bookingIdDisplay">...</span></h2>
-                <a href="peminjaman.html" class="back-link"><i class="fas fa-arrow-left"></i> Kembali</a>
+            <div class="page-title-group">
+                <a href="peminjaman.html" class="back-icon-link"><i class="fas fa-arrow-left"></i></a>
+                <h1>Detail Peminjaman #<span id="bookingIdDisplay">...</span></h1>
             </div>
         </header>
 
-        <main>
-            <div id="statusMessage" class="status-message" style="display:none; padding: 10px; margin-bottom: 20px;">
-            </div>
+        <main class="main-content">
+            <div id="statusMessage" class="message success" style="display:none;"></div>
 
-            <div id="detailContent" class="card">
+            <div id="detailContent" class="detail-card-container">
                 <p id="loadingState">Memuat detail peminjaman...</p>
             </div>
 
-            <div class="card mt-20" id="actionArea" style="display:none;">
-                <h4 style="margin-top: 0;">Aksi Admin</h4>
+            <div class="action-area" id="actionArea" style="display:none;">
+                <h4 style="margin-top: 0; color: var(--primary-blue);">Aksi Peminjaman</h4>
                 <p>Ubah Status Peminjaman:</p>
-                <button class="btn btn-action" id="approveBtn"><i class="fas fa-check"></i> Setujui</button>
-                <button class="btn btn-danger" id="rejectBtn" style="margin-left: 10px;"><i class="fas fa-times"></i>
+                <button class="btn-action-approve" id="approveBtn"><i class="fas fa-check"></i> Setujui</button>
+                <button class="btn-action-reject" id="rejectBtn" style="margin-left: 10px;"><i class="fas fa-times"></i>
                     Tolak</button>
             </div>
         </main>
     </div>
 
-    <div id="rejectModal" class="modal"
-        style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4); justify-content: center; align-items: center;">
-        <div class="modal-content"
-            style="background-color: #fefefe; margin: auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 500px; border-radius: 10px;">
-            <span class="close-btn"
-                onclick="document.getElementById('rejectModal').style.display='none';">&times;</span>
+    <div id="rejectModal" class="modal-overlay">
+        <div class="modal-content-custom">
             <h4>Tolak Peminjaman</h4>
-            <p>Anda akan menolak peminjaman ini. Masukkan alasan penolakan:</p>
-            <textarea id="rejectionReason" rows="4" style="width: 100%; padding: 10px; margin-bottom: 15px;"
-                placeholder="Alasan penolakan wajib diisi"></textarea>
-            <button class="btn btn-danger" id="confirmRejectBtn">Tolak Permanen</button>
-            <button class="btn btn-secondary"
-                onclick="document.getElementById('rejectModal').style.display='none';">Batal</button>
+            <p>Anda akan **menolak** peminjaman ini. Masukkan alasan penolakan:</p>
+            <textarea id="rejectionReason" rows="4"
+                style="width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 5px;"
+                placeholder="Alasan penolakan wajib diisi minimal 5 karakter"></textarea>
+            <div class="modal-actions-custom">
+                <button class="btn-modal-custom btn-modal-confirm-red" id="confirmRejectBtn">Tolak Permanen</button>
+                <button class="btn-modal-custom btn-modal-cancel-gray"
+                    onclick="document.getElementById('rejectModal').style.display='none';">Batal</button>
+            </div>
         </div>
     </div>
 
-    <div id="approveModal" class="modal"
-        style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4); justify-content: center; align-items: center;">
-        <div class="modal-content"
-            style="background-color: #fefefe; margin: auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 400px; border-radius: 10px;">
-            <span class="close-btn"
-                onclick="document.getElementById('approveModal').style.display='none';">&times;</span>
+    <div id="approveModal" class="modal-overlay">
+        <div class="modal-content-custom">
             <h4>Setujui Peminjaman</h4>
-            <p>Anda yakin ingin menyetujui peminjaman ini?</p>
-            <button class="btn btn-action" id="confirmApproveBtn">Ya, Setujui</button>
-            <button class="btn btn-secondary"
-                onclick="document.getElementById('approveModal').style.display='none';">Batal</button>
+            <p>Anda yakin ingin **menyetujui** peminjaman ini?</p>
+            <div class="modal-actions-custom">
+                <button class="btn-modal-custom btn-modal-confirm-green" id="confirmApproveBtn">Ya, Setujui</button>
+                <button class="btn-modal-custom btn-modal-cancel-gray"
+                    onclick="document.getElementById('approveModal').style.display='none';">Batal</button>
+            </div>
         </div>
     </div>
 
-    <div id="logoutModal" class="modal"
-        style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4); justify-content: center; align-items: center;">
-        <div class="modal-content"
-            style="background-color: #fefefe; margin: auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 400px; border-radius: 10px;">
-            <span class="close-btn"
-                onclick="document.getElementById('logoutModal').style.display='none';">&times;</span>
-            <p>Anda yakin ingin keluar?</p>
-            <button id="confirmLogoutBtn" class="btn btn-danger">Ya, Logout</button>
-            <button id="cancelLogoutBtn" class="btn btn-secondary">Batal</button>
+    <div id="logoutModal" class="modal-overlay">
+        <div class="modal-content-custom">
+            <h4 style="color: var(--dark-grey);">Konfirmasi Logout</h4>
+            <p>Anda yakin ingin keluar dari halaman administrator?</p>
+            <div class="modal-actions-custom">
+                <button id="confirmLogoutBtn" class="btn-modal-custom btn-modal-confirm-red"><i
+                        class="fas fa-sign-out-alt"></i> Ya, Logout</button>
+                <button id="cancelLogoutBtn" class="btn-modal-custom btn-modal-cancel-gray">Batal</button>
+            </div>
         </div>
     </div>
 
@@ -152,11 +280,7 @@
         function showStatusMessage(message, type = 'error') {
             const statusDiv = document.getElementById('statusMessage');
             statusDiv.textContent = message;
-            statusDiv.style.backgroundColor = type === 'success' ? '#4CAF50' : '#f44336';
-            statusDiv.style.color = 'white';
-            statusDiv.style.padding = '10px';
-            statusDiv.style.marginBottom = '20px';
-            statusDiv.style.borderRadius = '5px';
+            statusDiv.className = `message ${type}`;
             statusDiv.style.display = 'block';
             setTimeout(() => { statusDiv.style.display = 'none'; }, 5000);
         }
@@ -175,33 +299,35 @@
 
             bookingIdDisplay.textContent = bookingId;
             loadingState.style.display = 'block';
-            detailContent.innerHTML = ''; // Hapus konten lama
+            detailContent.innerHTML = `<p id="loadingState">Memuat detail peminjaman...</p>`; // Reset konten lama
 
             try {
                 // Menggunakan detail.php
                 const response = await fetch(BASE_API_URL + 'detail.php?id=' + bookingId);
                 const data = await response.json();
 
-                loadingState.style.display = 'none';
+                // Hapus loading state yang lama
+                const currentLoadingState = document.getElementById('loadingState');
+                if (currentLoadingState) currentLoadingState.style.display = 'none';
 
                 if (response.ok && data && data.booking_id) {
                     currentBookingData = data;
                     renderDetail(data);
                 } else {
                     const message = data.message || data.error || 'Data Peminjaman tidak ditemukan atau Anda tidak berhak melihatnya.';
-                    loadingState.textContent = message;
+                    detailContent.innerHTML = `<p style="color: red; font-weight: 600;">${message}</p>`;
                     showStatusMessage(message);
                     actionArea.style.display = 'none';
                 }
             } catch (error) {
                 console.error('Fetch Detail Error:', error);
-                loadingState.textContent = 'Gagal memuat detail peminjaman karena error jaringan/server.';
+                detailContent.innerHTML = '<p style="color: red; font-weight: 600;">Gagal memuat detail peminjaman karena error jaringan/server.</p>';
                 showStatusMessage('Gagal memuat detail peminjaman.');
                 actionArea.style.display = 'none';
             }
         }
 
-        // --- 2. FUNGSI RENDER DETAIL ---
+        // --- 2. FUNGSI RENDER DETAIL (DENGAN NAMA DOSEN & MAHASISWA) ---
         function renderDetail(data) {
             const detailContent = document.getElementById('detailContent');
             const actionArea = document.getElementById('actionArea');
@@ -235,31 +361,33 @@
                     <label>Keperluan</label>
                     <p>${data.keperluan || '-'}</p>
                 </div>
+
                 <div class="detail-group">
                     <label>Peminjam (Username)</label>
                     <p>${data.peminjam || '-'}</p>
                 </div>
                 <div class="detail-group">
-                    <label>NIM Mahasiswa</label>
-                    <p>${data.mahasiswa_nim || '-'}</p>
+                    <label>Nama Mahasiswa (NIM)</label>
+                    <p>${data.nama_mahasiswa || '-'} (${data.mahasiswa_nim || '-'})</p>
                 </div>
                 <div class="detail-group">
                     <label>Dosen Penanggung Jawab (NIDN)</label>
-                    <p>${data.booking_dosen_nidn || '-'}</p>
+                    <p>${data.nama_dosen || '-'} (${data.booking_dosen_nidn || '-'})</p>
                 </div>
+                
                 <div class="detail-group">
                     <label>Dibuat Tanggal</label>
                     <p>${data.created_at || '-'}</p>
                 </div>
                 
                 ${data.rejection_reason && data.rejection_reason !== '' ? `
-                    <div class="detail-group" style="border-left: 3px solid #dc3545; background-color: #ffe5e5;">
+                    <div class="detail-group" style="border-left: 5px solid #dc3545; background-color: #ffe5e5;">
                         <label>Alasan Penolakan</label>
                         <p>${data.rejection_reason}</p>
                     </div>` : ''}
                 
                 ${data.handled_by ? `
-                    <div class="detail-group" style="border-left: 3px solid #28a745;">
+                    <div class="detail-group" style="border-left: 5px solid #28a745; background-color: #e8f5e9;">
                         <label>Ditangani Oleh Admin ID</label>
                         <p>${data.handled_by}</p>
                     </div>` : ''}
@@ -289,11 +417,6 @@
 
             const approveBtn = document.getElementById('approveBtn');
             const rejectBtn = document.getElementById('rejectBtn');
-            const confirmApproveBtn = document.getElementById('confirmApproveBtn');
-            const confirmRejectBtn = document.getElementById('confirmRejectBtn');
-
-            // Tentukan tombol yang diklik untuk menampilkan loading state
-            let btnToAnimate = action === 'approve' ? confirmApproveBtn : confirmRejectBtn;
 
             // Sembunyikan modal
             if (action === 'approve') {
@@ -330,6 +453,7 @@
                 rejectBtn.disabled = false;
                 approveBtn.innerHTML = '<i class="fas fa-check"></i> Setujui';
                 rejectBtn.innerHTML = '<i class="fas fa-times"></i> Tolak';
+                // Muat ulang detail setelah aksi
                 fetchDetailPeminjaman();
             }
         }
