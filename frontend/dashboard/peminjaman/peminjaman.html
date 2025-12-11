@@ -139,12 +139,12 @@
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Peminjam (Username)</th>
                             <th>Nama Mahasiswa</th>
                             <th>Nama Dosen PJ</th>
                             <th>Sarana</th>
                             <th>Tanggal</th>
                             <th>Waktu</th>
+                            <th>Keperluan Meminjam</th>
                             <th>Status</th>
                             <th>Aksi</th>
                         </tr>
@@ -246,20 +246,22 @@
                         const namaMahasiswa = item.nama_mahasiswa ? item.nama_mahasiswa : '-';
                         const namaDosen = item.nama_dosen ? item.nama_dosen : '-';
 
-                        row.insertCell().textContent = item.booking_id; // 1
-                        row.insertCell().textContent = item.peminjam; // 2 (Peminjam Username) <-- DIKEMBALIKAN
-                        row.insertCell().textContent = namaMahasiswa; // 3 (Nama Mahasiswa)
-                        row.insertCell().textContent = namaDosen; // 4 (Nama Dosen PJ)
-                        row.insertCell().textContent = item.nama_sarana; // 5
-                        row.insertCell().textContent = item.tanggal; // 6
-                        row.insertCell().textContent = `${item.start_time.substring(0, 5)} - ${item.end_time.substring(0, 5)}`; // 7
+                        row.insertCell().textContent = item.booking_id; // 1. ID
+                        // item.peminjam (username) DILOMPATI / DIHAPUS
+                        row.insertCell().textContent = namaMahasiswa; // 2. Nama Mahasiswa
+                        row.insertCell().textContent = namaDosen; // 3. Nama Dosen PJ
+                        row.insertCell().textContent = item.nama_sarana; // 4. Sarana
+                        row.insertCell().textContent = item.tanggal; // 5. Tanggal
+                        row.insertCell().textContent = `${item.start_time.substring(0, 5)} - ${item.end_time.substring(0, 5)}`; // 6. Waktu
+                        row.insertCell().textContent = item.keperluan; // 7. KEPERLUAN BARU
 
-                        const statusCell = row.insertCell(); // 8
+
+                        const statusCell = row.insertCell(); // 8. Status
                         // Pastikan status adalah uppercase untuk mencocokkan class CSS
                         const statusText = item.status.toUpperCase();
                         statusCell.innerHTML = `<span class="status ${statusText}">${statusText}</span>`;
 
-                        const actionCell = row.insertCell(); // 9
+                        const actionCell = row.insertCell(); // 9. Aksi
 
                         // LOGIKA TOMBOL AKSI
                         const statusLower = item.status.toLowerCase();
