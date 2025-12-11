@@ -21,7 +21,22 @@
 
         .main-container {
             width: 100%;
-            /* Form disembunyikan secara default */
+        }
+
+        /* Helper untuk menyembunyikan elemen */
+        .is-hidden {
+            display: none;
+        }
+
+        /* Style untuk Pesan Status (Error/Sukses) */
+        .status-message {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            color: white;
+            font-weight: 500;
+            display: none; /* Sembunyi default */
+            text-align: center;
         }
     </style>
 </head>
@@ -44,13 +59,13 @@
                     Cek Status & Riwayat
                 </button>
             </div>
-            <a href="index.html" class="back-link-home" style="">
-                <i class=" fas fa-arrow-left"></i> Kembali ke Halaman Utama
+            <a href="index.html" class="back-link-home">
+                <i class="fas fa-arrow-left"></i> Kembali ke Halaman Utama
             </a>
         </div>
     </div>
 
-    <div class="main-container is-hidden " id="formContainer">
+    <div class="main-container is-hidden" id="formContainer">
 
         <div class="header-status-blue">
             <h1><i class="fas fa-calendar-plus"></i> Formulir Pengajuan Peminjaman Lab</h1>
@@ -58,13 +73,14 @@
         </div>
 
         <div class="container">
-            <a href="peminjaman-mahasiswa.html" class="back-link" style="margin-top: 30px;">
+            <a href="#" id="backToModal" class="back-link" style="margin-top: 30px;">
                 <i class="fas fa-arrow-left"></i> Kembali ke Pilihan Aksi
             </a>
 
-            <div class="form-card">
+            <div id="statusMessage" class="status-message"></div>
 
-                <form action="#" method="POST" form id="formPeminjaman">
+            <div class="form-card">
+                <form id="formPeminjaman">
 
                     <div class="form-group">
                         <label for="sarana_id">Sarana / Ruangan <span class="required">*</span></label>
@@ -78,27 +94,27 @@
                         <input type="date" id="tanggal" name="tanggal" required>
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group">
+                    <div class="form-row" style="display: flex; gap: 20px; flex-wrap: wrap;">
+                        <div class="form-group" style="flex: 1;">
                             <label for="nidn">Dosen Penanggung Jawab <span class="required">*</span></label>
                             <select id="nidn" name="nidn" required>
                                 <option value="">-- Memuat Data Dosen... --</option>
                             </select>
                         </div>
 
-                        <div class="form-group">
-                            <label for="nim">NIM Mahasiswa</label>
-                            <input type="text" id="nim" name="nim" placeholder="Wajib diisi">
+                        <div class="form-group" style="flex: 1;">
+                            <label for="nim">NIM Mahasiswa <span class="required">*</span></label>
+                            <input type="text" id="nim" name="nim" placeholder="Masukkan NIM Anda" required>
                         </div>
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group">
+                    <div class="form-row" style="display: flex; gap: 20px; flex-wrap: wrap;">
+                        <div class="form-group" style="flex: 1;">
                             <label for="sks">Jumlah SKS <span class="required">*</span></label>
-                            <input type="number" id="sks" name="sks" required min="1" max="10" placeholder="Contoh: 4">
-                            <small class="form-text">1 SKS setara ±100 menit.</small>
+                            <input type="number" id="sks" name="sks" required min="2" max="10" placeholder="Contoh: 2">
+                            <small class="form-text" style="color: #666; font-size: 0.85em;">Minimal 2 SKS. (1 SKS = 100 menit)</small>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group" style="flex: 1;">
                             <label for="start_time">Waktu Mulai <span class="required">*</span></label>
                             <input type="time" id="start_time" name="start_time" required>
                         </div>
@@ -110,42 +126,71 @@
                             placeholder="Contoh: Digunakan untuk praktikum mata kuliah Pemrograman Web"></textarea>
                     </div>
 
-                    <button type="submit" class="btn-submit">
+                    <button type="submit" id="submitBtn" class="btn-submit">
                         <i class="fas fa-paper-plane"></i>
                         Kirim Permintaan Peminjaman
                     </button>
                 </form>
             </div>
         </div>
+    </div>
 
-        <script>
-            const PEMINJAMAN_API_URL = '../../backend/api/booking/';
-            const SARANA_API_URL = '../../backend/api/sarana/list.php'; // Asumsi API Sarana
-            const DOSEN_API_URL = '../../backend/api/dosen/list.php'; // Asumsi API Dosen
+    <script>
+        // Sesuaikan path ini dengan struktur folder Anda
+        const API_BASE_URL = '../../backend/api/';
+        const PEMINJAMAN_API_URL = API_BASE_URL + 'booking/';
+        const SARANA_API_URL = API_BASE_URL + 'sarana/list.php';
+        const DOSEN_API_URL = API_BASE_URL + 'dosen/list.php';
 
-            const actionModal = document.getElementById('actionModal');
-            const triggerForm = document.getElementById('triggerForm');
-            const triggerStatus = document.getElementById('triggerStatus'); // Ambil ID tombol Status baru
-            const formContainer = document.getElementById('formContainer');
+        const actionModal = document.getElementById('actionModal');
+        const triggerForm = document.getElementById('triggerForm');
+        const triggerStatus = document.getElementById('triggerStatus');
+        const formContainer = document.getElementById('formContainer');
+        const backToModal = document.getElementById('backToModal');
 
-            // STATE AWAL: Pastikan Form Sembunyi
+        // STATE AWAL: Pastikan Form Sembunyi
+        formContainer.classList.add('is-hidden');
+
+        // --- NAVIGASI ---
+        triggerForm.addEventListener('click', (e) => {
+            e.preventDefault();
+            actionModal.style.display = 'none';
+            formContainer.classList.remove('is-hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        backToModal.addEventListener('click', (e) => {
+            e.preventDefault();
             formContainer.classList.add('is-hidden');
+            actionModal.style.display = 'flex';
+        });
 
-            // 1. Logika Ajukan Permintaan Baru (Menampilkan Form)
-            triggerForm.addEventListener('click', (e) => {
-                e.preventDefault();
-                actionModal.style.display = 'none';
-                formContainer.classList.remove('is-hidden');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            });
+        triggerStatus.addEventListener('click', () => {
+            // alert('Fitur menuju halaman riwayat sedang dikembangkan.');
+            window.location.href = 'status-peminjaman-mahasiswa.html'; // Sesuaikan nama file jika mahasiswa
+        });
 
-            // 2. Logika Cek Status & Riwayat (Redirect ke halaman baru)
-            triggerStatus.addEventListener('click', () => {
-                // Lakukan pengalihan ke halaman status
-                window.location.href = 'status-peminjaman-dosen.html';
-            });
+        // --- PERBAIKAN 3: MENAMBAHKAN FUNGSI showStatusMessage ---
+        function showStatusMessage(message, type = 'error') {
+            const statusDiv = document.getElementById('statusMessage');
+            statusDiv.textContent = message;
+            
+            if (type === 'success') {
+                statusDiv.style.backgroundColor = '#4CAF50'; // Hijau
+            } else {
+                statusDiv.style.backgroundColor = '#f44336'; // Merah
+            }
+            
+            statusDiv.style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            // Hilangkan pesan otomatis setelah 5 detik jika sukses
+            if(type === 'success') {
+                setTimeout(() => { statusDiv.style.display = 'none'; }, 5000);
+            }
+        }
 
-            // 1. Fetch Data Sarana
+        // 1. Fetch Data Sarana
         async function fetchSarana() {
             const saranaSelect = document.getElementById('sarana_id');
             try {
@@ -156,7 +201,6 @@
                 if (Array.isArray(data)) {
                     saranaSelect.innerHTML = '<option value="">-- Pilih Sarana --</option>';
                     data.forEach(item => {
-                        // Asumsi data sarana memiliki sarana_id dan nama_sarana
                         saranaSelect.innerHTML += `<option value="${item.sarana_id}">${item.nama_sarana}</option>`;
                     });
                 } else {
@@ -179,7 +223,6 @@
                 if (Array.isArray(data)) {
                     dosenSelect.innerHTML = '<option value="">-- Pilih Dosen PJ --</option>';
                     data.forEach(item => {
-                        // Asumsi data dosen memiliki nidn dan nama
                         dosenSelect.innerHTML += `<option value="${item.nidn}">${item.nama} (${item.nidn})</option>`;
                     });
                 } else {
@@ -198,15 +241,14 @@
             const submitBtn = document.getElementById('submitBtn');
             const originalText = submitBtn.innerHTML;
             submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengajukan...';
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengirim...';
 
-            const form = e.target;
-            const formData = new FormData(form);
+            const formData = new FormData(this);
 
-            // Periksa SKS
+            // Validasi SKS Client-side (Harus > 1 karena create.php menolak <= 1)
             const sks = parseInt(formData.get('sks'));
-            if (isNaN(sks) || sks <= 0) {
-                showStatusMessage('Jumlah SKS harus lebih dari 0.');
+            if (isNaN(sks) || sks <= 1) {
+                showStatusMessage('Jumlah SKS harus lebih dari 1 (Minimal 2 SKS).');
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = originalText;
                 return;
@@ -226,19 +268,28 @@
                     method: 'POST',
                     body: formData
                 });
+                
+                // Parsing response JSON
+                // Jika error 400, kita perlu membaca body JSON-nya untuk tahu pesannya
                 const result = await response.json();
 
                 if (response.ok && result.success) {
                     showStatusMessage('Peminjaman berhasil diajukan! Menunggu persetujuan admin.', 'success');
-                    form.reset();
-                    // Redirect setelah beberapa saat
-                    setTimeout(() => { window.location.href = 'peminjaman.html'; }, 1500);
+                    this.reset();
+                    // Redirect atau kembali ke menu
+                    setTimeout(() => { 
+                        formContainer.classList.add('is-hidden');
+                        actionModal.style.display = 'flex';
+                        document.getElementById('statusMessage').style.display = 'none';
+                    }, 3000);
                 } else {
+                    // Tampilkan pesan error dari server (misal: "SKS harus lebih dari 1" atau validasi lain)
                     showStatusMessage(result.message || 'Gagal menyimpan data.');
                 }
+
             } catch (error) {
-                showStatusMessage('Terjadi kesalahan jaringan.');
-                console.error('Create Error:', error);
+                console.error('Submit Error:', error);
+                showStatusMessage('Terjadi kesalahan sistem/jaringan.');
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = originalText;
@@ -250,11 +301,11 @@
             fetchSarana();
             fetchDosen();
             // Set minimal tanggal hari ini agar tidak bisa memilih tanggal lampau
-            document.getElementById('tanggal').min = new Date().toISOString().split('T')[0];
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('tanggal').min = today;
         });
 
-        </script>
+    </script>
 
 </body>
-
 </html>
