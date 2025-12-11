@@ -10,7 +10,6 @@ require_once __DIR__ . "/BookingController.php";
 
 // --- SECURITY: HANYA ADMIN ---
 require_admin(); 
-// -----------------------------
 
 if (!isset($_POST['booking_id'])) {
     http_response_code(400);
