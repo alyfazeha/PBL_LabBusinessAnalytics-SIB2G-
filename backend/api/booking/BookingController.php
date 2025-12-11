@@ -2,7 +2,7 @@
 // Hapus header content-type di sini karena ini class library, bukan output JSON langsung
 require_once __DIR__ . "/../../config/database.php";
 require_once __DIR__ . "/../../models/Booking.php";
-require_once __DIR__ . "/../../models/BlockedDate.php";
+require_once __DIR__ . "/../../models/BlockDate.php";
 require_once __DIR__ . "/../../config/auth.php";
 
 
