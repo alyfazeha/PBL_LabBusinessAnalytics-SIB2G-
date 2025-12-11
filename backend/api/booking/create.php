@@ -19,7 +19,7 @@ foreach ($required_fields as $field) {
 }
 
 // Cek SKS harus positif
-if ((int)$_POST['sks'] <= 0) {
+if ((int)$_POST['sks'] <= 1) {
     http_response_code(400);
     echo json_encode(["success" => false, "message" => "Jumlah SKS harus lebih dari 1."]);
     exit;
