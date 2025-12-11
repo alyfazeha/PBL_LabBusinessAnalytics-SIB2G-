@@ -140,12 +140,13 @@
         </div>
     </div>
 
+
     <script>
         const BASE_API_URL = '../../../backend/api/peminjaman/';
-
         // Ambil ID dari URL
         const urlParams = new URLSearchParams(window.location.search);
         const bookingId = urlParams.get('id');
+        let currentBookingData = null; // Menyimpan data detail
 
         // --- FUNGSI UTILITY ---
         function showStatusMessage(message, type = 'error') {
@@ -157,174 +158,196 @@
             statusDiv.style.marginBottom = '20px';
             statusDiv.style.borderRadius = '5px';
             statusDiv.style.display = 'block';
-            setTimeout(() => {
-                statusDiv.style.display = 'none';
-            }, 5000);
+            setTimeout(() => { statusDiv.style.display = 'none'; }, 5000);
         }
 
-        // --- 1. FUNGSI AMBIL DETAIL PEMINJAMAN ---
+        // --- 1. FUNGSI FETCH DETAIL ---
         async function fetchDetailPeminjaman() {
-            const loadingState = document.getElementById('loadingState');
             const detailContent = document.getElementById('detailContent');
+            const loadingState = document.getElementById('loadingState');
+            const bookingIdDisplay = document.getElementById('bookingIdDisplay');
             const actionArea = document.getElementById('actionArea');
 
             if (!bookingId) {
-                loadingState.textContent = 'Error: ID Peminjaman tidak ditemukan di URL.';
-                showStatusMessage('ID Peminjaman tidak ditemukan di URL.');
+                loadingState.textContent = 'ID Peminjaman tidak ditemukan dalam URL.';
                 return;
             }
 
-            document.getElementById('bookingIdDisplay').textContent = bookingId;
-            loadingState.textContent = 'Memuat detail peminjaman...';
+            bookingIdDisplay.textContent = bookingId;
+            loadingState.style.display = 'block';
+            detailContent.innerHTML = ''; // Hapus konten lama
 
             try {
-                // Menggunakan detail.php?id=...
-                const response = await fetch(BASE_API_URL + `detail.php?id=${bookingId}`);
+                // Menggunakan detail.php
+                const response = await fetch(BASE_API_URL + 'detail.php?id=' + bookingId);
+                const data = await response.json();
 
-                if (!response.ok) {
-                    loadingState.textContent = `Data Peminjaman ID ${bookingId} tidak ditemukan.`;
-                    showStatusMessage('Data tidak ditemukan atau error server.');
-                    return;
-                }
+                loadingState.style.display = 'none';
 
-                const data = await response.json(); // Asumsi detail.php mengembalikan objek JSON tunggal
-
-                // 2. TAMPILKAN DETAIL
-                if (data.booking_id) {
-                    loadingState.style.display = 'none';
-
-                    const statusClass = data.status.toUpperCase();
-                    const detailHTML = `
-                        <div class="detail-group">
-                            <label>Status Peminjaman</label>
-                            <p><span class="status-display status-${statusClass}">${statusClass}</span></p>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <div class="detail-group">
-                                    <label>Sarana/Ruangan</label>
-                                    <p>${data.nama_sarana || 'N/A'}</p>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <div class="detail-group">
-                                    <label>Tanggal Peminjaman</label>
-                                    <p>${data.tanggal || 'N/A'}</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <div class="detail-group">
-                                    <label>Waktu Mulai</label>
-                                    <p>${data.start_time ? data.start_time.substring(0, 5) : 'N/A'}</p>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <div class="detail-group">
-                                    <label>Waktu Selesai</label>
-                                    <p>${data.end_time ? data.end_time.substring(0, 5) : 'N/A'}</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="detail-group">
-                            <label>Peminjam</label>
-                            <p>${data.peminjam || 'N/A'} (${data.nim || data.nidn || 'ID N/A'})</p>
-                        </div>
-                        <div class="detail-group">
-                            <label>Mata Kuliah / SKS</label>
-                            <p>${data.sks || 'N/A'}</p>
-                        </div>
-                        <div class="detail-group">
-                            <label>Keperluan</label>
-                            <p>${data.keperluan || 'Tidak ada keterangan.'}</p>
-                        </div>
-                        ${data.status === 'ditolak' ? `
-                            <div class="detail-group" style="border-left: 3px solid #dc3545;">
-                                <label>Alasan Penolakan</label>
-                                <p>${data.rejection_reason || 'N/A'}</p>
-                            </div>` : ''}
-                        ${data.handled_by ? `
-                            <div class="detail-group" style="border-left: 3px solid #28a745;">
-                                <label>Ditangani Oleh Admin ID</label>
-                                <p>${data.handled_by}</p>
-                            </div>` : ''}
-                    `;
-                    detailContent.innerHTML = detailHTML;
-
-                    // Tampilkan area aksi hanya jika status masih 'pending'
-                    if (data.status === 'pending') {
-                        actionArea.style.display = 'block';
-                    } else {
-                        actionArea.style.display = 'none';
-                    }
-
+                if (response.ok && data && data.booking_id) {
+                    currentBookingData = data;
+                    renderDetail(data);
                 } else {
-                    loadingState.textContent = 'Data Peminjaman tidak valid.';
-                    showStatusMessage('Respons server tidak berisi data yang valid.');
+                    const message = data.message || data.error || 'Data Peminjaman tidak ditemukan atau Anda tidak berhak melihatnya.';
+                    loadingState.textContent = message;
+                    showStatusMessage(message);
+                    actionArea.style.display = 'none';
                 }
-
-
             } catch (error) {
                 console.error('Fetch Detail Error:', error);
                 loadingState.textContent = 'Gagal memuat detail peminjaman karena error jaringan/server.';
                 showStatusMessage('Gagal memuat detail peminjaman.');
+                actionArea.style.display = 'none';
             }
         }
 
-        // --- 2. FUNGSI AKSI (APPROVE/REJECT) DARI DETAIL ---
+        // --- 2. FUNGSI RENDER DETAIL ---
+        function renderDetail(data) {
+            const detailContent = document.getElementById('detailContent');
+            const actionArea = document.getElementById('actionArea');
+            const statusText = data.status ? data.status.toUpperCase() : 'N/A';
+            const statusClass = statusText.replace(' ', '_'); // Classname status
+
+            // Format tanggal dan waktu
+            const dateObj = new Date(data.tanggal);
+            const formattedDate = data.tanggal ? dateObj.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : '-';
+            const formattedTime = `${data.start_time.substring(0, 5)} - ${data.end_time.substring(0, 5)}`;
+
+            if (!data.booking_id) {
+                detailContent.innerHTML = '<p style="color: red;">Data Peminjaman tidak valid.</p>';
+                return;
+            }
+
+            const detailHTML = `
+                <div class="detail-group">
+                    <label>Status Peminjaman</label>
+                    <p><span class="status-display status-${statusClass}">${statusText}</span></p>
+                </div>
+                <div class="detail-group">
+                    <label>Sarana/Ruangan</label>
+                    <p>${data.nama_sarana || '-'}</p>
+                </div>
+                <div class="detail-group">
+                    <label>Tanggal & Waktu</label>
+                    <p>${formattedDate}, Pukul ${formattedTime} (${data.sks} SKS)</p>
+                </div>
+                <div class="detail-group">
+                    <label>Keperluan</label>
+                    <p>${data.keperluan || '-'}</p>
+                </div>
+                <div class="detail-group">
+                    <label>Peminjam (Username)</label>
+                    <p>${data.peminjam || '-'}</p>
+                </div>
+                <div class="detail-group">
+                    <label>NIM Mahasiswa</label>
+                    <p>${data.mahasiswa_nim || '-'}</p>
+                </div>
+                <div class="detail-group">
+                    <label>Dosen Penanggung Jawab (NIDN)</label>
+                    <p>${data.booking_dosen_nidn || '-'}</p>
+                </div>
+                <div class="detail-group">
+                    <label>Dibuat Tanggal</label>
+                    <p>${data.created_at || '-'}</p>
+                </div>
+                
+                ${data.rejection_reason && data.rejection_reason !== '' ? `
+                    <div class="detail-group" style="border-left: 3px solid #dc3545; background-color: #ffe5e5;">
+                        <label>Alasan Penolakan</label>
+                        <p>${data.rejection_reason}</p>
+                    </div>` : ''}
+                
+                ${data.handled_by ? `
+                    <div class="detail-group" style="border-left: 3px solid #28a745;">
+                        <label>Ditangani Oleh Admin ID</label>
+                        <p>${data.handled_by}</p>
+                    </div>` : ''}
+            `;
+
+            detailContent.innerHTML = detailHTML;
+
+            // Tampilkan area aksi hanya jika status masih 'pending'
+            if (data.status.toLowerCase() === 'pending') {
+                actionArea.style.display = 'block';
+            } else {
+                actionArea.style.display = 'none';
+            }
+        }
+
+
+        // --- 3. FUNGSI AKSI (APPROVE/REJECT) ---
         async function performAction(action, reason = null) {
+            if (!bookingId) return;
+
+            const url = BASE_API_URL + `${action}.php`; // 'approve.php' or 'reject.php'
             const formData = new FormData();
             formData.append('booking_id', bookingId);
             if (reason) {
                 formData.append('reason', reason);
             }
 
+            const approveBtn = document.getElementById('approveBtn');
+            const rejectBtn = document.getElementById('rejectBtn');
+            const confirmApproveBtn = document.getElementById('confirmApproveBtn');
+            const confirmRejectBtn = document.getElementById('confirmRejectBtn');
+
+            // Tentukan tombol yang diklik untuk menampilkan loading state
+            let btnToAnimate = action === 'approve' ? confirmApproveBtn : confirmRejectBtn;
+
+            // Sembunyikan modal
+            if (action === 'approve') {
+                document.getElementById('approveModal').style.display = 'none';
+            } else {
+                document.getElementById('rejectModal').style.display = 'none';
+            }
+
+            // Ganti tombol aksi utama dengan loading state
+            approveBtn.disabled = true;
+            rejectBtn.disabled = true;
+            approveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
+            rejectBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
+
             try {
-                const response = await fetch(BASE_API_URL + `${action}.php`, {
+                const response = await fetch(url, {
                     method: 'POST',
-                    body: formData
+                    body: formData,
                 });
+
                 const result = await response.json();
 
-                if (result.success) {
-                    showStatusMessage(`Peminjaman berhasil di${action === 'approve' ? 'setujui' : 'tolak'}.`, 'success');
-                    // Muat ulang detail
-                    fetchDetailPeminjaman();
-                    document.getElementById('rejectModal').style.display = 'none';
-                    document.getElementById('approveModal').style.display = 'none';
+                if (response.ok && result.success) {
+                    showStatusMessage(result.message, 'success');
                 } else {
-                    showStatusMessage(`Gagal ${action}: ${result.message}`);
+                    showStatusMessage(result.message || `Gagal ${action} peminjaman.`);
                 }
-
             } catch (error) {
-                console.error('Action Error:', error);
-                showStatusMessage(`Error jaringan saat memproses ${action}.`);
+                console.error(`${action} Error:`, error);
+                showStatusMessage('Terjadi kesalahan jaringan.');
+            } finally {
+                // Reset tombol dan muat ulang data
+                approveBtn.disabled = false;
+                rejectBtn.disabled = false;
+                approveBtn.innerHTML = '<i class="fas fa-check"></i> Setujui';
+                rejectBtn.innerHTML = '<i class="fas fa-times"></i> Tolak';
+                fetchDetailPeminjaman();
             }
         }
 
-
-        // --- LOGIKA MODAL ---
-        const approveBtn = document.getElementById('approveBtn');
-        const rejectBtn = document.getElementById('rejectBtn');
-        const confirmApproveBtn = document.getElementById('confirmApproveBtn');
-        const confirmRejectBtn = document.getElementById('confirmRejectBtn');
-        const rejectModal = document.getElementById('rejectModal');
-        const approveModal = document.getElementById('approveModal');
-
-        approveBtn.addEventListener('click', () => {
-            approveModal.style.display = 'flex';
+        // Event Listeners for modal buttons
+        document.getElementById('approveBtn').addEventListener('click', () => {
+            document.getElementById('approveModal').style.display = 'flex';
         });
 
-        confirmApproveBtn.addEventListener('click', () => {
+        document.getElementById('rejectBtn').addEventListener('click', () => {
+            document.getElementById('rejectModal').style.display = 'flex';
+        });
+
+        document.getElementById('confirmApproveBtn').addEventListener('click', () => {
             performAction('approve');
         });
 
-        rejectBtn.addEventListener('click', () => {
-            rejectModal.style.display = 'flex';
-        });
-
-        confirmRejectBtn.addEventListener('click', () => {
+        document.getElementById('confirmRejectBtn').addEventListener('click', () => {
             const reason = document.getElementById('rejectionReason').value.trim();
             if (reason.length < 5) {
                 alert("Alasan penolakan harus diisi minimal 5 karakter.");
@@ -356,10 +379,10 @@
             const url = '../../../backend/api/auth/logout.php';
             try {
                 await fetch(url, { method: 'POST' });
-                window.location.href = '../../public/index.html';
             } catch (error) {
-                window.location.href = '../../public/index.html';
+                console.error('Logout Error:', error);
             }
+            window.location.href = '../../public/index.html';
         });
     </script>
 </body>
