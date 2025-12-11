@@ -16,14 +16,10 @@
             font-weight: 600;
             font-size: 0.9em;
             display: inline-block;
+            white-space: nowrap;
         }
 
-        .PENDING {
-            background-color: #ffc107;
-            color: #333;
-        }
-
-        /* Tambahkan style untuk DIAJUKAN, jika ini statusnya di DB */
+        .PENDING,
         .DIAJUKAN {
             background-color: #ffc107;
             color: #333;
@@ -91,6 +87,18 @@
             text-decoration: none;
             cursor: pointer;
         }
+
+        .btn-detail {
+            background-color: #4A90E2;
+            /* Warna biru */
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-right: 5px;
+        }
     </style>
 </head>
 
@@ -131,7 +139,9 @@
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Peminjam</th>
+                            <th>Peminjam (Username)</th>
+                            <th>Nama Mahasiswa</th>
+                            <th>Nama Dosen PJ</th>
                             <th>Sarana</th>
                             <th>Tanggal</th>
                             <th>Waktu</th>
@@ -141,7 +151,7 @@
                     </thead>
                     <tbody id="peminjamanTableBody">
                         <tr>
-                            <td colspan="7">Memuat data...</td>
+                            <td colspan="9">Memuat data...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -156,7 +166,7 @@
             <p>Anda akan menolak peminjaman dengan ID: <span id="rejectIdDisplay"></span>. Masukkan alasan penolakan:
             </p>
             <textarea id="rejectionReason" rows="4" style="width: 100%; padding: 10px; margin-bottom: 15px;"
-                placeholder="Alasan penolakan wajib diisi"></textarea>
+                placeholder="Alasan penolakan wajib diisi (minimal 5 karakter)"></textarea>
             <button class="btn btn-danger" onclick="rejectPeminjaman()">Tolak Permanen</button>
             <button class="btn btn-secondary" onclick="closeRejectModal()">Batal</button>
         </div>
@@ -203,7 +213,8 @@
         // --- FUNGSI FETCH DATA PEMINJAMAN ---
         async function fetchPeminjaman() {
             const tableBody = document.getElementById('peminjamanTableBody');
-            tableBody.innerHTML = '<tr><td colspan="7" class="loading-state">Memuat data...</td></tr>';
+            // Colspan 9
+            tableBody.innerHTML = '<tr><td colspan="9" class="loading-state">Memuat data...</td></tr>';
 
             try {
                 const response = await fetch(BASE_API_URL + 'list.php');
@@ -213,57 +224,62 @@
                 if (!response.ok || result.error) {
                     const errorMessage = result.error || result.message || `Gagal memuat data. Status: ${response.status}.`;
                     showStatusMessage(errorMessage);
-                    tableBody.innerHTML = '<tr><td colspan="7" style="color: red;">Error: Data gagal dimuat. Cek Console.</td></tr>';
+                    tableBody.innerHTML = '<tr><td colspan="9" style="color: red;">Error: Data gagal dimuat. Cek Console.</td></tr>';
                     return;
                 }
 
-                // 2. Koreksi pengambilan data dari respons (harusnya result.data, bukan seluruh result)
+                // 2. Koreksi pengambilan data dari respons (harus array di key 'data')
                 if (result.status === 'success' && Array.isArray(result.data)) {
                     const data = result.data; // Ambil array data dari key 'data'
 
                     tableBody.innerHTML = '';
 
                     if (data.length === 0) {
-                        tableBody.innerHTML = '<tr><td colspan="7" class="loading-state">Tidak ada data peminjaman.</td></tr>';
+                        tableBody.innerHTML = '<tr><td colspan="9" class="loading-state">Tidak ada data peminjaman.</td></tr>';
                         return;
                     }
 
                     data.forEach(item => {
                         const row = tableBody.insertRow();
 
-                        row.insertCell().textContent = item.booking_id;
-                        row.insertCell().textContent = item.peminjam;
-                        row.insertCell().textContent = item.nama_sarana;
-                        row.insertCell().textContent = item.tanggal;
-                        row.insertCell().textContent = `${item.start_time.substring(0, 5)} - ${item.end_time.substring(0, 5)}`;
+                        // Default nama jika data dari backend null/kosong
+                        const namaMahasiswa = item.nama_mahasiswa ? item.nama_mahasiswa : '-';
+                        const namaDosen = item.nama_dosen ? item.nama_dosen : '-';
 
-                        const statusCell = row.insertCell();
+                        row.insertCell().textContent = item.booking_id; // 1
+                        row.insertCell().textContent = item.peminjam; // 2 (Peminjam Username) <-- DIKEMBALIKAN
+                        row.insertCell().textContent = namaMahasiswa; // 3 (Nama Mahasiswa)
+                        row.insertCell().textContent = namaDosen; // 4 (Nama Dosen PJ)
+                        row.insertCell().textContent = item.nama_sarana; // 5
+                        row.insertCell().textContent = item.tanggal; // 6
+                        row.insertCell().textContent = `${item.start_time.substring(0, 5)} - ${item.end_time.substring(0, 5)}`; // 7
+
+                        const statusCell = row.insertCell(); // 8
                         // Pastikan status adalah uppercase untuk mencocokkan class CSS
                         const statusText = item.status.toUpperCase();
                         statusCell.innerHTML = `<span class="status ${statusText}">${statusText}</span>`;
 
-                        const actionCell = row.insertCell();
+                        const actionCell = row.insertCell(); // 9
 
-                        // LOGIKA TOMBOL AKSI (DIPERBAIKI)
-                        // Cek status, biarkan tombol muncul jika status adalah 'pending' ATAU 'diajukan'
+                        // LOGIKA TOMBOL AKSI
                         const statusLower = item.status.toLowerCase();
                         const isPending = statusLower === 'pending' || statusLower === 'diajukan'; // Tambahkan 'diajukan'
 
                         actionCell.innerHTML = `
-                            <button class="btn btn-detail" onclick="window.location.href='detail.php?id=${item.booking_id}'">Detail</button>
+                            <a href="edit_peminjaman.html?id=${item.booking_id}" class="btn btn-detail">Detail</a>
                             ${isPending ? `<button class="btn btn-action" onclick="showApproveModal(${item.booking_id})">Setuju</button>` : ''}
                             ${isPending ? `<button class="btn btn-danger" onclick="showRejectModal(${item.booking_id})">Tolak</button>` : ''}
                         `;
                     });
                 } else {
                     showStatusMessage(result.message || 'Format data dari server tidak valid.');
-                    tableBody.innerHTML = '<tr><td colspan="7" style="color: red;">Error: Data gagal diurai. Cek format backend.</td></tr>';
+                    tableBody.innerHTML = '<tr><td colspan="9" style="color: red;">Error: Data gagal diurai. Cek format backend.</td></tr>';
                 }
 
             } catch (error) {
                 console.error('Fetch Error:', error);
                 showStatusMessage(`Terjadi kesalahan jaringan: ${error.message}`);
-                tableBody.innerHTML = '<tr><td colspan="7" style="color: red;">Error Jaringan: Gagal terhubung ke API.</td></tr>';
+                tableBody.innerHTML = '<tr><td colspan="9" style="color: red;">Error Jaringan: Gagal terhubung ke API.</td></tr>';
             }
         }
 
@@ -376,10 +392,9 @@
             const url = '../../../backend/api/auth/logout.php';
 
             try {
-                const response = await fetch(url, {
+                await fetch(url, {
                     method: 'POST',
                 });
-                // Tidak perlu cek result, langsung redirect
                 window.location.href = '../../public/index.html';
 
             } catch (error) {
