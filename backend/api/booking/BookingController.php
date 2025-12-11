@@ -1,15 +1,10 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
 // Hapus header content-type di sini karena ini class library, bukan output JSON langsung
 require_once __DIR__ . "/../../config/database.php";
 require_once __DIR__ . "/../../models/Booking.php";
 require_once __DIR__ . "/../../models/BlockedDate.php";
 require_once __DIR__ . "/../../config/auth.php";
 
-// --- HAPUS require_admin() DARI SINI AGAR MAHASISWA BISA BOOKING ---
 
 class BookingController
 {
@@ -29,23 +24,89 @@ class BookingController
         $this->blocked = new BlockedDate($this->conn);
     }
 
-    public function createBooking($data)
+    /* ======================================================
+        LOGIKA PERHITUNGAN WAKTU BOOKING (Pindah ke Controller)
+    ====================================================== */
+    private function calculateBookingTime($sks, $start_time, $tanggal)
     {
+        // Aturan: 1 SKS = 2 jam akademik. 1 jam akademik = 50 menit.
+        // Total durasi dalam menit: SKS * 2 * 50 = SKS * 100 menit
+        $minutes_per_sks_unit = 100; 
+        $hours_per_sks_db = 2; // Nilai tetap untuk disimpan ke DB sebagai referensi jam akademik
+
+        $duration_minutes = $sks * $minutes_per_sks_unit;
+        
+        // Hitung End Time
+        try {
+            // Gabungkan tanggal dan waktu mulai
+            $start_dt = new DateTime($tanggal . ' ' . $start_time);
+            $end_dt = clone $start_dt;
+            
+            // Tambahkan durasi total dalam menit
+            $end_dt->modify('+' . $duration_minutes . ' minutes'); 
+
+            $end_time = $end_dt->format('H:i:s');
+            
+        } catch (Exception $e) {
+            return ['error' => 'Kesalahan format waktu/tanggal saat perhitungan: ' . $e->getMessage()];
+        }
+
+        return [
+            'hours_per_sks' => $hours_per_sks_db,
+            'duration_hours' => $duration_minutes / 60,
+            'end_time' => $end_time // end_time hasil perhitungan (HH:ii:ss)
+        ];
+    }
+
+    public function createBooking($data)
+    {        
+        $nim       = $data['nim'];
+        $nidn      = $data['nidn'];
         $sarana_id = $data['sarana_id'];
         $tanggal   = $data['tanggal'];
         $start     = $data['start_time'];
-        $end       = $data['end_time'];
+        $keperluan = $data['keperluan'];
+        $created_by= $data['created_by'];
+        
+        // 1. Hitung END TIME di Controller
+        $time_data = $this->calculateBookingTime(
+            $data['sks'], 
+            $data['start_time'], 
+            $data['tanggal']
+        );
+        
+        // Cek jika ada error dari perhitungan waktu
+        if (isset($time_data['error'])) {
+            return ['success' => false, 'message' => $time_data['error']];
+        }
 
-        // Cek apakah tanggal diblokir admin
-        if ($this->blocked->isBlockedRange($sarana_id, $tanggal, $start, $end)) {
+        // Ambil hasil perhitungan
+        $end = $time_data['end_time']; 
+
+        // 2. SISIPKAN DATA WAKTU HASIL PERHITUNGAN KE ARRAY $data
+        $data['end_time']         = $end; 
+        $data['hours_per_sks']    = $time_data['hours_per_sks'];
+        $data['duration_hours']   = $time_data['duration_hours'];
+
+        // 3. Cek apakah tanggal diblokir admin
+        // Gunakan metode yang tersedia di Model BlockedDate. Asumsi isBlockedRange/isBlocked adalah metode yang benar.
+        $is_blocked = false;
+        if (method_exists($this->blocked, 'isBlockedRange')) {
+            $is_blocked = $this->blocked->isBlockedRange($sarana_id, $tanggal, $start, $end);
+        } else {
+            $is_blocked = $this->booking->isBlocked($sarana_id, $tanggal, $start, $end);
+        }
+
+        if ($is_blocked) {
             return ['success' => false, 'message' => 'Waktu ini diblokir oleh admin.'];
         }
 
-        // Cek bentrok jadwal
+        // 4. Cek bentrok jadwal
         if ($this->booking->hasConflict($sarana_id, $tanggal, $start, $end)) {
             return ['success' => false, 'message' => 'Jadwal bentrok dengan booking lain.'];
         }
 
+        // 5. Simpan data (Model menerima data yang sudah lengkap)
         $booking_id = $this->booking->create($data);
 
         if ($booking_id) {

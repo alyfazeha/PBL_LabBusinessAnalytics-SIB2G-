@@ -86,10 +86,6 @@ class Booking
     ====================================================== */
     public function create($data)
     {
-        // Perhitungan SKS & Durasi jam harus ada
-        $hours_per_sks = 2; // Asumsi konstan
-        $duration_hours = $data['sks'] * $hours_per_sks;
-
         $sql = "
             INSERT INTO bookings (
                 mahasiswa_nim, booking_dosen_nidn,
@@ -113,13 +109,13 @@ class Booking
         $stmt = $this->conn->prepare($sql);
 
         $params = [
-            ':nim' => $data['nim'] ?: null,
-            ':nidn' => $data['nidn'] ?: null,
+            ':nim' => $data['nim'],
+            ':nidn' => $data['nidn'],
             ':sarana_id' => $data['sarana_id'],
             ':tanggal' => $data['tanggal'],
             ':sks' => $data['sks'],
-            ':hours_per_sks' => $hours_per_sks,
-            ':duration_hours' => $duration_hours,
+            ':hours_per_sks'   => $data['hours_per_sks'], // Diisi oleh Controller
+            ':duration_hours'  => $data['duration_hours'],
             ':start_time' => $data['start_time'],
             ':end_time' => $data['end_time'],
             ':keperluan' => $data['keperluan'],
