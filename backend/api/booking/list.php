@@ -44,7 +44,7 @@ try {
         LEFT JOIN mahasiswa m ON b.mahasiswa_nim = m.nim
     ";
 
-    $order_by = "ORDER BY b.tanggal DESC, b.start_time";
+    $order_by = "ORDER BY b.booking_id DESC";
 
     // 2. Query berdasarkan Role (Memastikan klausa WHERE terpasang)
     if ($role === 'admin') {
