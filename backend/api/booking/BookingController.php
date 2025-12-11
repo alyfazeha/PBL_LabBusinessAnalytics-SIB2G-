@@ -120,30 +120,97 @@ class BookingController
         }
     }
 
+    /* =====================================================
+    Tambahkan Helper untuk Ambil Detail Booking
+    ====================================================== */
+    private function getBookingDetails($booking_id)
+    {
+        // Mengambil data penting: sarana_id, waktu, dan status saat ini.
+        $query = "SELECT sarana_id, tanggal, start_time, end_time, status FROM bookings WHERE booking_id = :id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute([':id' => $booking_id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    /* =====================================================
+    REVISI UTAMA: Logika Approval
+    ====================================================== */
     public function approveBooking($booking_id, $admin_id)
     {
-        // Cek status harus pending agar tidak double approve
-        $query = "UPDATE bookings SET status = 'disetujui', handled_by = :admin, updated_at = NOW() WHERE booking_id = :id";
+        // 1. Ambil detail booking
+        $booking_data = $this->getBookingDetails($booking_id); 
+        
+        if (!$booking_data) {
+            return ['success' => false, 'message' => "Booking ID tidak ditemukan."];
+        }
+        
+        // 2. Cek status harus diajukan
+        if ($booking_data['status'] !== 'diajukan') {
+            return ['success' => false, 'message' => "Gagal menyetujui. Booking sudah diproses ({$booking_data['status']})."];
+        }
+
+        $sarana_id = $booking_data['sarana_id'];
+        $tanggal   = $booking_data['tanggal'];
+        $start     = $booking_data['start_time'];
+        $end       = $booking_data['end_time'];
+
+        // 3. RE-CHECK: Konflik dengan Blocked Date (dari model BlockedDate)
+        if ($this->blocked->isBlockedRange($sarana_id, $tanggal, $start, $end)) {
+            return ['success' => false, 'message' => 'Gagal menyetujui. Waktu ini telah diblokir oleh Admin setelah pengajuan.'];
+        }
+
+        // 4. RE-CHECK: Konflik dengan Booking LAIN yang SUDAH DISETUJUI
+        // Cek bentrok dengan booking lain di sarana, tanggal, dan jam yang sama.
+        $conflict_query = "
+            SELECT 1 
+            FROM bookings 
+            WHERE sarana_id = :sarana_id
+            AND tanggal = :tanggal
+            AND status = 'disetujui' -- **HANYA CEK DENGAN YANG SUDAH DISETUJUI**
+            AND booking_id != :current_id -- Kecualikan ID booking yang sedang diproses
+            AND (
+                    end_time > :start
+                AND start_time < :end
+            )
+            LIMIT 1;
+        ";
+        
+        $stmt_conflict = $this->conn->prepare($conflict_query);
+        $stmt_conflict->execute([
+            ':sarana_id'  => $sarana_id,
+            ':tanggal'    => $tanggal,
+            ':start'      => $start,
+            ':end'        => $end,
+            ':current_id' => $booking_id
+        ]);
+
+        if ($stmt_conflict->rowCount() > 0) {
+            return ['success' => false, 'message' => 'Gagal menyetujui. Jadwal bentrok dengan booking lain yang sudah disetujui.'];
+        }
+
+        // 5. Lakukan UPDATE: Ubah status menjadi 'disetujui'
+        // Perhatikan penambahan AND status = 'diajukan' di WHERE clause untuk atomicity.
+        $query = "UPDATE bookings SET status = 'disetujui', handled_by = :admin, updated_at = NOW() WHERE booking_id = :id AND status = 'diajukan'";
         $stmt = $this->conn->prepare($query);
         $ok = $stmt->execute([":admin" => $admin_id, ":id" => $booking_id]);
-        
-        if ($ok) {
-             return ['success' => true, 'message' => "Booking berhasil disetujui."];
+
+        if ($ok && $stmt->rowCount() > 0) {
+            return ['success' => true, 'message' => "Booking berhasil disetujui."];
         } else {
-             return ['success' => false, 'message' => "Gagal menyetujui booking."];
+            return ['success' => false, 'message' => "Gagal menyetujui booking (ID tidak ditemukan atau sudah diproses)."];
         }
     }
 
-    public function rejectBooking($booking_id, $admin_id, $reason)
-    {
-        $query = "UPDATE bookings SET status = 'ditolak', rejection_reason = :reason, handled_by = :admin, updated_at = NOW() WHERE booking_id = :id";
+    public function rejectBooking($booking_id, $admin_id, $reason){
+        // Tambahkan kondisi AND status = 'diajukan'
+        $query = "UPDATE bookings SET status = 'ditolak', rejection_reason = :reason, handled_by = :admin, updated_at = NOW() WHERE booking_id = :id AND status = 'diajukan'"; 
         $stmt = $this->conn->prepare($query);
         $ok = $stmt->execute([":reason" => $reason, ":admin" => $admin_id, ":id" => $booking_id]);
 
-        if ($ok) {
-             return ['success' => true, 'message' => "Booking berhasil ditolak."];
+        if ($ok && $stmt->rowCount() > 0) { // Cek rowCount > 0
+            return ['success' => true, 'message' => "Booking berhasil ditolak."];
         } else {
-             return ['success' => false, 'message' => "Gagal menolak booking."];
+            return ['success' => false, 'message' => "Gagal menolak booking (ID tidak ditemukan atau sudah diproses)."];
         }
     }
 }
