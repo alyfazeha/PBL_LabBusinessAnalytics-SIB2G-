@@ -4,43 +4,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tambah Peminjaman | Admin</title>
+    <title>Peminjaman Lab Business Analytics</title>
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../../assets/css/cssadmin.css">
+    <link rel="stylesheet" href="../assets/css/cssadmin.css">
+
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: var(--light-bg);
+            box-sizing: border-box;
+        }
+
+        .main-container {
+            width: 100%;
+            /* Form disembunyikan secara default */
+        }
+    </style>
 </head>
 
 <body>
 
-    <div class="sidebar">
-        <div class="logo-area">
-            <h3>Lab Admin</h3>
+    <div id="actionModal" class="action-modal-overlay">
+        <div class="action-modal-content">
+            <h2>Pilih Aksi Peminjaman</h2>
+            <p>Silakan pilih tindakan yang ingin Anda lakukan di Lab Business Analytics.</p>
+
+            <div class="action-buttons">
+                <button id="triggerForm" class="action-btn">
+                    <i class="fas fa-file-signature"></i>
+                    Ajukan Peminjaman
+                </button>
+
+                <button id="triggerStatus" class="action-btn">
+                    <i class="fas fa-search"></i>
+                    Cek Status & Riwayat
+                </button>
+            </div>
+            <a href="index.html" class="back-link-home" style="">
+                <i class=" fas fa-arrow-left"></i> Kembali ke Halaman Utama
+            </a>
         </div>
-        <nav>
-            <a href="../admin.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-            <a href="peminjaman.html" class="active"><i class="fas fa-calendar-alt"></i> Peminjaman</a>
-            <a href="../konten/konten.html"><i class="fas fa-newspaper"></i> Berita & Konten</a>
-            <a href="../publikasi/publikasi.html"><i class="fas fa-newspaper"></i> Publikasi</a>
-            <a href="../dosen/dosen.html"><i class="fas fa-users"></i> Data Dosen</a>
-            <a href="../mahasiswa/mahasiswa.html"><i class="fas fa-user-graduate"></i> Data Mahasiswa</a>
-            <a href="#" id="logoutTrigger"><i class="fas fa-sign-out-alt"></i> Logout</a>
-        </nav>
     </div>
 
-    <div class="main-content">
-        <header>
-            <div class="header-title">
-                <h2>Tambah Peminjaman</h2>
-                <a href="peminjaman.html" class="back-link"><i class="fas fa-arrow-left"></i> Kembali</a>
-            </div>
-        </header>
+    <div class="main-container is-hidden " id="formContainer">
 
-        <main>
-            <div id="statusMessage" class="status-message" style="display:none; padding: 10px; margin-bottom: 20px;">
-            </div>
+        <div class="header-status-blue">
+            <h1><i class="fas fa-calendar-plus"></i> Formulir Pengajuan Peminjaman Lab</h1>
+            <p>Isi formulir ini dengan detail lengkap untuk mengajukan peminjaman Lab Business Analytics.</p>
+        </div>
 
-            <div class="card">
-                <form id="formPeminjaman" class="data-form">
+        <div class="container">
+            <a href="peminjaman-mahasiswa.html" class="back-link" style="margin-top: 30px;">
+                <i class="fas fa-arrow-left"></i> Kembali ke Pilihan Aksi
+            </a>
+
+            <div class="form-card">
+
+                <form action="#" method="POST" form id="formPeminjaman">
 
                     <div class="form-group">
                         <label for="sarana_id">Sarana / Ruangan <span class="required">*</span></label>
@@ -86,43 +110,42 @@
                             placeholder="Contoh: Digunakan untuk praktikum mata kuliah Pemrograman Web"></textarea>
                     </div>
 
-                    <button type="submit" id="submitBtn" class="btn btn-action"><i class="fas fa-save"></i> Ajukan
-                        Peminjaman</button>
+                    <button type="submit" class="btn-submit">
+                        <i class="fas fa-paper-plane"></i>
+                        Kirim Permintaan Peminjaman
+                    </button>
                 </form>
             </div>
-        </main>
-    </div>
-
-    <div id="logoutModal" class="modal"
-        style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4); justify-content: center; align-items: center;">
-        <div class="modal-content"
-            style="background-color: #fefefe; margin: auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 400px; border-radius: 10px;">
-            <span class="close-btn" onclick="logoutModal.style.display='none';">&times;</span>
-            <p>Anda yakin ingin keluar?</p>
-            <button id="confirmLogoutBtn" class="btn btn-danger">Ya, Logout</button>
-            <button id="cancelLogoutBtn" class="btn btn-secondary">Batal</button>
         </div>
-    </div>
 
-    <script>
-        const PEMINJAMAN_API_URL = '../../../backend/api/booking/';
-        const SARANA_API_URL = '../../../backend/api/sarana/list.php'; // Asumsi API Sarana
-        const DOSEN_API_URL = '../../../backend/api/dosen/list.php'; // Asumsi API Dosen
+        <script>
+            const PEMINJAMAN_API_URL = '../../backend/api/booking/';
+            const SARANA_API_URL = '../../backend/api/sarana/list.php'; // Asumsi API Sarana
+            const DOSEN_API_URL = '../../backend/api/dosen/list.php'; // Asumsi API Dosen
 
-        // --- FUNGSI UTILITY ---
-        function showStatusMessage(message, type = 'error') {
-            const statusDiv = document.getElementById('statusMessage');
-            statusDiv.textContent = message;
-            statusDiv.style.backgroundColor = type === 'success' ? '#4CAF50' : '#f44336';
-            statusDiv.style.color = 'white';
-            statusDiv.style.padding = '10px';
-            statusDiv.style.marginBottom = '20px';
-            statusDiv.style.borderRadius = '5px';
-            statusDiv.style.display = 'block';
-            setTimeout(() => { statusDiv.style.display = 'none'; }, 5000);
-        }
+            const actionModal = document.getElementById('actionModal');
+            const triggerForm = document.getElementById('triggerForm');
+            const triggerStatus = document.getElementById('triggerStatus'); // Ambil ID tombol Status baru
+            const formContainer = document.getElementById('formContainer');
 
-        // 1. Fetch Data Sarana
+            // STATE AWAL: Pastikan Form Sembunyi
+            formContainer.classList.add('is-hidden');
+
+            // 1. Logika Ajukan Permintaan Baru (Menampilkan Form)
+            triggerForm.addEventListener('click', (e) => {
+                e.preventDefault();
+                actionModal.style.display = 'none';
+                formContainer.classList.remove('is-hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+
+            // 2. Logika Cek Status & Riwayat (Redirect ke halaman baru)
+            triggerStatus.addEventListener('click', () => {
+                // Lakukan pengalihan ke halaman status
+                window.location.href = 'status-peminjaman-dosen.html';
+            });
+
+            // 1. Fetch Data Sarana
         async function fetchSarana() {
             const saranaSelect = document.getElementById('sarana_id');
             try {
@@ -230,16 +253,8 @@
             document.getElementById('tanggal').min = new Date().toISOString().split('T')[0];
         });
 
-        // Logout Logic
-        const logoutModal = document.getElementById('logoutModal');
-        document.getElementById('logoutTrigger').onclick = (e) => { e.preventDefault(); logoutModal.style.display = 'flex'; };
-        document.getElementById('cancelLogoutBtn').onclick = () => logoutModal.style.display = 'none';
-        document.getElementById('confirmLogoutBtn').onclick = async () => {
-            try { await fetch('../../../backend/api/auth/logout.php', { method: 'POST' }); } catch (e) { console.error('Logout Error:', e); }
-            window.location.href = '../../public/index.html';
-        };
+        </script>
 
-    </script>
 </body>
 
 </html>
