@@ -9,6 +9,37 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../../assets/css/cssadmin.css">
     <link rel="stylesheet" href="../../assets/css/cssmahasiswa.css">
+    
+    <style>
+        .filter-container {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+            margin-bottom: 20px;
+            align-items: center;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .filter-group label {
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #666;
+        }
+        .filter-select {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            min-width: 200px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 
 <body>
@@ -21,7 +52,7 @@
             <a href="../admin.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
             <a href="../peminjaman/peminjaman.html"><i class="fas fa-calendar-alt"></i> Peminjaman</a>
             <a href="konten.html" class="active"><i class="fas fa-newspaper"></i> Berita & Konten</a>
-            <a href="../publikasi/publikasi.html"><i class="fas fa-newspaper"></i> Publikasi</a>
+            <a href="../publikasi/publikasi.html"><i class="fas fa-book"></i> Publikasi</a>
             <a href="../dosen/dosen.html"><i class="fas fa-users"></i> Data Dosen</a>
             <a href="../mahasiswa/mahasiswa.html"><i class="fas fa-user-graduate"></i> Data Mahasiswa</a>
             <a href="#" id="logoutTrigger"><i class="fas fa-sign-out-alt"></i> Logout</a>
@@ -38,6 +69,15 @@
 
             <a href="tambah_konten.html" class="add-button"><i class="fas fa-plus"></i> Tambah Konten</a>
 
+            <div class="filter-container">
+                <div class="filter-group">
+                    <label for="filterKategori"> Filter Kategori Berita:</label>
+                    <select id="filterKategori" class="filter-select">
+                        <option value="">-- Tampilkan Semua --</option>
+                    </select>
+                </div>
+            </div>
+
             <div class="data-table-container">
                 <table class="data-table">
                     <thead>
@@ -53,6 +93,7 @@
                         </tr>
                     </thead>
                     <tbody id="kontenTableBody">
+                        <tr><td colspan="8" style="text-align:center;">Sedang memuat data...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -69,61 +110,105 @@
     </div>
 
     <script>
+        // --- VARIABEL GLOBAL ---
+        let allKontenData = []; // Menyimpan data mentah dari server untuk keperluan filtering
+
         function displayMessage(type, message) {
             const messageArea = document.getElementById('message');
             messageArea.textContent = message;
             messageArea.className = 'message-area ' + type;
             messageArea.style.display = 'block';
-            setTimeout(() => {
-                messageArea.style.display = 'none';
-            }, 5000);
+            setTimeout(() => { messageArea.style.display = 'none'; }, 5000);
         }
 
         const kontenTableBody = document.getElementById('kontenTableBody');
 
+        // [PERBAIKAN] Fetch Kategori
+        async function fetchKategori() {
+            try {
+                const response = await fetch('../../../backend/api/contents/kategori_list.php');
+                const result = await response.json();
+                const select = document.getElementById('filterKategori');
+
+                // Reset dropdown
+                select.innerHTML = '<option value="">-- Tampilkan Semua --</option>';
+
+                if (result.status === 'success' && Array.isArray(result.data)) {
+                    result.data.forEach(item => {
+                        const option = document.createElement('option');
+                        
+                        // PERBAIKAN: Gunakan 'item.nama' sesuai kolom database Anda
+                        const namaKategori = item.nama; 
+                        
+                        // Value kita set nama kategori agar mudah dicocokkan dengan tabel berita
+                        option.value = namaKategori; 
+                        option.textContent = namaKategori;
+                        select.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error('Kategori Error:', error);
+            }
+        }
+        // [UPDATE] 2. Fetch Data Konten Utama
         async function fetchKonten() {
-            // Pastikan path ini benar sesuai struktur folder
             const url = '../../../backend/api/contents/list.php';
             try {
                 const response = await fetch(url);
                 const result = await response.json();
 
                 if (result.status === 'success') {
-                    renderKontenTable(result.data);
+                    allKontenData = result.data; // Simpan ke variabel global
+                    renderKontenTable(allKontenData); // Tampilkan semua saat awal load
                 } else {
-                    displayMessage('error', 'Gagal memuat data konten: ' + result.message);
+                    kontenTableBody.innerHTML = '<tr><td colspan="8" style="text-align:center;">Gagal memuat data.</td></tr>';
+                    displayMessage('error', 'Gagal memuat data: ' + result.message);
                 }
             } catch (error) {
                 console.error('Fetch error:', error);
-                displayMessage('error', 'Terjadi kesalahan jaringan saat memuat data konten.');
+                kontenTableBody.innerHTML = '<tr><td colspan="8" style="text-align:center;">Error koneksi.</td></tr>';
+                displayMessage('error', 'Terjadi kesalahan jaringan.');
             }
         }
 
+        // [BARU] 3. Logika Filtering Client-Side
+        function applyFilters() {
+            const selectedKategori = document.getElementById('filterKategori').value;
+
+            // Filter array global allKontenData
+            const filteredData = allKontenData.filter(item => {
+                // Jika dropdown kosong ("") maka tampilkan semua (return true)
+                // Jika tidak, cek apakah category_name sama dengan pilihan
+                return selectedKategori === "" || item.category_name === selectedKategori;
+            });
+
+            renderKontenTable(filteredData);
+        }
+
+        // 4. Render Tabel (Menampilkan Data ke HTML)
         function renderKontenTable(kontenList) {
             kontenTableBody.innerHTML = '';
 
             if (kontenList.length === 0) {
-                kontenTableBody.innerHTML = '<tr><td colspan="8" style="text-align:center;">Belum ada data konten.</td></tr>';
+                kontenTableBody.innerHTML = '<tr><td colspan="8" style="text-align:center;">Data tidak ditemukan.</td></tr>';
                 return;
             }
 
             kontenList.forEach(konten => {
                 const row = kontenTableBody.insertRow();
 
-                // Cek status published (bisa boolean true/false atau string 't'/'f' atau '1'/'0')
+                // Cek status published
                 const isPub = konten.is_published === true || konten.is_published === 't' || konten.is_published === '1';
                 const statusClass = isPub ? 'status-published' : 'status-pending';
 
-                // Logika Gambar Kecil
+                // Tampilan Gambar
                 let imgDisplay = '<span style="color:#ccc; font-size: 0.8em;">No Img</span>';
                 if (konten.featured_image && konten.featured_image.trim() !== '') {
                     imgDisplay = `<img src="${konten.featured_image}" alt="Img" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; border: 1px solid #ddd;">`;
                 }
 
-                // Logika ID & Penulis
-                // Gunakan content_id (bukan id) karena database pakai content_id
                 const id = konten.content_id;
-                const penulis = konten.user_name || 'Admin'; // Fallback jika user_name kosong
+                const penulis = konten.user_name || 'Admin';
 
                 row.innerHTML = `
                     <td>${id}</td>
@@ -148,6 +233,7 @@
             });
         }
 
+        // 5. Fungsi Hapus Konten
         async function deleteKonten(id, title) {
             if (!confirm(`Apakah Anda yakin ingin menghapus konten:\n"${title}"?`)) {
                 return;
@@ -158,26 +244,24 @@
             formData.append('content_id', id);
 
             try {
-                const response = await fetch(url, {
-                    method: 'POST',
-                    body: formData
-                });
+                const response = await fetch(url, { method: 'POST', body: formData });
                 const result = await response.json();
 
                 if (result.status === 'success') {
                     displayMessage('success', result.message);
-                    fetchKonten(); // Muat ulang tabel
+                    fetchKonten(); // Refresh data dari server agar sinkron
                 } else {
                     displayMessage('error', result.message);
                 }
             } catch (error) {
                 console.error('Delete error:', error);
-                displayMessage('error', 'Terjadi kesalahan jaringan saat menghapus konten.');
+                displayMessage('error', 'Gagal menghapus konten.');
             }
         }
 
+        // 6. Fungsi Toggle Publish
         async function togglePublish(id, currentStatus) {
-            const newStatus = !currentStatus; // Balik status
+            const newStatus = !currentStatus; 
 
             const url = '../../../backend/api/contents/publish.php';
             const formData = new FormData();
@@ -185,65 +269,43 @@
             formData.append('status', newStatus ? '1' : '0');
 
             try {
-                const response = await fetch(url, {
-                    method: 'POST',
-                    body: formData
-                });
+                const response = await fetch(url, { method: 'POST', body: formData });
                 const result = await response.json();
 
                 if (result.status === true || result.status === 'success') {
                     displayMessage('success', result.message);
-                    fetchKonten();
+                    fetchKonten(); // Refresh data
                 } else {
                     displayMessage('error', result.message);
                 }
             } catch (error) {
                 console.error('Publish error:', error);
-                displayMessage('error', 'Terjadi kesalahan jaringan saat mengubah status.');
+                displayMessage('error', 'Gagal mengubah status.');
             }
         }
 
-        document.addEventListener('DOMContentLoaded', fetchKonten);
+        // --- Event Listener Filter ---
+        // Panggil fungsi filter saat dropdown berubah
+        document.getElementById('filterKategori').addEventListener('change', applyFilters);
 
-        // --- LOGIKA LOGOUT ---
-        const logoutModal = document.getElementById('logoutModal');
-        const logoutTrigger = document.getElementById('logoutTrigger');
-        const cancelLogoutBtn = document.getElementById('cancelLogoutBtn');
-        const confirmLogoutBtn = document.getElementById('confirmLogoutBtn');
-
-        if (logoutTrigger) {
-            logoutTrigger.addEventListener('click', (e) => {
-                e.preventDefault();
-                logoutModal.classList.add('show');
-            });
-        }
-
-        if (cancelLogoutBtn) {
-            cancelLogoutBtn.addEventListener('click', () => {
-                logoutModal.classList.remove('show');
-            });
-        }
-
-        if (confirmLogoutBtn) {
-            confirmLogoutBtn.addEventListener('click', async () => {
-                const url = '../../../backend/api/auth/logout.php';
-                try {
-                    await fetch(url, { method: 'POST' });
-                    // Redirect ke login/landing page
-                    window.location.href = '../../public/index.html';
-                } catch (error) {
-                    console.error('Logout Error:', error);
-                    window.location.href = '../../public/index.html';
-                }
-            });
-        }
-
-        window.addEventListener('click', (e) => {
-            if (e.target === logoutModal) {
-                logoutModal.classList.remove('show');
-            }
+        // --- Load Data Saat Halaman Dibuka ---
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchKategori(); // Ambil list kategori untuk filter
+            fetchKonten();   // Ambil data tabel
         });
+
+        // --- Logika Logout ---
+        const logoutModal = document.getElementById('logoutModal');
+        document.getElementById('logoutTrigger').onclick = (e) => { e.preventDefault(); logoutModal.classList.add('show'); };
+        document.getElementById('cancelLogoutBtn').onclick = () => logoutModal.classList.remove('show');
+        document.getElementById('confirmLogoutBtn').onclick = async () => {
+            try { await fetch('../../../backend/api/auth/logout.php', { method: 'POST' }); } catch(e){}
+            window.location.href = '../../public/index.html';
+        };
+
+        window.onclick = (e) => {
+            if (e.target === logoutModal) logoutModal.classList.remove('show');
+        };
     </script>
 </body>
-
 </html>
