@@ -379,7 +379,13 @@
           </div>
         </div>
       </div>
-      <div class="row publications-row">
+
+      <div class="row publications-row" id="publications-list-container">
+        <div class="col-lg-12">
+
+        </div>
+      </div>
+      <!-- <div class="row publications-row">
 
         <div class="col-lg-4 col-md-6">
           <div class="publication-item minimal">
@@ -417,7 +423,7 @@
           </div>
         </div>
 
-      </div>
+      </div> -->
 
       <div class="row navigation-controls">
         <div class="col-lg-12">
@@ -434,6 +440,14 @@
       </div>
     </div>
   </section>
+
+  <div class="row publications-row" id="publications-list-container">
+    <div class="col-lg-12">
+      <p id="publications-loading-message" class="text-center w-100" style="padding: 30px;">
+        Memuat data publikasi...
+      </p>
+    </div>
+  </div>
 
   <div id="proyeks" class="proyeks section">
     <div class="container">
@@ -760,6 +774,96 @@
 
     // Jalankan fungsi saat seluruh halaman selesai dimuat
     window.addEventListener('load', fetchAndRenderDosen);
+
+
+    // ... [Skrip Dosen yang sudah ada di sini] ...
+
+    // ==========================================================
+    // SCRIPT KARTU PUBLIKASI
+    // ==========================================================
+
+    // >>> PERIKSA PATH INI LAGI <<<
+    // Jika file index.html/php Anda ada di 'public/' dan API ada di 'backend/api/publikasi/'
+    const PUB_API_URL = '../../backend/api/publikasi/list_public.php';
+
+    // Jika struktur Anda seperti pada jawaban sebelumnya:
+    // const PUB_API_URL = '../../backend/api/publikasi/list_public.php'; 
+
+    const publicationsContainer = document.getElementById('publications-list-container');
+    const publicationsLoading = document.getElementById('publications-loading-message');
+
+    // Helper: Membuat Card Publikasi (Kolom harus sesuai dengan Pubikasi.php)
+    const createPublicationCard = (pub) => {
+      const title = pub.judul || 'Judul Publikasi Tidak Tersedia';
+      const year = pub.tahun_terbit || 'Tidak Diketahui';
+      const url = pub.url_link && pub.url_link.startsWith('http') ? pub.url_link : '#';
+
+      return `
+        <div class="col-lg-4 col-md-6 col-sm-12 publication-item-col">
+            <div class="publication-item minimal">
+                <div class="down-content">
+                    <h4 class="publication-title-text">${title}</h4>
+                    <span class="publication-year">Tahun Terbit: ${year}</span>
+                    <div class="main-blue-button">
+                        <a href="${url}" target="_blank">Lihat Publikasi</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+      `;
+    };
+
+    const fetchAndRenderPublications = async () => {
+      if (!publicationsContainer) return;
+      if (publicationsLoading) publicationsLoading.textContent = 'Memuat data publikasi...';
+      publicationsContainer.innerHTML = ''; // Kosongkan dulu
+
+      try {
+        const response = await fetch(PUB_API_URL);
+
+        if (!response.ok) {
+          // Error HTTP (misal 404 Not Found)
+          throw new Error(`Error HTTP! Cek Path URL: ${PUB_API_URL} (Status: ${response.status})`);
+        }
+
+        const result = await response.json();
+
+        // Cek respon dari PHP: status 'success' dan data ada
+        if (result.status === 'success' && result.data && result.data.length > 0) {
+
+          if (publicationsLoading) publicationsLoading.remove();
+
+          let htmlContent = '';
+          const displayLimit = 6;
+          const dataToDisplay = result.data.slice(0, displayLimit);
+
+          dataToDisplay.forEach(pub => {
+            htmlContent += createPublicationCard(pub);
+          });
+
+          publicationsContainer.innerHTML = htmlContent;
+
+        } else if (result.status === 'success' && result.data.length === 0) {
+          // Data kosong tapi API sukses
+          publicationsContainer.innerHTML = `<div class="col-lg-12"><p class="text-center w-100">Tidak ada data publikasi yang ditemukan.</p></div>`;
+          if (publicationsLoading) publicationsLoading.remove(); // Hapus pesan loading
+
+        } else {
+          // API error tapi bukan HTTP error
+          throw new Error(result.message || 'API merespon error tanpa detail.');
+        }
+
+      } catch (error) {
+        // Tangani semua error (HTTP error, JSON parse error, atau API logic error)
+        console.error('Error fetching Publikasi data:', error);
+        publicationsContainer.innerHTML = `<div class="col-lg-12"><p class="text-center w-100" style="color: red;">Gagal memuat data publikasi. (${error.message})</p></div>`;
+      }
+    };
+
+    // Jalankan fungsi saat seluruh halaman selesai dimuat
+    window.addEventListener('load', fetchAndRenderPublications);
+
+
   </script>
 </body>
 
