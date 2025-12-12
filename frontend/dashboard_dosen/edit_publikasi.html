@@ -172,10 +172,10 @@
                 if (jsonDetail.status === 'success') {
                     const data = jsonDetail.data;
                     // Isi Input Hidden
-                    document.getElementById('pub_id').value = data.id || data.publikasi_id;
+                    document.getElementById('publikasi_id').value = data.id || data.publikasi_id; // <-- BARIS INI BENAR
                     document.getElementById('dosen_nidn').value = data.dosen_nidn;
 
-                    // Isi Input Visible
+                    // Isi Input Visible (sekarang baris-baris ini akan tereksekusi)
                     document.getElementById('judul').value = data.judul;
                     document.getElementById('tahun').value = data.tahun;
                     document.getElementById('kategori_id').value = data.kategori_id;
