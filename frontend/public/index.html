@@ -377,77 +377,43 @@
 
       <div class="row filter-controls">
         <div class="col-lg-12">
-          <div class="main-buttons">
-            <div class="filter-dropdown">
-              <button class="filter-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                Tahun Publikasi
-              </button>
-              <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="#">Semua Tahun</a></li>
-                <li><a class="dropdown-item" href="#">2025</a></li>
-                <li><a class="dropdown-item" href="#">2024</a></li>
-                <li><a class="dropdown-item" href="#">2023</a></li>
-              </ul>
+          <div class="main-buttons d-flex flex-wrap gap-2">
+
+            <div id="filterTahun" class="filter-dropdown">
+              <button class="filter-btn dropdown-toggle" type="button" data-bs-toggle="dropdown">Tahun</button>
+              <ul id="listTahun" class="dropdown-menu"></ul>
             </div>
+
+            <div id="filterFokus" class="filter-dropdown">
+              <button class="filter-btn dropdown-toggle" type="button" data-bs-toggle="dropdown">Fokus Riset</button>
+              <ul id="listFokus" class="dropdown-menu"></ul>
+            </div>
+
+            <div id="filterKategori" class="filter-dropdown">
+              <button class="filter-btn dropdown-toggle" type="button" data-bs-toggle="dropdown">Kategori</button>
+              <ul id="listKategori" class="dropdown-menu"></ul>
+            </div>
+
             <a href="URL_SINTA" target="_blank" class="main-blue-button sinta-button">Lihat Semua SINTA</a>
           </div>
         </div>
       </div>
-      <div class="row publications-row">
-
-        <div class="col-lg-4 col-md-6">
-          <div class="publication-item minimal">
-            <div class="down-content">
-              <h4>Judul Publikasi Pertama yang Mungkin Cukup Panjang</h4>
-              <span class="publication-year">Tahun Terbit: 2024</span>
-              <div class="main-blue-button">
-                <a href="URL_PUBLIKASI_1" target="_blank">Lihat Publikasi</a>
-              </div>
-            </div>
-          </div>
+      <div id="publicationsContainer" class="row publications-row">
+        <div class="col-lg-12 text-center" id="pubLoadingMessage">
+          <p class="loading-message"><i class="fa fa-spinner fa-spin"></i> Memuat data publikasi...</p>
         </div>
-
-        <div class="col-lg-4 col-md-6">
-          <div class="publication-item minimal">
-            <div class="down-content">
-              <h4>Judul Publikasi Kedua yang Singkat</h4>
-              <span class="publication-year">Tahun Terbit: 2023</span>
-              <div class="main-blue-button">
-                <a href="URL_PUBLIKASI_2" target="_blank">Lihat Publikasi</a>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-lg-4 col-md-6">
-          <div class="publication-item minimal">
-            <div class="down-content">
-              <h4>Judul Publikasi Ketiga: Pengaruh Analitik Bisnis Terhadap Kinerja Operasional</h4>
-              <span class="publication-year">Tahun Terbit: 2024</span>
-              <div class="main-blue-button">
-                <a href="URL_PUBLIKASI_3" target="_blank">Lihat Publikasi</a>
-              </div>
-            </div>
-          </div>
-        </div>
-
       </div>
 
       <div class="row navigation-controls">
         <div class="col-lg-12">
-          <div class="pagination-buttons">
-            <button class="nav-btn prev-btn"><i class="fa fa-angle-left"></i> Previous</button>
-
-            <div class="main-blue-button all-list-button">
-              <a href="berita.html">Lihat Semua List Publikasi</a>
-            </div>
-
-            <button class="nav-btn next-btn">Next <i class="fa fa-angle-right"></i></button>
+          <div id="paginationContainer" class="pagination-buttons">
           </div>
         </div>
       </div>
     </div>
   </section>
+
+
 
   <div id="proyeks" class="proyeks section">
     <div class="container">
@@ -687,99 +653,288 @@
 
   <script>
     // ==========================================================
-    // SCRIPT KARTU DOSEN HORIZONTAL (TANPA CAROUSEL BOOTSTRAP)
+    // 1. KONFIGURASI & VARIABEL GLOBAL
     // ==========================================================
+    const PUB_API_URL = '../../backend/api/publikasi/list_public.php';
+    const DOSEN_API_URL = '../../backend/api/dosen/list_public.php';
+    const DEFAULT_FOTO = '../assets/images/dosen.jpg';
 
-    const API_URL = '../../backend/api/dosen/list_public.php';
-    const dosenListContainer = document.getElementById('dosen-list-flex');
-    const loadingMessage = document.getElementById('loading-message');
+    let allPubData = [];
+    let filteredPubData = [];
+    let currentPage = 1;
+    const limit = 3;
 
-    // PASTIKAN DEFAULT FOTO HANYA SATU KALI MUNDUR (../)
-    const DEFAULT_FOTO_PATH = '../assets/images/dosen.jpg';
-
-    // --- Helper 1: Membuat Card Dosen (Perbaikan Path Foto di sini) ---
-    const createDosenCard = (dosen) => {
-      let finalFotoPath = DEFAULT_FOTO_PATH;
-
-      if (dosen.foto_path && dosen.foto_path !== 'null' && dosen.foto_path !== '') {
-        const path = dosen.foto_path;
-
-        // Logika Cek Path (Diambil dari script Carousel yang sudah Anda modifikasi)
-        if (path.startsWith('http://') || path.startsWith('https://')) {
-          // Kasus 1: Jika foto_path di DB sudah berupa URL lengkap
-          finalFotoPath = path;
-        } else {
-          // Kasus 2: Jika foto_path adalah nama file lokal
-
-          // *** PERBAIKAN JALUR UTAMA DI SINI ***
-          // Dari index.html (misal: frontend/) hanya perlu MUNDUR SATU KALI (../) 
-          // untuk sampai di folder 'proyek/' utama yang berisi folder 'uploads/'.
-          finalFotoPath = `../assets/uploads/dosen/${path}`;
-
-          // Catatan: Jika path ini masih salah (gambar tidak muncul), 
-          // ganti menjadi `../../uploads/dosen/${path}` lagi, tergantung 
-          // struktur folder utama proyek Anda. Tapi `../` biasanya yang benar.
-        }
-      }
-
-      const detailUrl = `detail-dosen.html?nidn=${dosen.nidn}`;
-
-      // Cukup mengembalikan div .member-card
-      return `
-            <div class="member-card">
-                <img src="${finalFotoPath}" alt="Foto ${dosen.nama}" style="object-fit: cover;">
-                <h5>${dosen.nama || 'Nama Dosen'}</h5>
-                <span>${dosen.jabatan || 'Anggota Laboratorium'}</span>
-                <p>${dosen.nidn ? `NIDN: ${dosen.nidn}` : 'Detail Belum Diisi'}</p>
-                <div class="main-blue-button">
-                    <a href="${detailUrl}">Info Detail</a>
-                </div>
-            </div>
-        `;
+    // State Filter Aktif
+    let activeFilters = {
+      tahun: 'all',
+      fokus: 'all',
+      kategori: 'all'
     };
 
     // ==========================================================
-    // FUNGSI UTAMA FETCH & RENDER (Tidak ada perubahan di sini)
+    // 2. BAGIAN PUBLIKASI (FILTER & PAGINATION)
     // ==========================================================
-    const fetchAndRenderDosen = async () => {
 
-      // 1. Set Status Awal
-      if (loadingMessage) loadingMessage.textContent = 'Memuat data dosen...';
-      if (dosenListContainer) dosenListContainer.innerHTML = '';
+    async function initPublikasi() {
+      const container = document.getElementById('publicationsContainer');
+      // Asumsi Anda punya elemen untuk loading, jika tidak, abaikan variabel ini
+      const loading = document.getElementById('pubLoadingMessage');
+
+      if (!container) return;
+      if (loading) loading.style.display = 'block';
 
       try {
-        const response = await fetch(API_URL);
-        const result = await response.json();
+        const response = await fetch(PUB_API_URL);
+        const res = await response.json();
 
-        if (result.success && result.data && result.data.length > 0) {
-          if (loadingMessage) loadingMessage.style.display = 'none';
+        if (res.status === 'success' && Array.isArray(res.data)) {
+          // Urutkan data berdasarkan tahun (terbaru dulu)
+          allPubData = res.data.sort((a, b) => (b.tahun || 0) - (a.tahun || 0));
+          filteredPubData = [...allPubData];
 
-          let htmlContent = '';
-          const dataToDisplay = result.data;
+          if (loading) loading.style.display = 'none';
 
-          // 2. Render Semua Data (Tanpa Chunking)
-          dataToDisplay.forEach(dosen => {
-            htmlContent += createDosenCard(dosen);
-          });
-
-          if (dosenListContainer) dosenListContainer.innerHTML = htmlContent;
-
+          renderFilterMenus();
+          renderPublikasi(1); // Tampilkan halaman pertama
         } else {
-          // Data kosong
-          if (loadingMessage) loadingMessage.textContent = 'Tidak ada data dosen yang ditemukan.';
-          if (loadingMessage) loadingMessage.style.display = 'block';
+          throw new Error(res.message || 'Data publikasi kosong atau tidak valid.');
+        }
+      } catch (err) {
+        console.error("[Publikasi Error]:", err);
+        // Ganti pesan loading dengan pesan error
+        if (loading) loading.innerHTML = `<p class="text-danger text-center">Gagal memuat data publikasi. (${err.message})</p>`;
+        // Kosongkan container jika ada error
+        container.innerHTML = `<div class="col-12 text-center py-4"><p>Gagal memuat data publikasi.</p></div>`;
+      }
+    }
+
+    // --- Filter Handlers ---
+
+    function renderFilterMenus() {
+      // Ambil data unik untuk filter
+      const years = [...new Set(allPubData.map(d => String(d.tahun)))].filter(y => y !== "null" && y !== "" && y !== "0").sort((a, b) => b - a);
+      const focus = [...new Set(allPubData.map(d => d.nama_fokus))].filter(Boolean).sort();
+      const cats = [...new Set(allPubData.map(d => d.nama_kategori))].filter(Boolean).sort();
+
+      fillDropdown('listTahun', 'filterTahun', years, 'Tahun');
+      fillDropdown('listFokus', 'filterFokus', focus, 'Fokus Riset');
+      fillDropdown('listKategori', 'filterKategori', cats, 'Kategori');
+    }
+
+    function fillDropdown(listId, containerId, items, label) {
+      const listEl = document.getElementById(listId);
+      const containerEl = document.getElementById(containerId);
+      if (!listEl || !containerEl) return;
+
+      const btnEl = containerEl.querySelector('.filter-btn');
+      // Set label asli (jika belum ada)
+      if (!btnEl.dataset.originalLabel) {
+        btnEl.dataset.originalLabel = label;
+      }
+
+      const key = containerId.replace('filter', '').toLowerCase(); // 'tahun', 'fokus', 'kategori'
+
+      // Buat opsi "Semua" aktif secara default
+      let html = `<li><a class="dropdown-item active" href="#" data-value="all" data-filter-key="${key}">Semua ${label}</a></li>`;
+      items.forEach(val => {
+        html += `<li><a class="dropdown-item" href="#" data-value="${val}" data-filter-key="${key}">${val}</a></li>`;
+      });
+      listEl.innerHTML = html;
+    }
+
+    function applyFilters() {
+      filteredPubData = allPubData.filter(item => {
+        // Normalisasi data dari API menjadi string lowercase untuk perbandingan yang aman
+        const itemYear = String(item.tahun || "").trim();
+        const itemFocus = (item.nama_fokus || "").trim().toLowerCase();
+        const itemCat = (item.nama_kategori || "").trim().toLowerCase();
+
+        // Normalisasi nilai filter
+        const filterYear = activeFilters.tahun;
+        const filterFocus = activeFilters.fokus.trim().toLowerCase();
+        const filterCat = activeFilters.kategori.trim().toLowerCase();
+
+        // Logika filter: Jika 'all', selalu true. Jika ada nilai, harus sama.
+        const matchYear = filterYear === 'all' || itemYear === filterYear;
+        const matchFocus = filterFocus === 'all' || itemFocus === filterFocus;
+        const matchCat = filterCat === 'all' || itemCat === filterCat;
+
+        return matchYear && matchFocus && matchCat;
+      });
+
+      renderPublikasi(1); // Selalu reset ke halaman 1
+    }
+
+    // --- Render Functions (Pagination & Cards) ---
+
+    function renderPublikasi(page) {
+      currentPage = page;
+      const container = document.getElementById('publicationsContainer');
+      if (!container) return;
+
+      const start = (currentPage - 1) * limit;
+      const end = start + limit;
+      const currentItems = filteredPubData.slice(start, end);
+
+      if (currentItems.length === 0) {
+        container.innerHTML = `<div class="col-12 text-center py-4"><p>Tidak ada publikasi yang cocok dengan kriteria.</p></div>`;
+      } else {
+        container.innerHTML = currentItems.map(item => `
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="publication-item minimal">
+                        <div class="down-content">
+                            <div class="mb-2">
+                                <span class="badge bg-primary" style="font-size:10px">${item.nama_kategori || 'N/A'}</span>
+                                <span class="badge bg-info text-dark" style="font-size:10px">${item.nama_fokus || 'N/A'}</span>
+                            </div>
+                            <h4>${item.judul}</h4>
+                            <p><strong>Tahun: ${item.tahun || 'N/A'}</strong></p>
+                            <div class="main-blue-button mt-3">
+                                <a href="${item.external_link || '#'}" target="_blank">Detail Publikasi</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+      }
+
+      renderPubPagination();
+    }
+
+    function renderPubPagination() {
+      const paginContainer = document.getElementById('paginationContainer');
+      if (!paginContainer) return;
+
+      const totalPages = Math.ceil(filteredPubData.length / limit);
+
+      if (totalPages <= 1) {
+        paginContainer.innerHTML = '';
+        return;
+      }
+
+      // Tampilan pagination
+      paginContainer.innerHTML = `
+            <button class="nav-btn pub-nav-btn" data-action="prev" ${currentPage === 1 ? 'disabled' : ''}>
+                <i class="fa fa-angle-left"></i> Previous
+            </button>
+            <div class="main-blue-button all-list-button">
+                <span style="color:white">Halaman ${currentPage} / ${totalPages}</span>
+            </div>
+            <button class="nav-btn pub-nav-btn" data-action="next" ${currentPage === totalPages ? 'disabled' : ''}>
+                Next <i class="fa fa-angle-right"></i>
+            </button>
+        `;
+    }
+
+    // -----------------------------------------------------------------------------------
+    // --- FUNGSI KUNCI GLOBAL EVENT DELEGATION (Filtering & Pagination) ---
+    // -----------------------------------------------------------------------------------
+
+    document.addEventListener('click', function (e) {
+      // Mencari elemen <a> terdekat dengan class .dropdown-item (untuk filter)
+      const item = e.target.closest('.dropdown-item');
+
+      // --- 1. Logic Filtering ---
+      if (item && item.closest('.filter-dropdown')) {
+        e.preventDefault();
+
+        const listEl = item.closest('.dropdown-menu');
+        const containerEl = item.closest('.filter-dropdown');
+        const btnEl = containerEl.querySelector('.filter-btn');
+
+        const filterKey = item.dataset.filterKey; // 'tahun', 'fokus', 'kategori'
+        const filterValue = item.dataset.value;
+
+        if (!filterKey) return;
+
+        // Visual toggle: hapus 'active' dari semua, tambahkan ke yang diklik
+        listEl.querySelectorAll('.dropdown-item').forEach(i => i.classList.remove('active'));
+        item.classList.add('active');
+
+        // Set button text
+        const originalLabel = btnEl.dataset.originalLabel || btnEl.innerText;
+        btnEl.innerText = filterValue === 'all' ? originalLabel : filterValue;
+
+        // Update Filter State
+        activeFilters[filterKey] = filterValue;
+
+        applyFilters(); // Jalankan Filter
+        return;
+      }
+
+      // --- 2. Logic Pagination ---
+      if (e.target.closest('.pub-nav-btn')) {
+        e.preventDefault();
+        const btn = e.target.closest('.pub-nav-btn');
+        if (btn.disabled) return;
+
+        const action = btn.dataset.action;
+        const totalPages = Math.ceil(filteredPubData.length / limit);
+        let newPage = currentPage;
+
+        if (action === 'prev' && currentPage > 1) {
+          newPage = currentPage - 1;
+        } else if (action === 'next' && currentPage < totalPages) {
+          newPage = currentPage + 1;
+        } else {
+          return;
         }
 
+        renderPublikasi(newPage);
+        const pubSection = document.getElementById('publications');
+        // Gulir ke atas halaman publikasi setelah pindah halaman
+        if (pubSection) pubSection.scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+
+    // ==========================================================
+    // 3. BAGIAN DOSEN (Tidak Diubah)
+    // ==========================================================
+    async function fetchDosen() {
+      const container = document.getElementById('dosen-list-flex');
+      const loadingDosen = document.getElementById('loading-message'); // Asumsi ID ini ada
+
+      if (!container) return;
+      if (loadingDosen) loadingDosen.textContent = 'Memuat data dosen...';
+
+      try {
+        const response = await fetch(DOSEN_API_URL);
+        const res = await response.json();
+
+        if ((res.success || res.status === 'success') && Array.isArray(res.data)) {
+          if (loadingDosen) loadingDosen.style.display = 'none';
+
+          container.innerHTML = res.data.map(d => {
+            let foto = DEFAULT_FOTO;
+            if (d.foto_path && d.foto_path !== 'null') {
+              foto = d.foto_path.startsWith('http') ? d.foto_path : `../assets/uploads/dosen/${d.foto_path}`;
+            }
+
+            return `
+                        <div class="member-card">
+                            <img src="${foto}" alt="${d.nama}" onerror="this.src='${DEFAULT_FOTO}'" style="object-fit: cover;">
+                            <h5>${d.nama}</h5>
+                            <span>${d.jabatan || 'Dosen'}</span>
+                            <p>${d.nidn ? `NIDN: ${d.nidn}` : ''}</p>
+                            <div class="main-blue-button">
+                                <a href="detail-dosen.html?nidn=${d.nidn}">Info Detail</a>
+                            </div>
+                        </div>`;
+          }).join('');
+        }
       } catch (error) {
-        // 3. Tangani error
-        console.error('Error fetching Dosen data:', error);
-        if (loadingMessage) loadingMessage.textContent = 'Gagal memuat data dosen. Cek koneksi API dan path URL.';
-        if (loadingMessage) loadingMessage.style.display = 'block';
+        console.error('Error Dosen:', error);
       }
     };
 
-    // Jalankan fungsi saat seluruh halaman selesai dimuat
-    window.addEventListener('load', fetchAndRenderDosen);
+
+    // ==========================================================
+    // 4. EKSEKUSI
+    // ==========================================================
+    document.addEventListener('DOMContentLoaded', () => {
+      initPublikasi(); // Memulai Publikasi dengan filter dan pagination
+      fetchDosen(); // Memulai Dosen
+    });
   </script>
 </body>
 
