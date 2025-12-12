@@ -5,7 +5,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="Detail Berita Business Analytics Laboratory">
+    <meta name="description" content="Detail berita dari Business Analytics Laboratory.">
     <meta name="author" content="Business Analytics Laboratory">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -37,8 +37,6 @@
                             <img src="../assets/images/LogoLab2.png" alt="Business Analytics Laboratory"
                                 style="width: 90px; margin-left: -15px;">
                         </a>
-
-
                         <ul class="nav">
                             <li class="scroll-to-section"><a href="index.html">Beranda</a></li>
                             <li class="scroll-to-section"><a href="index.html">Gallery</a></li>
@@ -54,7 +52,6 @@
                         <a class='menu-trigger'>
                             <span>Menu</span>
                         </a>
-
                     </nav>
                 </div>
             </div>
@@ -64,66 +61,35 @@
         <div class="container">
             <div class="row">
                 <div class="col-lg-12">
-                    <span class="breadcrumb-item"><a href="index.html">Beranda</a> / Detail Berita</span>
-                    <h4>Detail Berita</h4>
+                    <span class="breadcrumb-item"><a href="index.html">Beranda</a> / <a href="berita.html">Berita</a> /
+                        <span id="breadcrumbTitle">Detail</span></span>
+                    <h4 id="pageHeadingTitle">Memuat Detail Berita...</h4>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="detail-section section">
+    <div id="detail-section" class="section">
         <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-lg-10">
-                    <div id="beritaDetailContainer" class="berita-detail-content wow fadeIn" data-wow-duration="1s"
-                        data-wow-delay="0.5s">
-                        <div class="berita-header">
-                            <h1>Laboratorium Buka Kembali dengan Protokol Kesehatan Baru</h1>
-                            <div class="meta-info">
-                                <span><i class="fas fa-calendar-alt"></i> 15 Januari 2026</span>
-                                <span><i class="fas fa-tag"></i> Pengumuman Penting</span>
-                            </div>
-                        </div>
-                        <div class="featured-image-wrapper">
-                            <img src="../assets/images/placeholder-berita.jpg" alt="Ilustrasi Laboratorium"
-                                class="img-fluid rounded">
-                        </div>
-                        <div id="beritaBody" class="berita-body mt-4">
-                            <p>Setelah periode liburan semester yang panjang, kami mengumumkan bahwa Laboratorium
-                                Business Analytics akan dibuka kembali untuk kegiatan akademik dan riset mulai tanggal
-                                **15 Januari 2026**. Kami menyambut kembali seluruh dosen dan mahasiswa!</p>
-                            <h2>Protokol Akses dan Jam Operasional</h2>
-                            <p>Untuk memastikan lingkungan yang aman dan produktif, kami menerapkan protokol akses
-                                sebagai berikut:</p>
-                            <ul>
-                                <li>**Wajib Reservasi:** Semua kegiatan di laboratorium (praktikum, riset, atau
-                                    bimbingan) wajib mendaftar melalui sistem peminjaman kami (<a
-                                        href="peminjaman-mahasiswa.html">klik di sini</a>).</li>
-                                <li>**Jam Operasional:** Senin - Jumat, 08.00 - 16.00 WIB.</li>
-                                <li>**Kapasitas Terbatas:** Kapasitas maksimal dalam satu sesi adalah 50% dari total
-                                    normal.</li>
-                            </ul>
-                            <p>Kami sangat menghargai kerja sama Anda dalam mematuhi aturan baru ini demi kenyamanan dan
-                                kesehatan bersama. Mari kita jaga Laboratorium Business Analytics tetap menjadi pusat
-                                inovasi yang aman!</p>
+            <div class="row">
 
-                            <hr style="margin: 40px 0;">
-
-                            <div class="berita-footer d-flex justify-content-between align-items-center">
-                                <div class="share-buttons">
-                                    <strong>Bagikan:</strong>
-                                    <a href="#" class="btn-share facebook-bg"><i class="fab fa-facebook-f"></i></a>
-                                    <a href="#" class="btn-share twitter-bg"><i class="fab fa-twitter"></i></a>
-                                    <a href="#" class="btn-share whatsapp-bg"><i class="fab fa-whatsapp"></i></a>
-                                </div>
-                                <a href="berita.html" class="gradient-button">
-                                    <i class="fa fa-arrow-left"></i> Kembali ke Daftar Berita
-                                </a>
-                            </div>
-
+                <div class="col-lg-8">
+                    <div id="mainContent" class="berita-detail-content">
+                        <div class="loading-message" id="contentLoading">
+                            <i class="fa fa-spinner fa-spin"></i> Memuat Konten...
                         </div>
                     </div>
                 </div>
+
+                <div class="col-lg-4">
+                    <div class="sidebar-box">
+                        <h4>Berita Terbaru Lainnya</h4>
+                        <div id="recentPostsContainer">
+                            <p class="loading-message"><i class="fa fa-spinner fa-spin"></i> Memuat...</p>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
@@ -158,7 +124,8 @@
                             <img src="../assets/images/LogoLab2.png" alt="Logo Lab"
                                 style="width: 110px; margin-left: -14px;">
                         </div>
-                        <p>Laboratorium Jurusan Teknologi Informasi yang berfokus pada riset dan solusi teknologi
+                        <p>Laboratorium Jurusan Teknologi Informasi yang berfokus pada riset dan solusi
+                            teknologi
                             informasi untuk
                             mendukung dunia
                             bisnis dan akademis.</p>
@@ -213,6 +180,7 @@
         </div>
     </footer>
 
+
     <script src="../vendor/jquery/jquery.min.js"></script>
     <script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="../assets/js/owl-carousel.js"></script>
@@ -220,8 +188,184 @@
     <script src="../assets/js/imagesloaded.js"></script>
     <script src="../assets/js/templatemo-custom.js"></script>
     <script src="../assets/js/popup.js"></script>
+
     <script>
-        // Logika skrip template tidak akan menyebabkan loading stuck lagi karena preloader sudah dihapus
+        // API URL
+        const DETAIL_API_URL = '../../backend/api/contents/detail.php';
+        const LIST_API_URL = '../../backend/api/contents/list_public.php';
+
+        /**
+         * Mengambil parameter 'slug' dari URL.
+         */
+        function getUrlSlug() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('slug');
+        }
+
+        /**
+         * Merender konten utama berita ke dalam elemen HTML.
+         */
+        function renderBeritaDetail(data) {
+            const container = document.getElementById('mainContent');
+            const detailUrl = `detail_berita.html?slug=${data.slug || data.id}`;
+            const imageUrl = data.featured_image || '../assets/images/placeholder-berita.jpg';
+            const kategoriNama = data.category_name || 'Umum';
+            const tanggal = new Date(data.created_at).toLocaleDateString('id-ID', {
+                year: 'numeric', month: 'long', day: 'numeric'
+            });
+            const author = data.author_name || 'Admin Lab';
+
+            // 1. Update Header Halaman (Banner)
+            document.getElementById('pageHeadingTitle').textContent = data.title;
+            document.getElementById('breadcrumbTitle').textContent = data.title;
+
+            // 2. Update Meta Tags (SEO)
+            document.title = `${data.title} | Detail Berita`;
+            document.querySelector('meta[name="description"]').setAttribute('content', data.excerpt || data.title);
+
+
+            // 3. Render Konten Utama
+            const htmlContent = `
+                <div class="berita-header">
+                    <h1>${data.title}</h1>
+                    <div class="meta-info">
+                        <span><i class="fa fa-user"></i> ${author}</span>
+                        <span><i class="fa fa-calendar-alt"></i> ${tanggal}</span>
+                        <span><i class="fa fa-tag"></i> ${kategoriNama}</span>
+                    </div>
+                </div>
+
+                ${imageUrl ? `<div class="featured-image-wrapper">
+                    <img src="${imageUrl}" alt="Gambar Unggulan ${data.title}">
+                </div>` : ''}
+
+                <div class="berita-body">
+                    ${data.body}
+                </div>
+            `;
+            container.innerHTML = htmlContent;
+        }
+
+        /**
+         * Mengambil detail berita dari API menggunakan slug.
+         */
+        const fetchBeritaDetail = async (slug) => {
+            const container = document.getElementById('mainContent');
+            const loadingElement = document.getElementById('contentLoading');
+
+            try {
+                const response = await fetch(`${DETAIL_API_URL}?slug=${slug}`);
+
+                if (!response.ok) {
+                    throw new Error(`Gagal mengambil data dari API: Status ${response.status}`);
+                }
+
+                const result = await response.json();
+
+                if (result && result.status === 'success' && result.data) {
+                    renderBeritaDetail(result.data);
+                } else {
+                    // API merespon 404/error atau data kosong
+                    throw new Error(result.message || 'Berita tidak ditemukan.');
+                }
+
+            } catch (error) {
+                console.error('Error fetching Berita detail:', error);
+
+                // Ganti loading dengan pesan error
+                document.getElementById('pageHeadingTitle').textContent = 'Error 404';
+                document.getElementById('breadcrumbTitle').textContent = 'Tidak Ditemukan';
+                container.className = 'berita-detail-content'; // Reset class
+                container.innerHTML = `
+                    <div class="error-message" style="text-align: center; padding: 50px;">
+                        <h2 style="color: red;">Konten Tidak Ditemukan</h2>
+                        <p>Berita dengan URL ini tidak ada atau telah dihapus. (${error.message})</p>
+                        <a href="berita.html" class="main-button-secondary">Kembali ke Daftar Berita</a>
+                    </div>
+                `;
+            }
+        };
+
+
+        /**
+         * Merender daftar berita terbaru di sidebar.
+         */
+        const fetchRecentPosts = async () => {
+            const container = document.getElementById('recentPostsContainer');
+
+            try {
+                // Ambil semua data publik, tapi hanya 5 teratas
+                const response = await fetch(LIST_API_URL);
+                if (!response.ok) throw new Error('Gagal mengambil daftar berita publik.');
+
+                const result = await response.json();
+
+                if (result && result.status === 'success' && Array.isArray(result.data)) {
+                    // Ambil 4 berita terbaru (selain yang sedang dibuka)
+                    const currentSlug = getUrlSlug();
+                    const recentData = result.data
+                        .filter(item => item.slug !== currentSlug) // Filter berita yang sedang aktif
+                        .slice(0, 4); // Ambil 4 item pertama
+
+                    if (recentData.length === 0) {
+                        container.innerHTML = `<p class="loading-message" style="padding: 0;">Tidak ada berita terbaru.</p>`;
+                        return;
+                    }
+
+                    let html = '';
+                    recentData.forEach(item => {
+                        const tanggal = new Date(item.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+                        const detailUrl = `detail_berita.html?slug=${item.slug || item.id}`;
+                        const imageUrl = item.featured_image || '../assets/images/placeholder-thumb.jpg';
+
+                        html += `
+                            <div class="recent-post-item">
+                                <a href="${detailUrl}" class="post-thumb">
+                                    <img src="${imageUrl}" alt="${item.title}">
+                                </a>
+                                <div class="post-info">
+                                    <a href="${detailUrl}">${item.title}</a>
+                                    <span class="post-meta"><i class="fa fa-calendar-alt"></i> ${tanggal}</span>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    container.innerHTML = html;
+                } else {
+                    throw new Error('Data recent posts tidak valid.');
+                }
+
+            } catch (error) {
+                console.error('Error fetching Recent Posts:', error);
+                container.innerHTML = `<p class="error-message" style="color: red; padding: 0;">Gagal memuat berita terbaru.</p>`;
+            }
+        };
+
+
+        // --- Eksekusi Utama ---
+        window.addEventListener('load', () => {
+            const slug = getUrlSlug();
+
+            if (slug) {
+                // 1. Ambil dan render detail konten
+                fetchBeritaDetail(slug);
+            } else {
+                // Jika tidak ada slug di URL, tampilkan pesan error
+                const container = document.getElementById('mainContent');
+                document.getElementById('pageHeadingTitle').textContent = 'Error';
+                document.getElementById('breadcrumbTitle').textContent = 'Invalid URL';
+                container.className = 'berita-detail-content';
+                container.innerHTML = `
+                    <div class="error-message" style="text-align: center; padding: 50px;">
+                        <h2 style="color: orange;">Parameter URL Hilang</h2>
+                        <p>URL tidak valid. Pastikan Anda mengakses dari <a href="berita.html">daftar berita</a>.</p>
+                    </div>
+                `;
+            }
+
+            // 2. Muat Berita Terbaru di Sidebar (Selalu jalankan)
+            fetchRecentPosts();
+        });
     </script>
 </body>
 

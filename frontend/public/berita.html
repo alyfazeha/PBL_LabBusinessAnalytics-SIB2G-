@@ -37,12 +37,10 @@
                             <img src="../assets/images/LogoLab2.png" alt="Business Analytics Laboratory"
                                 style="width: 90px; margin-left: -15px;">
                         </a>
-
-
                         <ul class="nav">
                             <li class="scroll-to-section"><a href="index.html">Beranda</a></li>
                             <li class="scroll-to-section"><a href="index.html">Gallery</a></li>
-                            <li class="scroll-to-section"><a href="daftar-berita.html" class="active">Berita</a></li>
+                            <li class="scroll-to-section"><a href="berita.html" class="active">Berita</a></li>
                             <li class="scroll-to-section"><a href="jadwal-lab.html">Jadwal</a></li>
                             <li class="scroll-to-section"><a href="peminjaman-mahasiswa.html">Peminjaman</a></li>
                             <li>
@@ -54,7 +52,6 @@
                         <a class='menu-trigger'>
                             <span>Menu</span>
                         </a>
-
                     </nav>
                 </div>
             </div>
@@ -74,96 +71,27 @@
     <div id="berita-list-section" class="section">
         <div class="container">
             <div class="row">
-                <div class="col-lg-12">
-                    <div class="section-heading">
-                        <h2>Berita Terbaru</h2>
-                        <div class="line-dec"></div>
+
+                <div class="col-lg-12" style="margin-top: -50px;">
+                    <div class="berita-filter-tabs">
+                        <button class="filter-btn active" data-category="Semua">Semua</button>
+                        <button class="filter-btn" data-category="Agenda">Agenda</button>
+                        <button class="filter-btn" data-category="Berita">Berita</button>
+                        <button class="filter-btn" data-category="Pengumuman">Pengumuman</button>
+                        <button class="filter-btn" data-category="Prestasi">Prestasi</button>
                     </div>
                 </div>
 
                 <div class="col-lg-12">
-                    <div class="row grid-berita">
-
-                        <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.3s">
-                            <div class="berita-card">
-                                <a href="detail-berita-1.html">
-                                    <div class="berita-thumb">
-                                        <img src="../assets/images/berita-thumb-1.jpg" alt="Thumbnail Berita 1">
-                                        <span class="kategori">Pengumuman</span>
-                                    </div>
-                                </a>
-                                <div class="berita-content">
-                                    <div class="berita-meta">
-                                        <i class="fa fa-calendar-alt"></i> 12 Des 2025
-                                    </div>
-                                    <a href="detail-berita-1.html">
-                                        <h4>Workshop Big Data dan AI Sukses Digelar di Lab Analitik</h4>
-                                    </a>
-                                    <p>Acara workshop kolaborasi dengan industri sukses menarik puluhan peserta dari
-                                        kalangan mahasiswa dan praktisi...</p>
-                                    <a href="detail-berita-1.html" class="read-more">Baca Selengkapnya <i
-                                            class="fa fa-arrow-right"></i></a>
-                                </div>
-                            </div>
+                    <div class="row grid-berita" id="beritaContainer">
+                        <div class="col-lg-12" id="beritaLoading">
+                            <p class="text-center w-100 loading-message">Memuat data berita, mohon tunggu...</p>
                         </div>
+                    </div>
+                </div>
 
-                        <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.4s">
-                            <div class="berita-card">
-                                <a href="detail-berita-2.html">
-                                    <div class="berita-thumb">
-                                        <img src="../assets/images/berita-thumb-2.jpg" alt="Thumbnail Berita 2">
-                                        <span class="kategori">Kegiatan</span>
-                                    </div>
-                                </a>
-                                <div class="berita-content">
-                                    <div class="berita-meta">
-                                        <i class="fa fa-calendar-alt"></i> 05 Des 2025
-                                    </div>
-                                    <a href="detail-berita-2.html">
-                                        <h4>Peluncuran Sistem Peminjaman Peralatan Lab Versi 2.0</h4>
-                                    </a>
-                                    <p>Pembaruan besar pada sistem peminjaman kami untuk meningkatkan efisiensi dan
-                                        mengurangi antrian. Wajib coba...</p>
-                                    <a href="detail-berita-2.html" class="read-more">Baca Selengkapnya <i
-                                            class="fa fa-arrow-right"></i></a>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.5s">
-                            <div class="berita-card">
-                                <a href="detail-berita-3.html">
-                                    <div class="berita-thumb">
-                                        <img src="../assets/images/berita-thumb-3.jpg" alt="Thumbnail Berita 3">
-                                        <span class="kategori">Riset</span>
-                                    </div>
-                                </a>
-                                <div class="berita-content">
-                                    <div class="berita-meta">
-                                        <i class="fa fa-calendar-alt"></i> 28 Nov 2025
-                                    </div>
-                                    <a href="detail-berita-3.html">
-                                        <h4>Dua Mahasiswa Lab Analitik Raih Penghargaan Internasional</h4>
-                                    </a>
-                                    <p>Penelitian mereka tentang prediktif modeling berhasil memenangkan penghargaan
-                                        pada konferensi di Singapura...</p>
-                                    <a href="detail-berita-3.html" class="read-more">Baca Selengkapnya <i
-                                            class="fa fa-arrow-right"></i></a>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-lg-12">
-                            <div class="pagination">
-                                <ul>
-                                    <li><a href="#" class="active">1</a></li>
-                                    <li><a href="#">2</a></li>
-                                    <li><a href="#">3</a></li>
-                                    <li><a href="#"><i class="fa fa-angle-right"></i></a></li>
-                                </ul>
-                            </div>
-                        </div>
-
+                <div class="col-lg-12">
+                    <div class="pagination" id="beritaPagination">
                     </div>
                 </div>
 
@@ -201,7 +129,8 @@
                             <img src="../assets/images/LogoLab2.png" alt="Logo Lab"
                                 style="width: 110px; margin-left: -14px;">
                         </div>
-                        <p>Laboratorium Jurusan Teknologi Informasi yang berfokus pada riset dan solusi teknologi
+                        <p>Laboratorium Jurusan Teknologi Informasi yang berfokus pada riset dan solusi
+                            teknologi
                             informasi untuk
                             mendukung dunia
                             bisnis dan akademis.</p>
@@ -256,6 +185,7 @@
         </div>
     </footer>
 
+
     <script src="../vendor/jquery/jquery.min.js"></script>
     <script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="../assets/js/owl-carousel.js"></script>
@@ -263,6 +193,226 @@
     <script src="../assets/js/imagesloaded.js"></script>
     <script src="../assets/js/templatemo-custom.js"></script>
     <script src="../assets/js/popup.js"></script>
+
+    <script>
+        // --- 1. Variabel Global ---
+        let allBeritaData = [];
+        const API_URL = '../../backend/api/contents/list_public.php';
+
+        // --- Variabel Pagination Baru ---
+        let currentPage = 1;
+        const itemsPerPage = 6; // Hanya tampilkan 6 berita per halaman
+        let currentCategory = 'Semua'; // Menyimpan kategori yang sedang aktif
+        // -----------------------------------------------------------------------
+
+
+        // --- 2. Fungsi untuk membuat kerangka Kartu Berita ---
+        function createBeritaCard(data) {
+            const deskripsiMentah = data.excerpt || data.body || '';
+            const ringkasan = deskripsiMentah
+                ? deskripsiMentah.split(' ').slice(0, 25).join(' ') + '...'
+                : 'Klik untuk membaca selengkapnya...';
+
+            const tanggal = new Date(data.created_at).toLocaleDateString('id-ID', {
+                year: 'numeric', month: 'short', day: 'numeric'
+            });
+
+            // Pastikan URL detail menggunakan SLUG atau ID
+            const detailUrl = `detail_berita.html?slug=${data.slug || data.id}`;
+            const imageUrl = data.featured_image || '../assets/images/placeholder-berita.jpg';
+            // Pastikan API mengembalikan category_name
+            const kategoriNama = data.category_name || 'Umum';
+
+            return `
+                <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.3s">
+                    <div class="berita-card">
+                        <a href="${detailUrl}">
+                            <div class="berita-thumb">
+                                <img src="${imageUrl}" alt="${data.title}">
+                                <span class="kategori">${kategoriNama}</span>
+                            </div>
+                        </a>
+                        <div class="berita-content">
+                            <div class="berita-meta">
+                                <i class="fa fa-calendar-alt"></i> ${tanggal}
+                            </div>
+                            <a href="${detailUrl}">
+                                <h4>${data.title}</h4>
+                            </a>
+                            <p>${ringkasan}</p>
+                            <a href="${detailUrl}" class="read-more">Baca Selengkapnya <i class="fa fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+
+        // --- 3. Fungsi Pembuat Pagination ---
+        function renderPagination(totalItems, itemsPerPage, currentPage) {
+            const totalPages = Math.ceil(totalItems / itemsPerPage);
+            const paginationContainer = document.getElementById('beritaPagination');
+
+            if (!paginationContainer) return; // Cek keamanan
+
+            if (totalPages <= 1) {
+                paginationContainer.innerHTML = '';
+                return;
+            }
+
+            let html = '<ul>';
+
+            // Tombol 'Previous'
+            const prevPage = currentPage - 1;
+            const isPrevDisabled = currentPage === 1;
+            html += `<li><a href="#" data-page="${prevPage}" class="${isPrevDisabled ? 'disabled' : ''}"><i class="fa fa-angle-left"></i></a></li>`;
+
+            // Tombol Halaman (1, 2, 3, ...)
+            for (let i = 1; i <= totalPages; i++) {
+                html += `<li><a href="#" data-page="${i}" class="${i === currentPage ? 'active' : ''}">${i}</a></li>`;
+            }
+
+            // Tombol 'Next'
+            const nextPage = currentPage + 1;
+            const isNextDisabled = currentPage === totalPages;
+            html += `<li><a href="#" data-page="${nextPage}" class="${isNextDisabled ? 'disabled' : ''}"><i class="fa fa-angle-right"></i></a></li>`;
+
+            html += '</ul>';
+            paginationContainer.innerHTML = html;
+
+            // Tambahkan Event Listener ke Tombol Pagination
+            paginationContainer.querySelectorAll('a:not(.disabled)').forEach(link => {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const newPage = parseInt(this.getAttribute('data-page'));
+
+                    if (newPage >= 1 && newPage <= totalPages) {
+                        currentPage = newPage;
+                        // Render ulang dengan halaman baru dan kategori yang sedang aktif
+                        filterAndRenderBerita(currentCategory, currentPage);
+
+                        // Scroll ke atas section berita (UX bagus)
+                        const section = document.getElementById('berita-list-section');
+                        if (section) {
+                            window.scrollTo({
+                                top: section.offsetTop - 120, // Offset untuk header
+                                behavior: 'smooth'
+                            });
+                        }
+                    }
+                });
+            });
+        }
+
+
+        // --- 4. Fungsi untuk FILTER dan RENDER data + Pagination ---
+        function filterAndRenderBerita(category = 'Semua', page = 1) {
+            const container = document.getElementById('beritaContainer');
+            currentCategory = category; // Update kategori aktif
+            currentPage = page; // Update halaman aktif
+            let filteredData = allBeritaData;
+
+            // 1. Logika Filtering
+            if (category !== 'Semua') {
+                filteredData = allBeritaData.filter(berita =>
+                    berita.category_name && berita.category_name.toLowerCase() === category.toLowerCase()
+                );
+            }
+
+            // 2. Logika Pagination (Mengambil 6 data per halaman)
+            const totalItems = filteredData.length;
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const paginatedData = filteredData.slice(startIndex, endIndex);
+
+
+            // 3. Rendering Konten
+            if (paginatedData.length === 0) {
+                container.innerHTML = `<div class="col-lg-12"><p class="text-center w-100 loading-message">Tidak ada berita dalam kategori ${category} yang ditemukan.</p></div>`;
+                // Hapus pagination jika tidak ada data
+                const paginationContainer = document.getElementById('beritaPagination');
+                if (paginationContainer) paginationContainer.innerHTML = '';
+                return;
+            }
+
+            let htmlContent = '';
+            paginatedData.forEach(berita => {
+                htmlContent += createBeritaCard(berita);
+            });
+
+            container.innerHTML = htmlContent;
+
+            // 4. Render Pagination Controls
+            renderPagination(totalItems, itemsPerPage, currentPage);
+
+            // Re-initialize WOW (untuk animasi fadeIn)
+            if (window.WOW) {
+                new WOW().init();
+            }
+        }
+
+
+        // --- 5. Fungsi Utama untuk mengambil dan menyimpan data (fetch) ---
+        const fetchAndRenderBerita = async () => {
+            const container = document.getElementById('beritaContainer');
+            let loadingElement = document.getElementById('beritaLoading');
+
+            // Pastikan ada loading message saat fetch
+            if (!loadingElement) {
+                container.innerHTML = `<div class="col-lg-12" id="beritaLoading"><p class="text-center w-100 loading-message">Mengambil data...</p></div>`;
+                loadingElement = document.getElementById('beritaLoading');
+            } else {
+                loadingElement.innerHTML = '<p class="text-center w-100 loading-message">Mengambil data...</p>';
+            }
+
+            try {
+                const response = await fetch(API_URL);
+
+                if (!response.ok) {
+                    throw new Error(`Gagal mengambil data dari API: Status ${response.status}`);
+                }
+
+                const result = await response.json();
+
+                if (result && result.status === 'success' && Array.isArray(result.data)) {
+                    // SIMPAN DATA KE VARIABEL GLOBAL
+                    allBeritaData = result.data;
+                    if (loadingElement) loadingElement.remove();
+
+                    // Panggil Render/Filter dengan kategori 'Semua' dan halaman 1
+                    filterAndRenderBerita('Semua', 1);
+                    setupFilterListeners();
+
+                } else {
+                    throw new Error(result.message || 'API merespon error tanpa detail.');
+                }
+
+            } catch (error) {
+                console.error('Error fetching Berita data:', error);
+                container.innerHTML = `<div class="col-lg-12"><p class="text-center w-100 error-message" style="color: red;">Gagal memuat data berita. Pastikan URL API sudah benar. (${error.message})</p></div>`;
+            }
+        };
+
+        // --- 6. Fungsi Memasang Event Listeners pada Tombol Filter ---
+        function setupFilterListeners() {
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    // Hapus kelas 'active' dari semua tombol
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    // Tambahkan kelas 'active' ke tombol yang diklik
+                    this.classList.add('active');
+
+                    const category = this.getAttribute('data-category');
+                    // Saat ganti kategori, selalu kembali ke Halaman 1
+                    filterAndRenderBerita(category, 1);
+                });
+            });
+        }
+
+        // --- 7. Jalankan fungsi saat seluruh halaman selesai dimuat ---
+        window.addEventListener('load', fetchAndRenderBerita);
+    </script>
 </body>
 
 </html>
