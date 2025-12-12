@@ -1,0 +1,506 @@
+/* ========================================= */
+/* 1. Kustomisasi Layout Detail Berita */
+/* ========================================= */
+
+/* Styling baru untuk Page Header yang rapi dan menarik */
+.page-heading {
+    /* Padding disesuaikan agar tidak terlalu dekat dengan header-sticky */
+    padding: 150px 0 80px 0;
+    /* Menggunakan gradient warna primer untuk efek modern */
+    background-image: linear-gradient(135deg, rgba(91, 104, 235, 0.95) 0%, rgba(40, 225, 253, 0.95) 100%);
+    color: #ffffff;
+    text-align: center;
+}
+
+.page-heading h4 {
+    color: #ffffff;
+    font-size: 3rem;
+    font-weight: 900;
+    margin-top: 5px;
+}
+
+.page-heading .breadcrumb-item {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 500;
+}
+
+.page-heading .breadcrumb-item a {
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.page-heading .breadcrumb-item a:hover {
+    color: #ffffff;
+}
+
+
+/* Styling untuk bagian konten utama berita */
+.detail-section {
+    /* Menggunakan class: detail-section */
+    padding: 80px 0;
+    /* Padding lebih seimbang */
+    background-color: #f7f7f7;
+    min-height: 70vh;
+    /* Agar halaman tidak terlalu pendek jika konten sedikit */
+}
+
+.berita-detail-content {
+    background: #ffffff;
+    padding: 40px;
+    border-radius: 15px;
+    /* Bayangan sedikit lebih kuat dan menarik */
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* ========================================= */
+/* 2. Header dan Meta Info */
+/* ========================================= */
+.berita-header h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #2a2a2a;
+    margin-bottom: 15px;
+    line-height: 1.3;
+}
+
+.meta-info {
+    margin-bottom: 30px;
+    font-size: 0.95rem;
+    color: #afafaf;
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.meta-info span {
+    display: inline-flex;
+    align-items: center;
+}
+
+.meta-info i {
+    color: #4b8ef1;
+    margin-right: 5px;
+}
+
+/* ========================================= */
+/* 3. Featured Image (Gambar Utama) */
+/* ========================================= */
+.featured-image-wrapper {
+    margin-bottom: 30px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.1);
+}
+
+.featured-image-wrapper img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+/* Efek hover agar lebih menarik */
+.featured-image-wrapper:hover img {
+    transform: scale(1.02);
+}
+
+/* ========================================= */
+/* 4. Isi Berita (Body Content) */
+/* ========================================= */
+.berita-body {
+    line-height: 1.8;
+    color: #444444;
+    font-size: 1.05rem;
+}
+
+.berita-body p {
+    margin-bottom: 1.8rem;
+    /* Jarak antar paragraf lebih lega */
+}
+
+.berita-body h2,
+.berita-body h3,
+.berita-body h4 {
+    color: #2a2a2a;
+    font-weight: 700;
+    margin-top: 2.5rem;
+    margin-bottom: 1.2rem;
+}
+
+.berita-body h2 {
+    font-size: 2rem;
+}
+
+.berita-body h3 {
+    font-size: 1.75rem;
+}
+
+.berita-body ul,
+.berita-body ol {
+    margin-bottom: 1.8rem;
+    padding-left: 25px;
+}
+
+.berita-body li {
+    margin-bottom: 0.8rem;
+    color: #444444;
+}
+
+.berita-body a {
+    color: #4b8ef1;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.berita-body a:hover {
+    color: #357bd1;
+    text-decoration: underline;
+}
+
+/* ========================================= */
+/* 5. Berita Footer & Share Buttons */
+/* ========================================= */
+
+.berita-footer {
+    padding-top: 20px;
+    border-top: 1px solid #eeeeee;
+    /* Garis pembatas */
+    align-items: center;
+}
+
+.berita-footer strong {
+    color: #2a2a2a;
+    margin-right: 10px;
+    font-weight: 600;
+}
+
+.berita-footer .btn-share {
+    color: #fff;
+    width: 38px;
+    height: 38px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    margin-right: 8px;
+    font-size: 18px;
+    transition: all 0.3s ease;
+}
+
+.berita-footer .btn-share:hover {
+    filter: brightness(1.1);
+    /* Efek hover yang lebih elegan */
+}
+
+/* Warna spesifik untuk tombol share */
+.facebook-bg {
+    background-color: #3b5998;
+}
+
+.twitter-bg {
+    background-color: #00acee;
+}
+
+.whatsapp-bg {
+    background-color: #25d366;
+}
+
+
+/* ========================================= */
+/* 6. Responsiveness (Media Queries) */
+/* ========================================= */
+
+@media (max-width: 767px) {
+    .page-heading {
+        padding: 120px 0 60px 0;
+    }
+
+    .page-heading h4 {
+        font-size: 2.2rem;
+    }
+
+    .berita-detail-content {
+        padding: 25px;
+    }
+
+    .berita-header h1 {
+        font-size: 1.8rem;
+    }
+
+    .berita-body {
+        font-size: 1rem;
+    }
+
+    .berita-footer {
+        /* Mengubah tata letak agar tombol berbagi dan navigasi berada dalam dua baris */
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .berita-footer .share-buttons {
+        margin-bottom: 20px;
+    }
+
+    .gradient-button {
+        width: 100%;
+        /* Tombol kembali memenuhi lebar di mobile */
+        text-align: center;
+    }
+}
+
+/* ========================================= */
+/* 7. Perbaikan Darurat untuk Loading Stuck  */
+/* ========================================= */
+
+/* Memastikan konten utama selalu terlihat */
+.detail-section {
+    visibility: visible !important;
+    opacity: 1 !important;
+    display: block !important;
+}
+
+/* Memastikan preloader (jika masih ada) tersembunyi */
+#js-preloader {
+    display: none !important;
+}
+
+/* ========================================= */
+/* 8. Kustomisasi Navbar (Background Putih)  */
+/* ========================================= */
+
+/* 1. Navbar dalam status normal (paling atas) */
+.header-area {
+    /* Mengubah background menjadi putih solid */
+    background-color: #ffffff !important;
+    /* Menambahkan sedikit bayangan agar terlihat berbeda dari banner */
+    box-shadow: 0 0px 15px rgba(0, 0, 0, 0.05);
+}
+
+/* 2. Navbar dalam status 'sticky' (setelah di-scroll) */
+.header-area.header-sticky {
+    background-color: #ffffff !important;
+    /* Bayangan lebih kuat saat sticky */
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* 3. Penyesuaian Teks Navigasi */
+/* Jika teks navigasi hilang karena background putih, ini akan mengembalikan warnanya ke hitam/gelap */
+.header-area .main-nav .nav li a {
+    color: #333333 !important;
+    /* Warna teks gelap */
+}
+
+/* 4. Teks navigasi saat di-hover atau aktif */
+.header-area .main-nav .nav li a:hover,
+.header-area .main-nav .nav li a.active {
+    color: #4b8ef1 !important;
+    /* Warna primer template */
+}
+
+/* ========================================= */
+/* 9. Tombol Navigasi - Teks Putih */
+/* ========================================= */
+
+/* Memastikan teks pada link di dalam gradient-button berwarna putih */
+.header-area .main-nav .nav li .gradient-button a {
+    color: #ffffff !important;
+    /* Tambahkan bayangan teks tipis agar terlihat kontras pada gradient */
+    text-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Memastikan ikon (i) di dalam tombol juga putih */
+.header-area .main-nav .nav li .gradient-button a i {
+    color: #ffffff !important;
+}
+
+/* ========================================= */
+/* 10. Fix Navbar Sticky (Tetap di Atas) */
+/* ========================================= */
+
+/* Memastikan header-area selalu menempel di bagian atas viewport (Fixed Position) */
+.header-area {
+    position: fixed !important;
+    top: 0 !important;
+    width: 100% !important;
+    z-index: 9999;
+    /* Pastikan navbar selalu di atas konten lain */
+}
+
+/* Memastikan tidak ada transisi yang membuat navbar menghilang */
+.header-area.header-sticky {
+    /* Menimpa properti yang mungkin disetel oleh JavaScript template */
+    top: 0 !important;
+    transform: translateY(0) !important;
+    opacity: 1 !important;
+}
+
+/* Menambahkan padding pada bagian konten utama agar tidak tertutup navbar */
+/* Page heading yang sudah kita buat sebelumnya berfungsi sebagai padding ini */
+.page-heading {
+    /* Nilai ini harus lebih besar dari tinggi navbar (sekitar 90px) */
+    padding-top: 150px !important;
+}
+
+/* ========================================= */
+/* 11. Gaya Daftar Berita (News Cards) */
+/* ========================================= */
+
+#berita-list-section {
+    padding: 80px 0;
+    background-color: #f7f7f7;
+}
+
+.berita-card {
+    background-color: #ffffff;
+    border-radius: 10px;
+    margin-bottom: 30px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    height: 100%;
+    /* Penting untuk grid yang rapi */
+}
+
+/* Efek Hover: Kartu terangkat sedikit */
+.berita-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.berita-thumb {
+    position: relative;
+    height: 200px;
+    /* Tinggi gambar thumbnail yang konsisten */
+    overflow: hidden;
+}
+
+.berita-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+/* Efek Zoom saat hover pada gambar */
+.berita-card:hover .berita-thumb img {
+    transform: scale(1.05);
+}
+
+.berita-content {
+    padding: 20px 25px 25px 25px;
+}
+
+.berita-content h4 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #2a2a2a;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    line-height: 1.4;
+    /* Membatasi baris judul */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    height: 2.8em;
+}
+
+.berita-content p {
+    color: #777777;
+    font-size: 0.95rem;
+    margin-bottom: 15px;
+    /* Membatasi baris deskripsi */
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    height: 4.5em;
+}
+
+.berita-meta {
+    font-size: 0.85rem;
+    color: #afafaf;
+    margin-bottom: 10px;
+}
+
+.berita-meta i {
+    color: #4b8ef1;
+    margin-right: 5px;
+}
+
+.read-more {
+    color: #4b8ef1;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.read-more:hover {
+    color: #357bd1;
+    text-decoration: underline;
+}
+
+/* Kategori Label di atas Gambar */
+.berita-thumb .kategori {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    padding: 5px 10px;
+    background-color: #4b8ef1;
+    /* Warna primer */
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 5px;
+    text-transform: uppercase;
+}
+
+/* Gaya Pagination Sederhana (sesuai template) */
+.pagination {
+    margin-top: 30px;
+    text-align: center;
+}
+
+.pagination ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: inline-flex;
+    border-radius: 5px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.pagination ul li a {
+    display: block;
+    padding: 10px 15px;
+    color: #555;
+    background-color: #ffffff;
+    text-decoration: none;
+    transition: background-color 0.3s, color 0.3s;
+    font-weight: 500;
+}
+
+.pagination ul li a:hover:not(.active),
+.pagination ul li a.active {
+    background-color: #4b8ef1;
+    color: #ffffff;
+}
+
+/* Responsif untuk Tampilan Ponsel (Mobile View) */
+@media (max-width: 767px) {
+    .berita-content h4 {
+        font-size: 1.2rem;
+        -webkit-line-clamp: 3;
+        height: 3.6em;
+    }
+
+    .berita-content p {
+        -webkit-line-clamp: 4;
+        height: 6em;
+    }
+}
