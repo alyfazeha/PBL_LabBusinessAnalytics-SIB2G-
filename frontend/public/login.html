@@ -121,6 +121,8 @@
                         // LOGIKA PENGALIHAN BERDASARKAN ROLE
                         if (result.data.role === 'admin') {
                             window.location.href = '../dashboard/admin.html'; // Pindah ke admin.html (di folder frontend/)
+                        } else if (result.data.role === 'mahasiswa') {
+                            window.location.href = '../dashboard_mahasiswa/index.html'; // Pindah ke admin.html (di folder frontend/)
                         } else {
                             window.location.href = 'index.html'; // Pindah ke index.html (di folder frontend/)
                         }
