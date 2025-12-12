@@ -472,33 +472,6 @@
     </div>
   </div>
 
-  <section class="section colored-bg" id="dosen-section">
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-12">
-          <div class="section-heading">
-            <h4>Dosen Pengajar</h4>
-            <img src="assets/images/heading-line-dec.png" alt="">
-            <h2>Tim Dosen Pengajar Kami</h2>
-          </div>
-        </div>
-      </div>
-
-      <div class="row" id="dosenListContainer">
-        <div class="col-lg-12 text-center mt-4">
-          <p id="loadingMessage">Memuat data dosen...</p>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-lg-12 text-center mt-5">
-          <div class="main-blue-button">
-            <a href="dosen.html">Lihat Semua Dosen</a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
   <div id="dosen-member" class="the-dosen-member">
     <div class="container">
       <div class="row">
@@ -594,6 +567,37 @@
           <span class="visually-hidden">Next</span>
         </button>
 
+      </div>
+    </div>
+  </div>
+
+  <div id="dosen-member" class="the-dosen-member">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 offset-lg-2">
+          <div class="section-heading" style="margin-bottom: 50px;">
+            <h4>Anggota <em>Dosen</em> Laboratorium</h4>
+            <img src="../assets/images/heading-line-dec.png" alt="">
+          </div>
+        </div>
+      </div>
+
+      <p id="loading-message" style="text-align: center; font-style: italic; color: #777; margin-bottom: 20px;">Memuat
+        data dosen...</p>
+
+      <div id="dosenCarousel" class="carousel slide" data-bs-ride="carousel">
+
+        <div class="carousel-inner" id="dosen-carousel-inner" style="padding-top: 40px; padding-bottom: 40px;">
+        </div>
+
+        <button class="carousel-control-prev" type="button" data-bs-target="#dosenCarousel" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#dosenCarousel" data-bs-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Next</span>
+        </button>
       </div>
     </div>
   </div>
@@ -766,82 +770,160 @@
   <script src="../assets/js/imagesloaded.js"></script>
   <script src="../assets/js/popup.js"></script>
   <script src="../assets/js/custom.js"></script>
+  <script src="../vendor/jquery/jquery.min.js"></script>
+  <script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      const dosenListContainer = document.getElementById('dosenListContainer');
-      const loadingMessage = document.getElementById('loadingMessage');
+    // ==========================================================
+    // 1. KONFIGURASI DAN DEFINISI VARIABEL
+    // ==========================================================
+    const API_URL = '../../backend/api/dosen/list_public.php';
+    const carouselInnerContainer = document.getElementById('dosen-carousel-inner');
+    const loadingMessage = document.getElementById('loading-message');
+    const DEFAULT_FOTO_PATH = '../assets/images/dosen.jpg';
+    const CAROUSEL_ID = 'dosenCarousel'; // Ambil ID dari elemen HTML utama
 
-      // ******************** PENTING ********************
-      // SESUAIKAN PATH INI agar bisa diakses dari index.html.
-      // Jika path dari dosen.html adalah '../../../backend/api/dosen/read.php',
-      // Anda mungkin perlu menyesuaikannya agar bisa diakses dari root index.html.
-      // Contoh: '/backend/api/dosen/read.php' atau 'backend/api/dosen/read.php'
-      const API_URL = '../../../backend/api/dosen/read.php';
-      // *************************************************
+    // ==========================================================
+    // 2. HELPER FUNCTION
+    // ==========================================================
 
-      // Fungsi untuk membuat elemen card dosen
-      const createDosenCard = (dosen) => {
-        // Asumsi properti data: foto_path, nama, jabatan_akademik, bidang_keahlian
+    /**
+     * Helper Function: Membagi array menjadi kelompok-kelompok (chunk)
+     */
+    const chunkArray = (array, size) => {
+      const chunked = [];
+      for (let i = 0; i < array.length; i += size) {
+        chunked.push(array.slice(i, i + size));
+      }
+      return chunked;
+    };
 
-        // Atur URL foto. Jika kosong, gunakan placeholder.
-        const photoUrl = dosen.foto_path ? dosen.foto_path : 'assets/images/placeholder.jpg';
+    // ==========================================================
+    // 3. LOGIC CARD RENDER (Tidak Ada Perubahan Signifikan di sini)
+    // ==========================================================
 
-        // Gunakan struktur card yang sederhana dan cocok dengan gaya template
-        return `
-                <div class="col-lg-4 col-md-6 mb-4 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.3s">
-                    <div class="team-member-item shadow-sm p-3" style="border-radius: 25px; background: #fff;">
-                        <div class="thumb text-center mb-3">
-                            <img src="${photoUrl}" alt="${dosen.nama}" class="img-fluid" 
-                                style="border-radius: 20px; height: 250px; width: 100%; object-fit: cover;">
-                        </div>
-                        <div class="down-content text-center">
-                            <h4>${dosen.nama}</h4>
-                            <span style="color: #00875a; font-weight: 500;">${dosen.jabatan_akademik || 'Jabatan Akademik'}</span>
-                            <p class="mt-2">${dosen.bidang_keahlian || 'Bidang Keahlian: Tidak tersedia.'}</p>
-                            <a href="#" class="main-green-button-small">Lihat Profil</a>
-                        </div>
+    /**
+     * Fungsi untuk membuat elemen HTML Card Dosen (member-card)
+     */
+    const createDosenCard = (dosen) => {
+      let finalFotoPath = DEFAULT_FOTO_PATH;
+
+      if (dosen.foto_path && dosen.foto_path !== 'null' && dosen.foto_path !== '') {
+        const path = dosen.foto_path;
+
+        if (path.startsWith('http://') || path.startsWith('https://')) {
+          finalFotoPath = path;
+        } else {
+          finalFotoPath = `../../uploads/dosen/${path}`;
+        }
+      }
+
+      const detailUrl = `detail-dosen.html?nidn=${dosen.nidn}`;
+
+      return `
+            <div class="col-lg-4 col-md-6">
+                <div class="member-card">
+                    <img src="${finalFotoPath}" alt="Foto ${dosen.nama}" style="object-fit: cover;">
+                    <h5>${dosen.nama || 'Nama Dosen'}</h5>
+                    <span>${dosen.jabatan || 'Anggota Laboratorium'}</span>
+                    <p>${dosen.nidn ? `NIDN: ${dosen.nidn}` : 'Detail Belum Diisi'}</p>
+                    <div class="main-blue-button">
+                        <a href="${detailUrl}">Info Detail</a>
                     </div>
                 </div>
-            `;
-      };
+            </div>
+        `;
+    };
 
-      const fetchAndRenderDosen = async () => {
-        loadingMessage.textContent = 'Memuat data dosen...';
-        dosenListContainer.innerHTML = ''; // Hapus pesan loading di dalam container
+    // ==========================================================
+    // 4. LOGIC FETCH DATA UTAMA
+    // ==========================================================
 
-        try {
-          const response = await fetch(API_URL);
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
+    /**
+     * Fungsi utama untuk mengambil data dan merender ke Carousel
+     */
+    const fetchAndRenderDosen = async () => {
+      if (loadingMessage) loadingMessage.textContent = 'Memuat data dosen...';
+      if (carouselInnerContainer) carouselInnerContainer.innerHTML = '';
 
-          const result = await response.json();
+      const carouselElement = document.getElementById(CAROUSEL_ID);
+      const prevButton = document.querySelector(`#${CAROUSEL_ID} .carousel-control-prev`);
+      const nextButton = document.querySelector(`#${CAROUSEL_ID} .carousel-control-next`);
 
-          if (result.success && result.data && result.data.length > 0) {
-            loadingMessage.style.display = 'none'; // Sembunyikan pesan loading
-            let htmlContent = '';
-            // Batasi jumlah dosen yang ditampilkan di homepage (opsional)
-            const displayLimit = 6;
-            const dataToDisplay = result.data.slice(0, displayLimit);
+      // Default: Sembunyikan tombol navigasi saat loading/error
+      if (prevButton) prevButton.style.display = 'none';
+      if (nextButton) nextButton.style.display = 'none';
 
-            dataToDisplay.forEach(dosen => {
-              htmlContent += createDosenCard(dosen);
-            });
-            dosenListContainer.innerHTML = htmlContent;
-          } else {
-            loadingMessage.textContent = 'Tidak ada data dosen yang ditemukan.';
-            loadingMessage.style.display = 'block';
-          }
 
-        } catch (error) {
-          console.error('Error fetching Dosen data:', error);
-          loadingMessage.textContent = 'Gagal memuat data dosen. Cek koneksi API dan path URL.';
-          loadingMessage.style.display = 'block';
+      try {
+        const response = await fetch(API_URL);
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
-      };
 
-      fetchAndRenderDosen();
-    });
+        const result = await response.json();
+
+        if (result.success && result.data && result.data.length > 0) {
+          if (loadingMessage) loadingMessage.style.display = 'none';
+          let carouselInnerHtml = '';
+
+          // 3. Kelompokkan data menjadi 3 item per array
+          const dosenChunks = chunkArray(result.data, 3);
+          const totalSlides = dosenChunks.length;
+
+          // 4. Loop setiap kelompok untuk membuat slide (carousel-item)
+          dosenChunks.forEach((chunk, index) => {
+            const isActive = index === 0 ? 'active' : ''; // Slide pertama harus active
+            let rowContent = '';
+
+            chunk.forEach(dosen => {
+              rowContent += createDosenCard(dosen);
+            });
+
+            carouselInnerHtml += `
+                        <div class="carousel-item ${isActive}">
+                            <div class="row dosen-row justify-content-center">
+                                ${rowContent}
+                            </div>
+                        </div>
+                    `;
+          });
+
+          if (carouselInnerContainer) carouselInnerContainer.innerHTML = carouselInnerHtml;
+
+          // ******************************************************
+          // PERBAIKAN UTAMA: INISIALISASI ULANG CAROUSEL
+          // ******************************************************
+          if (totalSlides > 1) {
+            // Hanya inisialisasi ulang jika ada lebih dari satu slide
+            if (typeof bootstrap !== 'undefined' && bootstrap.Carousel && carouselElement) {
+              // Hentikan dan inisialisasi ulang
+              // Note: Pastikan Anda memuat Bootstrap JS sebelum script ini!
+              new bootstrap.Carousel(carouselElement);
+            }
+            // Tampilkan tombol navigasi
+            if (prevButton) prevButton.style.display = 'block';
+            if (nextButton) nextButton.style.display = 'block';
+          }
+          // ******************************************************
+
+
+        } else {
+          // Data kosong
+          if (loadingMessage) loadingMessage.textContent = 'Tidak ada data dosen yang ditemukan.';
+          if (loadingMessage) loadingMessage.style.display = 'block';
+        }
+
+      } catch (error) {
+        // 5. Tangani error
+        console.error('Error fetching Dosen data:', error);
+        if (loadingMessage) loadingMessage.textContent = 'Gagal memuat data dosen. Cek koneksi API dan path URL.';
+        if (loadingMessage) loadingMessage.style.display = 'block';
+      }
+    };
+
+    // Panggil fungsi saat dokumen selesai dimuat
+    window.addEventListener('load', fetchAndRenderDosen);
   </script>
 </body>
 
