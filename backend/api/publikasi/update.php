@@ -21,13 +21,19 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $id = $_POST['publikasi_id'] ?? $_POST['id'] ?? null;
 
 // Tangkap Data Baru
-$data = [
-    'judul'         => $_POST['judul'] ?? null,
-    'external_link' => $_POST['external_link'] ?? null,
-    'kategori_id'   => $_POST['kategori_id'] ?? null,
-    'dosen_nidn'    => $_POST['dosen_nidn'] ?? null,
-    'focus_id'      => $_POST['focus_id'] ?? null // <--- WAJIB ADA
-];
+// ... kode atas tetap sama ...
+
+    // Tangkap Data Baru
+    $data = [
+        'judul'         => $_POST['judul'] ?? null,
+        'external_link' => $_POST['external_link'] ?? null,
+        'kategori_id'   => $_POST['kategori_id'] ?? null,
+        'dosen_nidn'    => $_POST['dosen_nidn'] ?? null,
+        'focus_id'      => $_POST['focus_id'] ?? null,
+        'tahun'         => $_POST['tahun'] ?? null 
+    ];
+
+    // ... kode bawah tetap sama ...
 
 // Validasi
 if (!$id || !$data['judul'] || !$data['kategori_id'] || !$data['focus_id']) {

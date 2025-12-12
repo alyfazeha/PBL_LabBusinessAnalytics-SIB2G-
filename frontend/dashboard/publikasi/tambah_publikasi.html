@@ -41,8 +41,12 @@
 
                 <div class="form-group">
                     <label for="judul">Judul Publikasi <span class="required">*</span></label>
-                    <input type="text" id="judul" name="judul" required
-                        placeholder="Masukkan judul jurnal/penelitian...">
+                    <input type="text" id="judul" name="judul" required placeholder="Masukkan judul jurnal/penelitian...">
+                </div>
+
+                <div class="form-group">
+                    <label for="tahun">Tahun Publikasi <span class="required">*</span></label>
+                    <input type="number" id="tahun" name="tahun" required placeholder="Contoh: 2024" min="1900" max="2100">
                 </div>
 
                 <div class="form-group">
@@ -74,8 +78,7 @@
                 </div>
 
                 <div class="form-actions">
-                    <button type="submit" class="btn btn-primary" id="submitBtn"><i class="fas fa-save"></i> Simpan
-                        Publikasi</button>
+                    <button type="submit" class="btn btn-primary" id="submitBtn"><i class="fas fa-save"></i> Simpan Publikasi</button>
                     <button type="reset" class="btn btn-secondary"><i class="fas fa-redo"></i> Reset</button>
                 </div>
             </form>
@@ -92,67 +95,45 @@
     </div>
 
     <script>
-        // Fungsi Menampilkan Pesan
         function displayMessage(type, message) {
             const messageArea = document.getElementById('message');
             messageArea.textContent = message;
-            messageArea.className = 'message-area ' + type; // Pastikan CSS memiliki class .success dan .error
+            messageArea.className = 'message-area ' + type;
             messageArea.style.display = 'block';
             setTimeout(() => { messageArea.style.display = 'none'; }, 5000);
         }
 
-        // 1. Fetch Kategori
         async function fetchKategori() {
             try {
                 const response = await fetch('../../../backend/api/publikasi/kategori_list.php');
                 const result = await response.json();
                 const select = document.getElementById('kategori_id');
                 select.innerHTML = '<option value="">-- Pilih Kategori --</option>';
-
                 if (result.status === 'success' && result.data) {
-                    result.data.forEach(item => {
-                        select.innerHTML += `<option value="${item.id}">${item.nama_kategori}</option>`;
-                    });
+                    result.data.forEach(item => { select.innerHTML += `<option value="${item.id}">${item.nama_kategori}</option>`; });
                 }
-            } catch (error) {
-                console.error('Kategori Error:', error);
-                document.getElementById('kategori_id').innerHTML = '<option value="">Error koneksi kategori</option>';
-            }
+            } catch (error) { console.error('Kategori Error:', error); }
         }
 
-        // 2. Fetch Research Focus
         async function fetchFocus() {
             try {
                 const response = await fetch('../../../backend/api/research/list.php');
                 const result = await response.json();
                 const select = document.getElementById('focus_id');
                 select.innerHTML = '<option value="">-- Pilih Topik Riset --</option>';
-
                 if (result.status === 'success' && result.data) {
-                    result.data.forEach(item => {
-                        // Value menggunakan focus_id agar tersimpan relasinya di DB
-                        select.innerHTML += `<option value="${item.focus_id}">${item.nama_fokus}</option>`;
-                    });
+                    result.data.forEach(item => { select.innerHTML += `<option value="${item.focus_id}">${item.nama_fokus}</option>`; });
                 }
             } catch (error) { console.error('Focus Error:', error); }
         }
 
-        // 3. Fetch Dosen (Support Format Array / Object)
         async function fetchDosen() {
             try {
                 const response = await fetch('../../../backend/api/dosen/list.php');
                 const result = await response.json();
                 const select = document.getElementById('dosen_nidn');
                 select.innerHTML = '<option value="">-- Pilih Dosen --</option>';
-
-                let dataDosen = [];
-                // Cek format respons API (Array langsung atau Object {data: ...})
-                if (Array.isArray(result)) {
-                    dataDosen = result;
-                } else if (result.status === 'success' && Array.isArray(result.data)) {
-                    dataDosen = result.data;
-                }
-
+                let dataDosen = Array.isArray(result) ? result : (result.status === 'success' ? result.data : []);
                 if (dataDosen.length > 0) {
                     const seen = new Set();
                     dataDosen.forEach(dosen => {
@@ -161,23 +142,15 @@
                             select.innerHTML += `<option value="${dosen.nidn}">${dosen.nama} (${dosen.nidn})</option>`;
                         }
                     });
-                } else {
-                    select.innerHTML = '<option value="">Data Dosen Kosong</option>';
                 }
-
-            } catch (error) {
-                console.error('Dosen Error:', error);
-                document.getElementById('dosen_nidn').innerHTML = '<option value="">Gagal memuat dosen</option>';
-            }
+            } catch (error) { console.error('Dosen Error:', error); }
         }
 
-        // 4. Submit Form (LOGIKA DIPERBAIKI)
         const publikasiForm = document.getElementById('publikasiForm');
         publikasiForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const submitBtn = document.getElementById('submitBtn');
             const messageArea = document.getElementById('message');
-
             submitBtn.disabled = true;
             submitBtn.innerHTML = 'Menyimpan...';
             messageArea.style.display = 'none';
@@ -185,50 +158,23 @@
             const formData = new FormData(publikasiForm);
 
             try {
-                const response = await fetch('../../../backend/api/publikasi/create.php', {
-                    method: 'POST',
-                    body: formData
-                });
-
-                // Ambil respons sebagai Text dulu (Debugging Aman)
+                const response = await fetch('../../../backend/api/publikasi/create.php', { method: 'POST', body: formData });
                 const text = await response.text();
                 let result;
-
-                try {
-                    result = JSON.parse(text);
-                } catch (err) {
-                    // Jika error parsing JSON, berarti ada error PHP (Warning/Fatal)
-                    console.error("Server Error (Raw):", text);
-                    throw new Error("Terjadi kesalahan di server. Cek Console (F12) untuk detail.");
-                }
+                try { result = JSON.parse(text); } catch (err) { throw new Error("Server Error"); }
 
                 if (response.ok && (result.status === 'success' || result.id)) {
                     displayMessage('success', result.message || 'Publikasi berhasil disimpan!');
                     publikasiForm.reset();
-                    // Reset dropdown ke posisi default
                     document.getElementById('dosen_nidn').value = "";
                     document.getElementById('focus_id').value = "";
-                } else {
-                    throw new Error(result.message || 'Gagal menyimpan data.');
-                }
-
-            } catch (error) {
-                console.error("Submit Error:", error);
-                displayMessage('error', error.message || 'Kesalahan jaringan.');
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '<i class="fas fa-save"></i> Simpan Publikasi';
-            }
+                } else { throw new Error(result.message || 'Gagal menyimpan data.'); }
+            } catch (error) { displayMessage('error', error.message || 'Kesalahan jaringan.'); }
+            finally { submitBtn.disabled = false; submitBtn.innerHTML = '<i class="fas fa-save"></i> Simpan Publikasi'; }
         });
 
-        // Load Data Saat Halaman Dibuka
-        document.addEventListener('DOMContentLoaded', () => {
-            fetchKategori();
-            fetchFocus();
-            fetchDosen();
-        });
+        document.addEventListener('DOMContentLoaded', () => { fetchKategori(); fetchFocus(); fetchDosen(); });
 
-        // Logout Logic
         const logoutModal = document.getElementById('logoutModal');
         document.getElementById('logoutTrigger').onclick = (e) => { e.preventDefault(); logoutModal.classList.add('show'); };
         document.getElementById('cancelLogoutBtn').onclick = () => logoutModal.classList.remove('show');
@@ -238,5 +184,4 @@
         };
     </script>
 </body>
-
 </html>
