@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kelola Publikasi</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="../assets/css/dashboarddns.css">
+    <link rel="stylesheet" href="../../frontend/assets/css/dashboarddns.css">
 </head>
 
 <body>
@@ -30,7 +30,7 @@
             <a href="tambah_publikasi.html" class="btn-add-pub"><i class="fas fa-plus"></i> Tambah Publikasi Baru</a>
 
             <div class="publication-list" id="publicationContainer">
-                <p style="text-align: center; color: #666;">Memuat data publikasi...</p>
+                <p style="text-align: center; color: #666; margin-top: 20px;">Memuat data publikasi...</p>
             </div>
         </div>
     </main>
@@ -41,25 +41,25 @@
             const container = document.getElementById('publicationContainer');
 
             try {
-                // Panggil API khusus Dosen (list_dosen.php)
+                // Panggil API khusus Dosen
                 const response = await fetch('../../backend/api/publikasi/list_dosen.php');
                 const result = await response.json();
 
                 if (result.status === 'success' && result.data.length > 0) {
-                    container.innerHTML = ''; // Kosongkan loading
+                    container.innerHTML = ''; // Hapus tulisan loading
 
                     result.data.forEach(pub => {
-                        // Tentukan class badge berdasarkan status
-                        let badgeClass = 'pending'; // Default kuning
+                        // Logika Warna Badge
+                        let badgeClass = 'pending';
                         let statusText = pub.status || 'Pending';
 
                         if (statusText.toLowerCase() === 'published') {
-                            badgeClass = 'published'; // Hijau
+                            badgeClass = 'published';
                         } else if (statusText.toLowerCase() === 'rejected') {
-                            badgeClass = 'rejected'; // Merah
+                            badgeClass = 'rejected';
                         }
 
-                        // Format tampilan HTML sama persis dengan desain asli
+                        // HTML Item (SAMA PERSIS DENGAN TAMPILAN LAMA)
                         const itemHtml = `
                             <div class="pub-item">
                                 <div class="pub-info">
@@ -72,8 +72,14 @@
                                     ${pub.external_link ? `<small><a href="${pub.external_link}" target="_blank" style="color:#007bff;">Lihat Dokumen <i class="fas fa-external-link-alt"></i></a></small>` : ''}
                                 </div>
                                 <div class="pub-actions">
-                                    <button class="btn-edit" onclick="alert('Fitur Edit belum aktif')"><i class="fas fa-edit"></i> Edit</button>
-                                    <button class="btn-delete" onclick="alert('Fitur Hapus belum aktif')"><i class="fas fa-trash-alt"></i> Hapus</button>
+                                    
+                                    <a href="edit_publikasi.html?id=${pub.id}" class="btn-edit" style="text-decoration:none; color:white; display:inline-flex; align-items:center; justify-content:center;">
+                                        <i class="fas fa-edit" style="margin-right:5px;"></i> Edit
+                                    </a>
+
+                                    <button class="btn-delete" onclick="deletePublikasi(${pub.id})">
+                                        <i class="fas fa-trash-alt"></i> Hapus
+                                    </button>
                                 </div>
                             </div>
                         `;
@@ -89,10 +95,31 @@
             }
         }
 
+        // 2. Fungsi Hapus (Opsional, agar tombol hapus berfungsi)
+        async function deletePublikasi(id) {
+            if(!confirm('Apakah Anda yakin ingin menghapus publikasi ini?')) return;
+            
+            const formData = new FormData();
+            formData.append('id', id);
+
+            try {
+                const res = await fetch('../../backend/api/publikasi/delete.php', { method: 'POST', body: formData });
+                const json = await res.json();
+                if(json.status === 'success') {
+                    alert('Berhasil dihapus');
+                    loadMyPublications(); // Reload list
+                } else {
+                    alert('Gagal: ' + json.message);
+                }
+            } catch(e) {
+                alert('Error jaringan');
+            }
+        }
+
         // Jalankan saat halaman dimuat
         document.addEventListener('DOMContentLoaded', loadMyPublications);
 
-        // 2. Logika Logout
+        // 3. Logika Logout
         document.getElementById('logoutLink').addEventListener('click', function (e) {
             e.preventDefault();
             if (confirm('Apakah Anda yakin ingin keluar dari sistem?')) {
@@ -104,5 +131,4 @@
         });
     </script>
 </body>
-
 </html>
