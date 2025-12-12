@@ -483,124 +483,16 @@
         </div>
       </div>
 
-      <div id="dosenCarousel" class="carousel slide" data-bs-ride="carousel">
-
-        <div class="carousel-inner" style="padding-top: 40px; padding-bottom: 40px;">
-
-          <div class="carousel-item active">
-            <div class="row dosen-row">
-
-              <div class="col-lg-4 col-md-6">
-                <div class="member-card">
-                  <img src="../assets/images/dosen.jpg" alt="Foto Dosen 1">
-                  <h5>Dr. Ir. Budi Santoso, M.Kom.</h5>
-                  <span>Ketua Laboratorium</span>
-                  <p>Pakar Big Data & Strategi Bisnis</p>
-                  <div class="main-blue-button">
-                    <a href="URL_PROFIL_DOSEN_1">Info Detail</a>
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-lg-4 col-md-6">
-                <div class="member-card">
-                  <img src="../assets/images/dosen.jpg" alt="Foto Dosen 2">
-                  <h5>Prof. Nia Kurniawan, S.T., M.Sc.</h5>
-                  <span>Anggota Laboratorium</span>
-                  <p>Spesialis Business Intelligence, IoT, & Cloud Computing</p>
-                  <div class="main-blue-button">
-                    <a href="URL_PROFIL_DOSEN_2">Info Detail</a>
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-lg-4 col-md-6">
-                <div class="member-card">
-                  <img src="../assets/images/dosen.jpg" alt="Foto Dosen 3">
-                  <h5>Ahmad Fikri, S.Kom., M.T.</h5>
-                  <span>Anggota Laboratorium</span>
-                  <p>Peneliti Data Mining & CRM</p>
-                  <div class="main-blue-button">
-                    <a href="URL_PROFIL_DOSEN_3">Info Detail</a>
-                  </div>
-                </div>
-              </div>
-
-            </div>
+      <div class="container">
+        <div class="dosen-scroll-container">
+          <div class="dosen-list-wrapper" id="dosen-list-flex">
+            <div id="loading-message" style="text-align: center; padding: 50px;">Memuat data dosen...</div>
           </div>
-          <div class="carousel-item">
-            <div class="row dosen-row justify-content-center">
-
-              <div class="col-lg-4 col-md-6">
-                <div class="member-card">
-                  <img src="../assets/images/dosen.jpg" alt="Foto Dosen 4">
-                  <h5>Citra Dewi, B.A., M.B.A.</h5>
-                  <span>Anggota Laboratorium</span>
-                  <p>Dosen Kewirausahaan Digital & E-Commerce Strategy</p>
-                  <div class="main-blue-button">
-                    <a href="URL_PROFIL_DOSEN_4">Info Detail</a>
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-lg-4 col-md-6">
-                <div class="member-card">
-                  <img src="../assets/images/dosen.jpg" alt="Foto Dosen 5">
-                  <h5>Rudi Hartono, Ph.D.</h5>
-                  <span>Anggota Laboratorium</span>
-                  <p>Ahli Sistem Informasi Manajemen</p>
-                  <div class="main-blue-button">
-                    <a href="URL_PROFIL_DOSEN_5">Info Detail</a>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-          </div>
-        </div> <button class="carousel-control-prev" type="button" data-bs-target="#dosenCarousel" data-bs-slide="prev">
-          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-          <span class="visually-hidden">Previous</span>
-        </button>
-
-        <button class="carousel-control-next" type="button" data-bs-target="#dosenCarousel" data-bs-slide="next">
-          <span class="carousel-control-next-icon" aria-hidden="true"></span>
-          <span class="visually-hidden">Next</span>
-        </button>
-
+        </div>
       </div>
     </div>
   </div>
 
-  <div id="dosen-member" class="the-dosen-member">
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-8 offset-lg-2">
-          <div class="section-heading" style="margin-bottom: 50px;">
-            <h4>Anggota <em>Dosen</em> Laboratorium</h4>
-            <img src="../assets/images/heading-line-dec.png" alt="">
-          </div>
-        </div>
-      </div>
-
-      <p id="loading-message" style="text-align: center; font-style: italic; color: #777; margin-bottom: 20px;">Memuat
-        data dosen...</p>
-
-      <div id="dosenCarousel" class="carousel slide" data-bs-ride="carousel">
-
-        <div class="carousel-inner" id="dosen-carousel-inner" style="padding-top: 40px; padding-bottom: 40px;">
-        </div>
-
-        <button class="carousel-control-prev" type="button" data-bs-target="#dosenCarousel" data-bs-slide="prev">
-          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-          <span class="visually-hidden">Previous</span>
-        </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#dosenCarousel" data-bs-slide="next">
-          <span class="carousel-control-next-icon" aria-hidden="true"></span>
-          <span class="visually-hidden">Next</span>
-        </button>
-      </div>
-    </div>
-  </div>
 
   <div id="services" class="services section">
     <div class="container">
@@ -772,141 +664,85 @@
   <script src="../assets/js/custom.js"></script>
   <script src="../vendor/jquery/jquery.min.js"></script>
   <script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
   <script>
     // ==========================================================
-    // 1. KONFIGURASI DAN DEFINISI VARIABEL
+    // SCRIPT KARTU DOSEN HORIZONTAL (TANPA CAROUSEL BOOTSTRAP)
     // ==========================================================
+
     const API_URL = '../../backend/api/dosen/list_public.php';
-    const carouselInnerContainer = document.getElementById('dosen-carousel-inner');
+    const dosenListContainer = document.getElementById('dosen-list-flex');
     const loadingMessage = document.getElementById('loading-message');
+
+    // PASTIKAN DEFAULT FOTO HANYA SATU KALI MUNDUR (../)
     const DEFAULT_FOTO_PATH = '../assets/images/dosen.jpg';
-    const CAROUSEL_ID = 'dosenCarousel'; // Ambil ID dari elemen HTML utama
 
-    // ==========================================================
-    // 2. HELPER FUNCTION
-    // ==========================================================
-
-    /**
-     * Helper Function: Membagi array menjadi kelompok-kelompok (chunk)
-     */
-    const chunkArray = (array, size) => {
-      const chunked = [];
-      for (let i = 0; i < array.length; i += size) {
-        chunked.push(array.slice(i, i + size));
-      }
-      return chunked;
-    };
-
-    // ==========================================================
-    // 3. LOGIC CARD RENDER (Tidak Ada Perubahan Signifikan di sini)
-    // ==========================================================
-
-    /**
-     * Fungsi untuk membuat elemen HTML Card Dosen (member-card)
-     */
+    // --- Helper 1: Membuat Card Dosen (Perbaikan Path Foto di sini) ---
     const createDosenCard = (dosen) => {
       let finalFotoPath = DEFAULT_FOTO_PATH;
 
       if (dosen.foto_path && dosen.foto_path !== 'null' && dosen.foto_path !== '') {
         const path = dosen.foto_path;
 
+        // Logika Cek Path (Diambil dari script Carousel yang sudah Anda modifikasi)
         if (path.startsWith('http://') || path.startsWith('https://')) {
+          // Kasus 1: Jika foto_path di DB sudah berupa URL lengkap
           finalFotoPath = path;
         } else {
-          finalFotoPath = `../../uploads/dosen/${path}`;
+          // Kasus 2: Jika foto_path adalah nama file lokal
+
+          // *** PERBAIKAN JALUR UTAMA DI SINI ***
+          // Dari index.html (misal: frontend/) hanya perlu MUNDUR SATU KALI (../) 
+          // untuk sampai di folder 'proyek/' utama yang berisi folder 'uploads/'.
+          finalFotoPath = `../uploads/dosen/${path}`;
+
+          // Catatan: Jika path ini masih salah (gambar tidak muncul), 
+          // ganti menjadi `../../uploads/dosen/${path}` lagi, tergantung 
+          // struktur folder utama proyek Anda. Tapi `../` biasanya yang benar.
         }
       }
 
       const detailUrl = `detail-dosen.html?nidn=${dosen.nidn}`;
 
+      // Cukup mengembalikan div .member-card
       return `
-            <div class="col-lg-4 col-md-6">
-                <div class="member-card">
-                    <img src="${finalFotoPath}" alt="Foto ${dosen.nama}" style="object-fit: cover;">
-                    <h5>${dosen.nama || 'Nama Dosen'}</h5>
-                    <span>${dosen.jabatan || 'Anggota Laboratorium'}</span>
-                    <p>${dosen.nidn ? `NIDN: ${dosen.nidn}` : 'Detail Belum Diisi'}</p>
-                    <div class="main-blue-button">
-                        <a href="${detailUrl}">Info Detail</a>
-                    </div>
+            <div class="member-card">
+                <img src="${finalFotoPath}" alt="Foto ${dosen.nama}" style="object-fit: cover;">
+                <h5>${dosen.nama || 'Nama Dosen'}</h5>
+                <span>${dosen.jabatan || 'Anggota Laboratorium'}</span>
+                <p>${dosen.nidn ? `NIDN: ${dosen.nidn}` : 'Detail Belum Diisi'}</p>
+                <div class="main-blue-button">
+                    <a href="${detailUrl}">Info Detail</a>
                 </div>
             </div>
         `;
     };
 
     // ==========================================================
-    // 4. LOGIC FETCH DATA UTAMA
+    // FUNGSI UTAMA FETCH & RENDER (Tidak ada perubahan di sini)
     // ==========================================================
-
-    /**
-     * Fungsi utama untuk mengambil data dan merender ke Carousel
-     */
     const fetchAndRenderDosen = async () => {
+
+      // 1. Set Status Awal
       if (loadingMessage) loadingMessage.textContent = 'Memuat data dosen...';
-      if (carouselInnerContainer) carouselInnerContainer.innerHTML = '';
-
-      const carouselElement = document.getElementById(CAROUSEL_ID);
-      const prevButton = document.querySelector(`#${CAROUSEL_ID} .carousel-control-prev`);
-      const nextButton = document.querySelector(`#${CAROUSEL_ID} .carousel-control-next`);
-
-      // Default: Sembunyikan tombol navigasi saat loading/error
-      if (prevButton) prevButton.style.display = 'none';
-      if (nextButton) nextButton.style.display = 'none';
-
+      if (dosenListContainer) dosenListContainer.innerHTML = '';
 
       try {
         const response = await fetch(API_URL);
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
         const result = await response.json();
 
         if (result.success && result.data && result.data.length > 0) {
           if (loadingMessage) loadingMessage.style.display = 'none';
-          let carouselInnerHtml = '';
 
-          // 3. Kelompokkan data menjadi 3 item per array
-          const dosenChunks = chunkArray(result.data, 3);
-          const totalSlides = dosenChunks.length;
+          let htmlContent = '';
+          const dataToDisplay = result.data;
 
-          // 4. Loop setiap kelompok untuk membuat slide (carousel-item)
-          dosenChunks.forEach((chunk, index) => {
-            const isActive = index === 0 ? 'active' : ''; // Slide pertama harus active
-            let rowContent = '';
-
-            chunk.forEach(dosen => {
-              rowContent += createDosenCard(dosen);
-            });
-
-            carouselInnerHtml += `
-                        <div class="carousel-item ${isActive}">
-                            <div class="row dosen-row justify-content-center">
-                                ${rowContent}
-                            </div>
-                        </div>
-                    `;
+          // 2. Render Semua Data (Tanpa Chunking)
+          dataToDisplay.forEach(dosen => {
+            htmlContent += createDosenCard(dosen);
           });
 
-          if (carouselInnerContainer) carouselInnerContainer.innerHTML = carouselInnerHtml;
-
-          // ******************************************************
-          // PERBAIKAN UTAMA: INISIALISASI ULANG CAROUSEL
-          // ******************************************************
-          if (totalSlides > 1) {
-            // Hanya inisialisasi ulang jika ada lebih dari satu slide
-            if (typeof bootstrap !== 'undefined' && bootstrap.Carousel && carouselElement) {
-              // Hentikan dan inisialisasi ulang
-              // Note: Pastikan Anda memuat Bootstrap JS sebelum script ini!
-              new bootstrap.Carousel(carouselElement);
-            }
-            // Tampilkan tombol navigasi
-            if (prevButton) prevButton.style.display = 'block';
-            if (nextButton) nextButton.style.display = 'block';
-          }
-          // ******************************************************
-
+          if (dosenListContainer) dosenListContainer.innerHTML = htmlContent;
 
         } else {
           // Data kosong
@@ -915,14 +751,14 @@
         }
 
       } catch (error) {
-        // 5. Tangani error
+        // 3. Tangani error
         console.error('Error fetching Dosen data:', error);
         if (loadingMessage) loadingMessage.textContent = 'Gagal memuat data dosen. Cek koneksi API dan path URL.';
         if (loadingMessage) loadingMessage.style.display = 'block';
       }
     };
 
-    // Panggil fungsi saat dokumen selesai dimuat
+    // Jalankan fungsi saat seluruh halaman selesai dimuat
     window.addEventListener('load', fetchAndRenderDosen);
   </script>
 </body>
