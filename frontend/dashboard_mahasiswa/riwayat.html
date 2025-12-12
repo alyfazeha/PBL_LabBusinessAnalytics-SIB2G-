@@ -120,13 +120,15 @@
 
     <script>
         // Menggunakan list.php yang sama dengan admin (Backend otomatis filter by NIM session)
-        const API_URL = '../../backend/api/booking/list.php';
+        // const API_URL = '../../backend/api/booking/list.php';
+        const API_BASE_URL = '../../backend/api/';
+        const PEMINJAMAN_API_URL = API_BASE_URL + 'booking/list.php';
 
         async function fetchStatusPeminjaman() {
             const tableBody = document.getElementById('statusTableBody');
             
             try {
-                const response = await fetch(API_URL);
+                const response = await fetch(PEMINJAMAN_API_URL);
                 
                 // Cek jika sesi habis (Unauthorized)
                 if (response.status === 401) {
