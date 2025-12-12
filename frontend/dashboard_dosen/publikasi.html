@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kelola Publikasi</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="../../frontend/assets/css/dashboarddns.css">
+    <link rel="stylesheet" href="/frontend/assets/css/dashboarddns.css">
 </head>
 
 <body>
@@ -29,55 +29,79 @@
 
             <a href="tambah_publikasi.html" class="btn-add-pub"><i class="fas fa-plus"></i> Tambah Publikasi Baru</a>
 
-            <div class="publication-list">
-
-                <div class="pub-item">
-                    <div class="pub-info">
-                        <h3>Implementasi AI dalam Kurikulum 2024</h3>
-                        <p>Jenis: **Jurnal Internasional** | Tanggal: 10 Jan 2025 | DOI: 10.1234/ai.2025.1 | Status:
-                            <span class="badge published">Published</span>
-                        </p>
-                    </div>
-                    <div class="pub-actions">
-                        <a href="edit_publikasi.html" class="btn-edit"><i class="fas fa-edit"></i> Edit</a>
-                        <button class="btn-delete"><i class="fas fa-trash-alt"></i> Hapus</button>
-                    </div>
-                </div>
-
-                <div class="pub-item">
-                    <div class="pub-info">
-                        <h3>Review Teknologi Blockchain di Asia Tenggara</h3>
-                        <p>Jenis: **Artikel Konferensi** | Tanggal: 01 Des 2024 | Status: <span
-                                class="badge pending">Draft</span></p>
-                    </div>
-                    <div class="pub-actions">
-                        <a href="edit_publikasi.html" class="btn-edit"><i class="fas fa-edit"></i> Edit</a>
-                        <button class="btn-delete"><i class="fas fa-trash-alt"></i> Hapus</button>
-                    </div>
-                </div>
+            <div class="publication-list" id="publicationContainer">
+                <p style="text-align: center; color: #666;">Memuat data publikasi...</p>
             </div>
         </div>
     </main>
 
     <script>
-        // Logika Logout
+        // 1. Fungsi Mengambil Data dari API
+        async function loadMyPublications() {
+            const container = document.getElementById('publicationContainer');
+            
+            try {
+                // Panggil API khusus Dosen (list_dosen.php)
+                const response = await fetch('../../backend/api/publikasi/list_dosen.php');
+                const result = await response.json();
+
+                if (result.status === 'success' && result.data.length > 0) {
+                    container.innerHTML = ''; // Kosongkan loading
+
+                    result.data.forEach(pub => {
+                        // Tentukan class badge berdasarkan status
+                        let badgeClass = 'pending'; // Default kuning
+                        let statusText = pub.status || 'Pending';
+
+                        if (statusText.toLowerCase() === 'published') {
+                            badgeClass = 'published'; // Hijau
+                        } else if (statusText.toLowerCase() === 'rejected') {
+                            badgeClass = 'rejected'; // Merah
+                        }
+
+                        // Format tampilan HTML sama persis dengan desain asli
+                        const itemHtml = `
+                            <div class="pub-item">
+                                <div class="pub-info">
+                                    <h3>${pub.judul}</h3>
+                                    <p>
+                                        Tahun: <strong>${pub.tahun}</strong> | 
+                                        Kategori: <strong>${pub.nama_kategori || '-'}</strong> | 
+                                        Status: <span class="badge ${badgeClass}">${statusText}</span>
+                                    </p>
+                                    ${pub.external_link ? `<small><a href="${pub.external_link}" target="_blank" style="color:#007bff;">Lihat Dokumen <i class="fas fa-external-link-alt"></i></a></small>` : ''}
+                                </div>
+                                <div class="pub-actions">
+                                    <button class="btn-edit" onclick="alert('Fitur Edit belum aktif')"><i class="fas fa-edit"></i> Edit</button>
+                                    <button class="btn-delete" onclick="alert('Fitur Hapus belum aktif')"><i class="fas fa-trash-alt"></i> Hapus</button>
+                                </div>
+                            </div>
+                        `;
+                        container.innerHTML += itemHtml;
+                    });
+
+                } else {
+                    container.innerHTML = '<p style="text-align: center; padding: 20px;">Belum ada publikasi yang diajukan.</p>';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                container.innerHTML = '<p style="text-align: center; color: red;">Gagal memuat data.</p>';
+            }
+        }
+
+        // Jalankan saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', loadMyPublications);
+
+        // 2. Logika Logout
         document.getElementById('logoutLink').addEventListener('click', function (e) {
             e.preventDefault();
             if (confirm('Apakah Anda yakin ingin keluar dari sistem?')) {
                 const logoutUrl = '../../backend/api/auth/logout.php';
                 fetch(logoutUrl, { method: 'POST' })
-                    .then(response => response.json())
-                    .then(data => {
-                        alert(data.message);
-                        window.location.href = '../public/index.html';
-                    })
-                    .catch(error => {
-                        alert('Terjadi kesalahan saat logout.');
-                        window.location.href = '../public/index.html';
-                    });
+                    .then(() => window.location.href = '../public/index.html')
+                    .catch(() => window.location.href = '../public/index.html');
             }
         });
     </script>
 </body>
-
 </html>

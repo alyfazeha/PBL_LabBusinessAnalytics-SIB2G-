@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tambah Publikasi</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="../../frontend/assets/css/dashboarddns.css">
+    <link rel="stylesheet" href="/frontend/assets/css/dashboarddns.css">
 </head>
 
 <body>
@@ -27,51 +27,41 @@
         <div class="content-card">
             <h2><i class="fas fa-file-upload"></i> Tambah Publikasi Baru</h2>
 
-            <form action="publikasi.html" method="POST">
+            <form id="formPublikasi">
                 <div class="form-grid">
 
-                    <div class="form-group full-width"><label for="judul">Judul Publikasi</label><input type="text"
-                            id="judul" name="judul_publikasi" required></div>
-
-                    <div class="form-group">
-                        <label for="jenis">Jenis Publikasi</label>
-                        <select id="jenis" name="jenis_publikasi" required>
-                            <option value="">-- Pilih Jenis --</option>
-                            <option value="Jurnal Internasional">Jurnal Internasional</option>
-                            <option value="Jurnal Nasional">Jurnal Nasional</option>
-                            <option value="Artikel Konferensi">Artikel Konferensi</option>
-                            <option value="Buku">Buku</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group"><label for="tanggal">Tanggal Publikasi</label><input type="date"
-                            id="tanggal" name="tanggal_publikasi" required></div>
-
-                    <div class="form-group"><label for="doi">DOI Publikasi</label><input type="text" id="doi"
-                            name="doi_publikasi" placeholder="Opsional"></div>
-
-                    <div class="form-group">
-                        <label for="status">Status Publikasi</label>
-                        <select id="status" name="status_publikasi" required>
-                            <option value="Published">Published</option>
-                            <option value="Draft">Draft</option>
-                            <option value="Review">Review</option>
-                        </select>
-                    </div>
-
                     <div class="form-group full-width">
-                        <label for="abstrak">Abstrak/Ringkasan Publikasi</label>
-                        <textarea id="abstrak" name="abstrak" rows="5" required></textarea>
+                        <label for="judul">Judul Publikasi</label>
+                        <input type="text" id="judul" name="judul" required placeholder="Judul Jurnal / Penelitian...">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tahun">Tahun Publikasi</label>
+                        <input type="number" id="tahun" name="tahun" required placeholder="2025" min="1900" max="2100">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="kategori_id">Kategori Publikasi</label>
+                        <select id="kategori_id" name="kategori_id" required>
+                            <option value="">-- Memuat Kategori... --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="focus_id">Topik Riset (Research Focus)</label>
+                        <select id="focus_id" name="focus_id" required>
+                            <option value="">-- Memuat Topik... --</option>
+                        </select>
                     </div>
 
                     <div class="form-group full-width">
                         <label for="link">Link Dokumen / Jurnal (URL)</label>
-                        <input type="url" id="link" name="link_dokumen"
+                        <input type="url" id="link" name="external_link"
                             placeholder="Contoh: https://jurnal.universitas.ac.id/...">
                     </div>
 
                     <div class="form-group full-width">
-                        <button type="submit" class="btn-submit"><i class="fas fa-save"></i> Simpan Publikasi</button>
+                        <button type="submit" id="btnSimpan" class="btn-submit"><i class="fas fa-save"></i> Simpan Publikasi</button>
                     </div>
                 </div>
             </form>
@@ -79,24 +69,74 @@
     </main>
 
     <script>
+        // 1. Load Data Dropdown (Kategori & Fokus) saat halaman dibuka
+        async function loadDropdowns() {
+            try {
+                // Kategori
+                const resKat = await fetch('../../backend/api/publikasi/kategori_list.php');
+                const jsonKat = await resKat.json();
+                const selKat = document.getElementById('kategori_id');
+                selKat.innerHTML = '<option value="">-- Pilih Kategori --</option>';
+                if (jsonKat.status === 'success') {
+                    jsonKat.data.forEach(d => selKat.innerHTML += `<option value="${d.id}">${d.nama_kategori}</option>`);
+                }
+
+                // Fokus Riset
+                const resFoc = await fetch('../../backend/api/research/list.php');
+                const jsonFoc = await resFoc.json();
+                const selFoc = document.getElementById('focus_id');
+                selFoc.innerHTML = '<option value="">-- Pilih Topik Riset --</option>';
+                if (jsonFoc.status === 'success') {
+                    jsonFoc.data.forEach(d => selFoc.innerHTML += `<option value="${d.focus_id}">${d.nama_fokus}</option>`);
+                }
+            } catch (error) { console.error('Error load dropdowns:', error); }
+        }
+
+        // 2. Submit Form
+        document.getElementById('formPublikasi').addEventListener('submit', async (e) => {
+            e.preventDefault(); // Mencegah reload halaman
+            const btn = document.getElementById('btnSimpan');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengirim...';
+            btn.disabled = true;
+
+            const formData = new FormData(e.target);
+
+            try {
+                // Kirim ke create.php (Logic backend akan otomatis set status=pending & NIDN dosen)
+                const response = await fetch('../../backend/api/publikasi/create.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    alert(result.message); // Pesan: Menunggu verifikasi Admin
+                    window.location.href = 'publikasi.html'; // Redirect kembali ke list
+                } else {
+                    alert('Gagal: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Terjadi kesalahan koneksi.');
+            } finally {
+                btn.innerHTML = '<i class="fas fa-save"></i> Simpan Publikasi';
+                btn.disabled = false;
+            }
+        });
+
+        // Panggil fungsi load saat halaman siap
+        document.addEventListener('DOMContentLoaded', loadDropdowns);
+
         // Logika Logout
         document.getElementById('logoutLink').addEventListener('click', function (e) {
             e.preventDefault();
             if (confirm('Apakah Anda yakin ingin keluar dari sistem?')) {
                 const logoutUrl = '../../backend/api/auth/logout.php';
                 fetch(logoutUrl, { method: 'POST' })
-                    .then(response => response.json())
-                    .then(data => {
-                        alert(data.message);
-                        window.location.href = '../public/index.html';
-                    })
-                    .catch(error => {
-                        alert('Terjadi kesalahan saat logout.');
-                        window.location.href = '../public/index.html';
-                    });
+                    .then(() => window.location.href = '../public/index.html')
+                    .catch(() => window.location.href = '../public/index.html');
             }
         });
     </script>
 </body>
-
 </html>
