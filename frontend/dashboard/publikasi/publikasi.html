@@ -19,6 +19,7 @@
             padding: 15px;
             border-radius: 8px;
             border: 1px solid #e9ecef;
+            flex-wrap: wrap;
         }
 
         .filter-group {
@@ -37,7 +38,7 @@
             padding: 8px;
             border: 1px solid #ddd;
             border-radius: 4px;
-            min-width: 200px;
+            min-width: 150px;
         }
     </style>
 </head>
@@ -73,15 +74,21 @@
 
             <div class="filter-container">
                 <div class="filter-group">
-                    <label for="filterFocus">Filter Berdasarkan Fokus Riset:</label>
+                    <label for="filterFocus">Fokus Riset:</label>
                     <select id="filterFocus" class="filter-select">
-                        <option value="">-- Tampilkan Semua --</option>
+                        <option value="">-- Semua --</option>
                     </select>
                 </div>
                 <div class="filter-group">
-                    <label for="filterKategori">Filter Berdasarkan Kategori:</label>
+                    <label for="filterKategori">Kategori:</label>
                     <select id="filterKategori" class="filter-select">
-                        <option value="">-- Tampilkan Semua --</option>
+                        <option value="">-- Semua --</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filterTahun">Tahun:</label>
+                    <select id="filterTahun" class="filter-select">
+                        <option value="">-- Semua --</option>
                     </select>
                 </div>
             </div>
@@ -92,7 +99,7 @@
                         <tr>
                             <th>ID</th>
                             <th>Judul Publikasi</th>
-                            <th>Kategori</th>
+                            <th>Tahun</th> <th>Kategori</th>
                             <th>Fokus Riset</th>
                             <th>Dosen (NIDN)</th>
                             <th>Status</th>
@@ -101,7 +108,7 @@
                     </thead>
                     <tbody id="publikasiTableBody">
                         <tr>
-                            <td colspan="7" style="text-align:center;">Sedang memuat data...</td>
+                            <td colspan="8" style="text-align:center;">Sedang memuat data...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -112,7 +119,7 @@
     <div id="logoutModal" class="modal">
         <div class="modal-content">
             <h2>Konfirmasi Logout</h2>
-            <p>Apakah Anda yakin ingin keluar?</p>
+            <p>Yakin ingin keluar?</p>
             <button id="confirmLogoutBtn" class="btn btn-danger">Logout</button>
             <button id="cancelLogoutBtn" class="btn btn-secondary">Batal</button>
         </div>
@@ -138,10 +145,7 @@
                 const selectFocus = document.getElementById('filterFocus');
                 if (dataFocus.status === 'success') {
                     dataFocus.data.forEach(item => {
-                        const opt = document.createElement('option');
-                        opt.value = item.nama_fokus;
-                        opt.textContent = item.nama_fokus;
-                        selectFocus.appendChild(opt);
+                        selectFocus.innerHTML += `<option value="${item.nama_fokus}">${item.nama_fokus}</option>`;
                     });
                 }
 
@@ -151,10 +155,7 @@
                 const selectKat = document.getElementById('filterKategori');
                 if (dataKat.status === 'success') {
                     dataKat.data.forEach(item => {
-                        const opt = document.createElement('option');
-                        opt.value = item.nama_kategori;
-                        opt.textContent = item.nama_kategori;
-                        selectKat.appendChild(opt);
+                        selectKat.innerHTML += `<option value="${item.nama_kategori}">${item.nama_kategori}</option>`;
                     });
                 }
             } catch (error) { console.error('Filter Error:', error); }
@@ -167,41 +168,55 @@
 
                 if (result.status === 'success') {
                     allPublikasiData = result.data;
+                    populateYearFilter(allPublikasiData); // Isi filter tahun otomatis
                     renderTable(allPublikasiData);
                 } else {
-                    tableBody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Tidak ada data.</td></tr>';
+                    tableBody.innerHTML = '<tr><td colspan="8" style="text-align:center;">Tidak ada data.</td></tr>';
                 }
             } catch (error) {
                 console.error('Fetch Error:', error);
-                tableBody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:red;">Gagal memuat data API.</td></tr>';
+                tableBody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:red;">Gagal memuat data API.</td></tr>';
             }
+        }
+
+        // [BARU] Fungsi isi dropdown tahun berdasarkan data yang ada
+        function populateYearFilter(data) {
+            const selectYear = document.getElementById('filterTahun');
+            // Ambil tahun unik, hilangkan null/kosong, urutkan descending
+            const years = [...new Set(data.map(item => item.tahun))]
+                          .filter(y => y != null && y != "" && y != 0)
+                          .sort((a, b) => b - a);
+            
+            selectYear.innerHTML = '<option value="">-- Semua --</option>';
+            years.forEach(y => {
+                selectYear.innerHTML += `<option value="${y}">${y}</option>`;
+            });
         }
 
         function renderTable(data) {
             tableBody.innerHTML = '';
 
             if (data.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Data tidak ditemukan.</td></tr>';
+                tableBody.innerHTML = '<tr><td colspan="8" style="text-align:center;">Data tidak ditemukan.</td></tr>';
                 return;
             }
 
             data.forEach(item => {
                 const row = tableBody.insertRow();
-                const id = item.publikasi_id || item.id; // Support kedua format ID
+                const id = item.publikasi_id || item.id;
 
-                // Badge Status
                 let statusBadge = '<span class="status-pending">Pending</span>';
                 if (item.status === 'published') statusBadge = '<span class="status-published" style="background:#d4edda; color:#155724; padding:2px 8px; border-radius:10px;">Published</span>';
                 else if (item.status === 'rejected') statusBadge = '<span class="status-rejected" style="background:#f8d7da; color:#721c24; padding:2px 8px; border-radius:10px;">Rejected</span>';
 
                 const namaFokus = item.nama_fokus ? `<span style="background:#e3f2fd; color:#0d47a1; padding:2px 6px; border-radius:4px; font-size:12px;">${item.nama_fokus}</span>` : '-';
                 const btnLink = item.external_link ? `<a href="${item.external_link}" target="_blank" class="btn btn-sm btn-info" title="Lihat Link"><i class="fas fa-link"></i></a>` : '';
+                const tahunPub = item.tahun || '-'; // Tampilkan tahun
 
-                // --- BAGIAN UTAMA YANG DIPERBAIKI: TOMBOL EDIT ---
                 row.innerHTML = `
                     <td>${id}</td>
                     <td>${item.judul}</td>
-                    <td>${item.nama_kategori || '-'}</td>
+                    <td>${tahunPub}</td> <td>${item.nama_kategori || '-'}</td>
                     <td>${namaFokus}</td>
                     <td>
                         <strong>${item.nama_dosen || 'Unknown'}</strong><br>
@@ -226,11 +241,13 @@
         function applyFilters() {
             const focusVal = document.getElementById('filterFocus').value;
             const katVal = document.getElementById('filterKategori').value;
+            const yearVal = document.getElementById('filterTahun').value;
 
             const filteredData = allPublikasiData.filter(item => {
                 const matchFocus = focusVal === "" || item.nama_fokus === focusVal;
                 const matchKat = katVal === "" || item.nama_kategori === katVal;
-                return matchFocus && matchKat;
+                const matchYear = yearVal === "" || item.tahun == yearVal; // Logic filter tahun
+                return matchFocus && matchKat && matchYear;
             });
 
             renderTable(filteredData);
@@ -238,6 +255,7 @@
 
         document.getElementById('filterFocus').addEventListener('change', applyFilters);
         document.getElementById('filterKategori').addEventListener('change', applyFilters);
+        document.getElementById('filterTahun').addEventListener('change', applyFilters); // Event listener tahun
 
         async function verifyPublikasi(id, status) {
             const actionName = status === 'published' ? 'Publish' : 'Reject';
@@ -280,10 +298,9 @@
         document.getElementById('logoutTrigger').onclick = (e) => { e.preventDefault(); logoutModal.classList.add('show'); };
         document.getElementById('cancelLogoutBtn').onclick = () => logoutModal.classList.remove('show');
         document.getElementById('confirmLogoutBtn').onclick = async () => {
-            await fetch('../../../backend/api/auth/logout.php', { method: 'POST' });
+            try { await fetch('../../../backend/api/auth/logout.php', { method: 'POST' }); } catch (e) { }
             window.location.href = '../../public/index.html';
         };
     </script>
 </body>
-
 </html>

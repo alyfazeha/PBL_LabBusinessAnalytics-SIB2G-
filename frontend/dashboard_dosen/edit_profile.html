@@ -128,9 +128,8 @@
                     document.getElementById('pendidikan').value = data.pendidikan || '';
                     document.getElementById('sinta_url').value = data.sinta_url || '';
                     document.getElementById('scholar_url').value = data.scholar_url || '';
-                    document.getElementById('scopus_url').value = data.scopus_url || '';
                     
-                    // --- PERBAIKAN FINAL: PATH ABSOLUT ---
+                    // --- PATH ABSOLUT UNTUK PREVIEW FOTO ---
                     if (data.foto_path && data.foto_path !== "") {
                         let path = data.foto_path;
                         let finalPath = "/frontend/assets/img/default-profile.png"; // Default Absolute
@@ -143,13 +142,11 @@
                         if (path.startsWith('http')) {
                             finalPath = path;
                         } else {
-                            // [FIX] Gunakan path absolut dari root domain
-                            // Ini akan menghasilkan: http://domain.test/frontend/assets/uploads/dosen/foto.jpg
+                            // Gunakan path absolut dari root domain
                             finalPath = `/frontend/assets/uploads/dosen/${path}`;
                         }
                         
                         document.getElementById('previewFoto').src = finalPath;
-                        console.log("Loading Foto Edit (Absolut):", finalPath);
                     }
                     // ------------------------------------------
 

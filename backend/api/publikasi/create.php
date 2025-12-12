@@ -24,13 +24,19 @@ try {
     }
 
     // Tangkap Data
+    // ... kode atas tetap sama ...
+
+    // Tangkap Data
     $data = [
         'judul'         => $_POST['judul'] ?? null,
         'external_link' => $_POST['external_link'] ?? null,
         'kategori_id'   => $_POST['kategori_id'] ?? null,
         'dosen_nidn'    => $_POST['dosen_nidn'] ?? null,
-        'focus_id'      => $_POST['focus_id'] ?? null 
+        'focus_id'      => $_POST['focus_id'] ?? null,
+        'tahun'         => $_POST['tahun'] ?? date('Y') 
     ];
+
+    // ... validasi dan eksekusi tetap sama ...
 
     // Validasi
     if (!$data['judul'] || !$data['kategori_id'] || !$data['dosen_nidn'] || !$data['focus_id']) {

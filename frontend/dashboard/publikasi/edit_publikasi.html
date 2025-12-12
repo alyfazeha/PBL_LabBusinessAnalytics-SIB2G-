@@ -46,6 +46,11 @@
                 </div>
 
                 <div class="form-group">
+                    <label for="tahun">Tahun Publikasi <span class="required">*</span></label>
+                    <input type="number" id="tahun" name="tahun" required placeholder="YYYY" min="1900" max="2100">
+                </div>
+
+                <div class="form-group">
                     <label for="kategori_id">Kategori Publikasi <span class="required">*</span></label>
                     <select id="kategori_id" name="kategori_id" required>
                         <option value="">-- Sedang memuat... --</option>
@@ -157,9 +162,12 @@
 
                 if (result.status === 'success' && result.data) {
                     const data = result.data;
-                    document.getElementById('publikasi_id').value = data.id;
+                    document.getElementById('publikasi_id').value = data.id || data.publikasi_id;
                     document.getElementById('judul').value = data.judul;
                     document.getElementById('external_link').value = data.external_link;
+                    
+                    // [BARU] Isi Tahun
+                    document.getElementById('tahun').value = data.tahun || '';
 
                     // Set Value Dropdown
                     document.getElementById('kategori_id').value = data.kategori_id;
