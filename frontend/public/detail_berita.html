@@ -195,6 +195,21 @@
         const LIST_API_URL = '../../backend/api/contents/list_public.php';
 
         /**
+         * Helper function: Mengoreksi path gambar lokal yang tersimpan salah.
+         * Jika path adalah '../../assets/...' (dari database), 
+         * fungsi ini mengoreksinya menjadi '../assets/...' (yang dibutuhkan browser).
+         */
+        function getCorrectImagePath(path) {
+            if (path && !path.startsWith('http') && path.startsWith('../../')) {
+                // Hapus satu lapisan '../' hanya untuk path lokal yang disimpan dengan path PHP
+                return path.replace('../../', '../');
+            }
+            // Kembalikan path asli jika itu URL (http/https) atau path yang sudah benar
+            return path;
+        }
+
+
+        /**
          * Mengambil parameter 'slug' dari URL.
          */
         function getUrlSlug() {
@@ -208,7 +223,12 @@
         function renderBeritaDetail(data) {
             const container = document.getElementById('mainContent');
             const detailUrl = `detail_berita.html?slug=${data.slug || data.id}`;
-            const imageUrl = data.featured_image || '../assets/images/placeholder-berita.jpg';
+
+            // --- APLIKASI KOREKSI PATH DI SINI ---
+            const rawImageUrl = data.featured_image;
+            const imageUrl = getCorrectImagePath(rawImageUrl) || '../assets/images/placeholder-berita.jpg';
+            // -------------------------------------
+
             const kategoriNama = data.category_name || 'Umum';
             const tanggal = new Date(data.created_at).toLocaleDateString('id-ID', {
                 year: 'numeric', month: 'long', day: 'numeric'
@@ -226,23 +246,23 @@
 
             // 3. Render Konten Utama
             const htmlContent = `
-                <div class="berita-header">
-                    <h1>${data.title}</h1>
-                    <div class="meta-info">
-                        <span><i class="fa fa-user"></i> ${author}</span>
-                        <span><i class="fa fa-calendar-alt"></i> ${tanggal}</span>
-                        <span><i class="fa fa-tag"></i> ${kategoriNama}</span>
-                    </div>
+            <div class="berita-header">
+                <h1>${data.title}</h1>
+                <div class="meta-info">
+                    <span><i class="fa fa-user"></i> ${author}</span>
+                    <span><i class="fa fa-calendar-alt"></i> ${tanggal}</span>
+                    <span><i class="fa fa-tag"></i> ${kategoriNama}</span>
                 </div>
+            </div>
 
-                ${imageUrl ? `<div class="featured-image-wrapper">
-                    <img src="${imageUrl}" alt="Gambar Unggulan ${data.title}">
-                </div>` : ''}
+            ${imageUrl ? `<div class="featured-image-wrapper">
+                <img src="${imageUrl}" alt="Gambar Unggulan ${data.title}">
+            </div>` : ''}
 
-                <div class="berita-body">
-                    ${data.body}
-                </div>
-            `;
+            <div class="berita-body">
+                ${data.body}
+            </div>
+        `;
             container.innerHTML = htmlContent;
         }
 
@@ -277,12 +297,12 @@
                 document.getElementById('breadcrumbTitle').textContent = 'Tidak Ditemukan';
                 container.className = 'berita-detail-content'; // Reset class
                 container.innerHTML = `
-                    <div class="error-message" style="text-align: center; padding: 50px;">
-                        <h2 style="color: red;">Konten Tidak Ditemukan</h2>
-                        <p>Berita dengan URL ini tidak ada atau telah dihapus. (${error.message})</p>
-                        <a href="berita.html" class="main-button-secondary">Kembali ke Daftar Berita</a>
-                    </div>
-                `;
+                <div class="error-message" style="text-align: center; padding: 50px;">
+                    <h2 style="color: red;">Konten Tidak Ditemukan</h2>
+                    <p>Berita dengan URL ini tidak ada atau telah dihapus. (${error.message})</p>
+                    <a href="daftar-berita.html" class="main-button-secondary">Kembali ke Daftar Berita</a>
+                </div>
+            `;
             }
         };
 
@@ -316,19 +336,22 @@
                     recentData.forEach(item => {
                         const tanggal = new Date(item.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
                         const detailUrl = `detail_berita.html?slug=${item.slug || item.id}`;
-                        const imageUrl = item.featured_image || '../assets/images/placeholder-thumb.jpg';
+
+                        // --- APLIKASI KOREKSI PATH DI SINI ---
+                        const imageUrl = getCorrectImagePath(item.featured_image) || '../assets/images/placeholder-thumb.jpg';
+                        // -------------------------------------
 
                         html += `
-                            <div class="recent-post-item">
-                                <a href="${detailUrl}" class="post-thumb">
-                                    <img src="${imageUrl}" alt="${item.title}">
-                                </a>
-                                <div class="post-info">
-                                    <a href="${detailUrl}">${item.title}</a>
-                                    <span class="post-meta"><i class="fa fa-calendar-alt"></i> ${tanggal}</span>
-                                </div>
+                        <div class="recent-post-item">
+                            <a href="${detailUrl}" class="post-thumb">
+                                <img src="${imageUrl}" alt="${item.title}">
+                            </a>
+                            <div class="post-info">
+                                <a href="${detailUrl}">${item.title}</a>
+                                <span class="post-meta"><i class="fa fa-calendar-alt"></i> ${tanggal}</span>
                             </div>
-                        `;
+                        </div>
+                    `;
                     });
                     container.innerHTML = html;
                 } else {
@@ -356,11 +379,11 @@
                 document.getElementById('breadcrumbTitle').textContent = 'Invalid URL';
                 container.className = 'berita-detail-content';
                 container.innerHTML = `
-                    <div class="error-message" style="text-align: center; padding: 50px;">
-                        <h2 style="color: orange;">Parameter URL Hilang</h2>
-                        <p>URL tidak valid. Pastikan Anda mengakses dari <a href="berita.html">daftar berita</a>.</p>
-                    </div>
-                `;
+                <div class="error-message" style="text-align: center; padding: 50px;">
+                    <h2 style="color: orange;">Parameter URL Hilang</h2>
+                    <p>URL tidak valid. Pastikan Anda mengakses dari <a href="daftar-berita.html">daftar berita</a>.</p>
+                </div>
+            `;
             }
 
             // 2. Muat Berita Terbaru di Sidebar (Selalu jalankan)
