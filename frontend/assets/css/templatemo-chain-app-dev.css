@@ -3273,3 +3273,159 @@ responsive
 .dosen-scroll-container::-webkit-scrollbar-track {
   background: #f1f1f1;
 }
+
+
+/* 1. Perubahan Latar Belakang Halaman Menjadi Putih */
+#berita-section {
+  padding: 120px 0 80px 0;
+  background-color: #ffffff;
+  /* DIUBAH MENJADI PUTIH */
+}
+
+.section-heading h4 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #212529;
+  margin-bottom: 50px;
+}
+
+/* Container Grid untuk Kartu Berita */
+.berita-list-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 30px;
+}
+
+/* Card Berita */
+.berita-card {
+  background: #ffffff;
+  /* Kartu tetap putih */
+  border-radius: 15px;
+  overflow: hidden;
+  /* BOX SHADOW DITAMBAHKAN AGAR KARTU TERLIHAT DI ATAS LATAR BELAKANG PUTIH */
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.berita-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.berita-card img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+}
+
+.berita-content {
+  padding: 25px;
+}
+
+.berita-content small.meta {
+  display: block;
+  color: #6a6a6a;
+  font-size: 0.85rem;
+  margin-bottom: 10px;
+}
+
+.category-badge {
+  background-color: #4A90E2;
+  color: white;
+  padding: 3px 8px;
+  border-radius: 5px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.berita-content h4 {
+  font-size: 1.35rem;
+  font-weight: 600;
+  margin-bottom: 15px;
+  line-height: 1.4;
+  height: 3.5em;
+  overflow: hidden;
+  color: #000000;
+}
+
+.berita-content p {
+  font-size: 0.9rem;
+  color: #888;
+  margin-bottom: 20px;
+  height: 4.5em;
+  overflow: hidden;
+}
+
+.read-more {
+  color: #007bff;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.read-more:hover {
+  color: #0056b3;
+  text-decoration: underline;
+}
+
+.loading-message,
+.error-message {
+  text-align: center;
+  padding: 40px;
+  font-size: 1.2rem;
+  color: #555;
+  width: 100%;
+  grid-column: 1 / -1;
+}
+
+.error-message {
+  color: #e3342f;
+  background-color: #fceceb;
+  border: 1px solid #f9caca;
+  border-radius: 8px;
+}
+
+/* Hero Section - Tidak diubah, tetap menggunakan background image */
+#berita-hero {
+  background-image: url('../assets/images/heading-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  height: 350px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: white;
+  position: relative;
+  padding-top: 50px;
+}
+
+#berita-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #4b8ef1;
+  z-index: 1;
+  /* Tambahkan efek agar menyatu dengan background putih di bawah */
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+#berita-hero .content {
+  position: relative;
+  z-index: 2;
+}
+
+#berita-hero h2 {
+  font-size: 3.5rem;
+  font-weight: 900;
+  margin-bottom: 10px;
+}
+
+#berita-hero p {
+  font-size: 1.2rem;
+  opacity: 0.9;
+}
