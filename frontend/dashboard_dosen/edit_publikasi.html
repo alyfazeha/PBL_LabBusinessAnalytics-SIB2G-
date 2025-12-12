@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Publikasi</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="../assets/css/dashboarddns.css">
+    <link rel="stylesheet" href="/frontend/assets/css/dashboarddns.css">
 </head>
 
 <body>
@@ -25,89 +25,157 @@
 
     <main class="main-content">
         <div class="content-card">
-            <h2><i class="fas fa-edit"></i> Edit Publikasi: Implementasi AI</h2>
+            <h2><i class="fas fa-edit"></i> Edit Publikasi</h2>
 
-            <form action="publikasi.html" method="POST">
-                <input type="hidden" name="id_publikasi" value="PBL001">
+            <form id="formEditPublikasi">
+                <input type="hidden" name="id" id="pub_id">
+                <input type="hidden" name="dosen_nidn" id="dosen_nidn">
 
                 <div class="form-grid">
 
                     <div class="form-group full-width">
                         <label for="judul">Judul Publikasi</label>
-                        <input type="text" id="judul" name="judul_publikasi"
-                            value="Implementasi AI dalam Kurikulum 2024" required>
+                        <input type="text" id="judul" name="judul" required>
                     </div>
 
                     <div class="form-group">
-                        <label for="jenis">Jenis Publikasi</label>
-                        <select id="jenis" name="jenis_publikasi" required>
-                            <option value="Jurnal Internasional" selected>Jurnal Internasional</option>
-                            <option value="Jurnal Nasional">Jurnal Nasional</option>
-                            <option value="Artikel Konferensi">Artikel Konferensi</option>
-                            <option value="Buku">Buku</option>
+                        <label for="tahun">Tahun Publikasi</label>
+                        <input type="number" id="tahun" name="tahun" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="kategori_id">Kategori Publikasi</label>
+                        <select id="kategori_id" name="kategori_id" required>
+                            <option value="">-- Memuat... --</option>
                         </select>
                     </div>
 
                     <div class="form-group">
-                        <label for="tanggal">Tanggal Publikasi</label>
-                        <input type="date" id="tanggal" name="tanggal_publikasi" value="2025-01-10" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="doi">DOI Publikasi</label>
-                        <input type="text" id="doi" name="doi_publikasi" value="10.1234/ai.2025.1"
-                            placeholder="Opsional">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="status">Status Publikasi</label>
-                        <select id="status" name="status_publikasi" required>
-                            <option value="Published" selected>Published</option>
-                            <option value="Draft">Draft</option>
-                            <option value="Review">Review</option>
+                        <label for="focus_id">Topik Riset</label>
+                        <select id="focus_id" name="focus_id" required>
+                            <option value="">-- Memuat... --</option>
                         </select>
-                    </div>
-
-                    <div class="form-group full-width">
-                        <label for="abstrak">Abstrak/Ringkasan Publikasi</label>
-                        <textarea id="abstrak" name="abstrak" rows="5"
-                            required>Penelitian ini membahas tentang integrasi Artificial Intelligence...</textarea>
                     </div>
 
                     <div class="form-group full-width">
                         <label for="link">Link Dokumen / Jurnal (URL)</label>
-                        <input type="url" id="link" name="link_dokumen"
-                            value="https://jurnal.universitas.ac.id/implementasi-ai"
+                        <input type="url" id="external_link" name="external_link"
                             placeholder="Contoh: https://jurnal.universitas.ac.id/...">
                     </div>
 
                     <div class="form-group full-width">
-                        <button type="submit" class="btn-submit"><i class="fas fa-save"></i> Perbarui Publikasi</button>
+                        <button type="submit" id="btnSimpan" class="btn-submit"><i class="fas fa-save"></i> Perbarui Publikasi</button>
                     </div>
                 </div>
             </form>
         </div>
     </main>
 
+    <style>
+        /* Mempertahankan style asli */
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .full-width { grid-column: span 2; }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group label { margin-bottom: 5px; font-weight: bold; }
+        .form-group input, .form-group select, .form-group textarea { padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
+        .btn-submit { background-color: #007bff; color: white; padding: 10px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        .btn-submit:hover { background-color: #0056b3; }
+        @media (max-width: 768px) { .form-grid { grid-template-columns: 1fr; } .full-width { grid-column: span 1; } }
+    </style>
+
     <script>
-        // Logika Logout
+        // Ambil ID dari URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const idPublikasi = urlParams.get('id');
+
+        // 1. Fungsi Load Data
+        async function initPage() {
+            if (!idPublikasi) {
+                alert("ID Publikasi tidak ditemukan.");
+                window.location.href = 'publikasi.html';
+                return;
+            }
+
+            try {
+                // A. Load Kategori
+                const resKat = await fetch('../../backend/api/publikasi/kategori_list.php');
+                const jsonKat = await resKat.json();
+                const selKat = document.getElementById('kategori_id');
+                selKat.innerHTML = '<option value="">-- Pilih Kategori --</option>';
+                jsonKat.data.forEach(d => selKat.innerHTML += `<option value="${d.id}">${d.nama_kategori}</option>`);
+
+                // B. Load Fokus
+                const resFoc = await fetch('../../backend/api/research/list.php');
+                const jsonFoc = await resFoc.json();
+                const selFoc = document.getElementById('focus_id');
+                selFoc.innerHTML = '<option value="">-- Pilih Topik --</option>';
+                jsonFoc.data.forEach(d => selFoc.innerHTML += `<option value="${d.focus_id}">${d.nama_fokus}</option>`);
+
+                // C. Load Detail Data (Untuk Mengisi Form)
+                const resDetail = await fetch(`../../backend/api/publikasi/detail.php?id=${idPublikasi}`);
+                const jsonDetail = await resDetail.json();
+
+                if (jsonDetail.status === 'success') {
+                    const data = jsonDetail.data;
+                    // Isi Input Hidden
+                    document.getElementById('pub_id').value = data.id || data.publikasi_id;
+                    document.getElementById('dosen_nidn').value = data.dosen_nidn;
+
+                    // Isi Input Visible
+                    document.getElementById('judul').value = data.judul;
+                    document.getElementById('tahun').value = data.tahun;
+                    document.getElementById('kategori_id').value = data.kategori_id;
+                    document.getElementById('focus_id').value = data.focus_id;
+                    document.getElementById('external_link').value = data.external_link;
+                } else {
+                    alert("Gagal mengambil data publikasi.");
+                }
+
+            } catch (error) { console.error('Error:', error); }
+        }
+
+        // 2. Submit Perubahan
+        document.getElementById('formEditPublikasi').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btnSimpan');
+            btn.innerHTML = 'Menyimpan...';
+            btn.disabled = true;
+
+            const formData = new FormData(e.target);
+
+            try {
+                const response = await fetch('../../backend/api/publikasi/update.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    alert('Publikasi berhasil diperbarui!');
+                    window.location.href = 'publikasi.html';
+                } else {
+                    alert('Gagal: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Terjadi kesalahan koneksi.');
+            } finally {
+                btn.innerHTML = '<i class="fas fa-save"></i> Perbarui Publikasi';
+                btn.disabled = false;
+            }
+        });
+
+        // Jalankan saat load
+        document.addEventListener('DOMContentLoaded', initPage);
+
+        // Logout
         document.getElementById('logoutLink').addEventListener('click', function (e) {
             e.preventDefault();
-            if (confirm('Apakah Anda yakin ingin keluar dari sistem?')) {
-                const logoutUrl = '../../backend/api/auth/logout.php';
-                fetch(logoutUrl, { method: 'POST' })
-                    .then(response => response.json())
-                    .then(data => {
-                        alert(data.message);
-                        window.location.href = '../public/index.html';
-                    })
-                    .catch(error => {
-                        alert('Terjadi kesalahan saat logout.');
-                        window.location.href = '../public/index.html';
-                    });
+            if (confirm('Keluar sistem?')) {
+                fetch('../../backend/api/auth/logout.php', { method: 'POST' })
+                    .then(() => window.location.href = '../public/index.html');
             }
         });
     </script>
 </body>
-
 </html>
