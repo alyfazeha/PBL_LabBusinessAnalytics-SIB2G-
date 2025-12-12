@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Status & Riwayat Peminjaman</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../../frontend/assets/css/dashboardmhs.css">
+</head>
+
+<body>
+    <aside class="mhs-sidebar">
+        <div class="mhs-logo-area">
+            <h2><i class="fas fa-graduation-cap"></i> MHS DASHBOARD</h2>
+        </div>
+        <nav>
+            <a href="index.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="profile.html"><i class="fas fa-user-circle"></i> Profil</a>
+            <a href="peminjaman.html"><i class="fas fa-laptop-code"></i> Ajukan Peminjaman</a>
+            <a href="riwayat.html" class="active"><i class="fas fa-history"></i> Status & Riwayat</a>
+            <a href="#"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <div class="content-card">
+            <h2><i class="fas fa-list-alt"></i> Status & Riwayat Peminjaman Aset</h2>
+
+            <div style="overflow-x: auto;">
+                <table class="status-table">
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>Kode Peminjaman</th>
+                            <th>Aset</th>
+                            <th>Tanggal Pinjam</th>
+                            <th>Tanggal Kembali</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>PJ-20251210-003</td>
+                            <td>Laptop Laboratorium (1 unit)</td>
+                            <td>15/12/2025</td>
+                            <td>18/12/2025</td>
+                            <td><span class="badge approved">Disetujui</span></td>
+                            <td>
+                                <div class="action-buttons"><button class="detail-btn"><i class="fas fa-eye"></i>
+                                        Detail</button></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>PJ-20251208-002</td>
+                            <td>Proyektor (1 unit)</td>
+                            <td>10/12/2025</td>
+                            <td>10/12/2025</td>
+                            <td><span class="badge finished">Selesai</span></td>
+                            <td>
+                                <div class="action-buttons"><button class="detail-btn"><i class="fas fa-eye"></i>
+                                        Detail</button></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>PJ-20251207-001</td>
+                            <td>Kamera DSLR (1 unit)</td>
+                            <td>09/12/2025</td>
+                            <td>12/12/2025</td>
+                            <td><span class="badge pending">Menunggu</span></td>
+                            <td>
+                                <div class="action-buttons"><button class="detail-btn"><i class="fas fa-eye"></i>
+                                        Detail</button></div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</body>
+
+</html>

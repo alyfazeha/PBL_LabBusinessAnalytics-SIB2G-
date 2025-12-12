@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Mahasiswa - Peminjaman</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../../frontend/assets/css/dashboardmhs.css">
+</head>
+
+<body>
+    <aside class="mhs-sidebar">
+        <div class="mhs-logo-area">
+            <h2><i class="fas fa-graduation-cap"></i> MHS DASHBOARD</h2>
+        </div>
+        <nav>
+            <a href="index.html" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="profile.html"><i class="fas fa-user-circle"></i> Profil</a>
+            <a href="peminjaman.html"><i class="fas fa-laptop-code"></i> Ajukan Peminjaman</a>
+            <a href="riwayat.html"><i class="fas fa-history"></i> Status & Riwayat</a>
+            <a href="#"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header class="dashboard-header">
+            <h1>Selamat Datang, [Nama Mahasiswa]!</h1>
+            <p>Anda telah login ke sistem peminjaman aset. Berikut adalah ringkasan status Anda.</p>
+        </header>
+
+        <div class="status-grid">
+            <div class="status-card approved">
+                <div class="status-info">
+                    <h3>Peminjaman Disetujui</h3>
+                    <p>2</p>
+                </div>
+                <div class="status-icon"><i class="fas fa-check-circle"></i></div>
+            </div>
+            <div class="status-card pending">
+                <div class="status-info">
+                    <h3>Menunggu Persetujuan</h3>
+                    <p>1</p>
+                </div>
+                <div class="status-icon"><i class="fas fa-clock"></i></div>
+            </div>
+            <div class="status-card rejected">
+                <div class="status-info">
+                    <h3>Ditolak/Dibatalkan</h3>
+                    <p>0</p>
+                </div>
+                <div class="status-icon"><i class="fas fa-times-circle"></i></div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <h2><i class="fas fa-bullhorn"></i> Informasi & Pengumuman Terbaru</h2>
+            <p style="text-align: center; color: #666;">Saat ini tidak ada pengumuman terbaru.</p>
+        </div>
+    </main>
+</body>
+
+</html>
