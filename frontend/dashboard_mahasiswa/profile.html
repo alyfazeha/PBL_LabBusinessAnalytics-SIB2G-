@@ -19,7 +19,7 @@
             <a href="profile.html" class="active"><i class="fas fa-user-circle"></i> Profil</a>
             <a href="peminjaman.html"><i class="fas fa-laptop-code"></i> Ajukan Peminjaman</a>
             <a href="riwayat.html"><i class="fas fa-history"></i> Status & Riwayat</a>
-            <a href="#"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            <a href="#" id="logoutLink"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </nav>
     </aside>
 
@@ -62,6 +62,49 @@
             <a href="edit_profile.html" class="btn-edit-profile"><i class="fas fa-edit"></i> Edit Profil</a>
         </div>
     </main>
+
+    <script>
+        document.getElementById('logoutLink').addEventListener('click', function (e) {
+            e.preventDefault(); // Mencegah navigasi default
+
+            // 1. Konfirmasi kepada pengguna
+            const isConfirmed = confirm('Apakah Anda yakin ingin keluar dari sistem?');
+
+            if (isConfirmed) {
+                // 2. Tentukan path ke logout.php
+                // Asumsi: Jika dashboard_mahasiswa/index.html berada di project root/dashboard_mahasiswa/,
+                // dan logout.php berada di project root/backend/auth/logout.php
+                // Anda mungkin perlu menyesuaikan path ini tergantung pada struktur root project Anda
+                const logoutUrl = '../../backend/api/auth/logout.php';
+
+                fetch(logoutUrl, {
+                    method: 'POST', // Gunakan POST karena logout.php Anda memproses session
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert(data.message);
+                            // 3. Redirect ke halaman login setelah berhasil logout
+                            // Asumsi halaman login ada di index.html atau login.html di root
+                            window.location.href = '../public/index.html'; // Sesuaikan path ini jika halaman login berbeda
+                        } else {
+                            alert('Logout Gagal: ' + data.message);
+                            // Jika gagal (misalnya tidak ada sesi), tetap arahkan ke halaman login
+                            window.location.href = '../public/index.html'; // Sesuaikan path ini jika halaman login berbeda
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error saat melakukan logout:', error);
+                        alert('Terjadi kesalahan jaringan atau server. Logout gagal.');
+                        // Sebagai fallback, tetap arahkan pengguna ke halaman login
+                            window.location.href = '../public/index.html'; // Sesuaikan path ini jika halaman login berbeda
+                    });
+            }
+        });
+    </script>
 </body>
 
 </html>
