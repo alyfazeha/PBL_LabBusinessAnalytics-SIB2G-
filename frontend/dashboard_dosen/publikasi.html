@@ -35,7 +35,8 @@
                     <div class="pub-info">
                         <h3>Implementasi AI dalam Kurikulum 2024</h3>
                         <p>Jenis: **Jurnal Internasional** | Tanggal: 10 Jan 2025 | DOI: 10.1234/ai.2025.1 | Status:
-                            <span class="badge published">Published</span></p>
+                            <span class="badge published">Published</span>
+                        </p>
                     </div>
                     <div class="pub-actions">
                         <a href="edit_publikasi.html" class="btn-edit"><i class="fas fa-edit"></i> Edit</a>
@@ -59,19 +60,20 @@
     </main>
 
     <script>
+        // Logika Logout
         document.getElementById('logoutLink').addEventListener('click', function (e) {
             e.preventDefault();
             if (confirm('Apakah Anda yakin ingin keluar dari sistem?')) {
-                const logoutUrl = '../../backend/auth/logout.php';
+                const logoutUrl = '../../backend/api/auth/logout.php';
                 fetch(logoutUrl, { method: 'POST' })
                     .then(response => response.json())
                     .then(data => {
                         alert(data.message);
-                        window.location.href = '../../index.html';
+                        window.location.href = '../public/index.html';
                     })
                     .catch(error => {
                         alert('Terjadi kesalahan saat logout.');
-                        window.location.href = '../../index.html';
+                        window.location.href = '../public/index.html';
                     });
             }
         });
