@@ -1,0 +1,471 @@
+/* css/dashboarddsn.css - VERSI FINAL DENGAN SIDEBAR MHS + LOGO 2 BARIS */
+
+/* Warna Utama yang Konsisten (Sesuai dashboardmhs.css) */
+:root {
+    --primary-blue: #4A90E2;
+    --light-blue: #75BBF7;
+    --dark-grey: #333;
+    /* Warna Sidebar Mahasiswa/Dosen */
+    --light-bg: #f4f6f9;
+    --font: 'Poppins', sans-serif;
+    --accent-color: #FFC107;
+    /* Kuning untuk Aksen/Info */
+    --success-color: #28A745;
+    /* Hijau untuk Status Sukses */
+    --danger-color: #dc3545;
+    /* Merah untuk Status Gagal */
+}
+
+/* Base Styling */
+body {
+    font-family: var(--font);
+    margin: 0;
+    padding: 0;
+    background-color: var(--light-bg);
+    display: flex;
+}
+
+/* ================== SIDEBAR (NAVIGASI) KHUSUS DOSEN (IDENTIK DENGAN MAHASISWA) ================== */
+.dsn-sidebar {
+    width: 250px;
+    background-color: var(--dark-grey);
+    color: #fff;
+    height: 100vh;
+    position: fixed;
+    padding-top: 20px;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+    z-index: 100;
+}
+
+.dsn-logo-area {
+    text-align: center;
+    padding: 20px 0;
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dsn-logo-area h2 {
+    color: var(--primary-blue);
+    margin: 0;
+    font-weight: 700;
+    font-size: 1.5em;
+}
+
+/* Tambahan: Styling untuk teks DASHBOARD di baris kedua */
+.dsn-logo-area h2 span {
+    display: block;
+    font-size: 0.8em;
+    font-weight: 500;
+    color: #e0e0e0;
+    /* Warna teks yang lebih kalem untuk baris kedua */
+    margin-top: -5px;
+}
+
+
+.dsn-sidebar nav a {
+    display: flex;
+    align-items: center;
+    padding: 15px 25px;
+    color: #e0e0e0;
+    text-decoration: none;
+    font-weight: 500;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.dsn-sidebar nav a:hover,
+.dsn-sidebar nav a.active {
+    background-color: var(--primary-blue);
+    color: #fff;
+    border-left: 5px solid var(--accent-color);
+    padding-left: 20px;
+}
+
+.dsn-sidebar nav a i {
+    margin-right: 15px;
+    font-size: 1.2em;
+}
+
+/* ================== MAIN CONTENT & CARD STYLING (Konsisten) ================== */
+.main-content {
+    margin-left: 250px;
+    padding: 30px;
+    width: calc(100% - 250px);
+    flex-grow: 1;
+}
+
+/* DASHBOARD HEADER */
+header.dashboard-header {
+    background: linear-gradient(135deg, var(--primary-blue), #387ac0);
+    color: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+}
+
+header.dashboard-header h1 {
+    margin: 0 0 5px 0;
+    font-weight: 700;
+    font-size: 2em;
+}
+
+/* STATUS CARD */
+.status-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+    margin-bottom: 40px;
+}
+
+.status-card {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: transform 0.3s, box-shadow 0.3s;
+    border-left: 5px solid transparent;
+}
+
+.status-card.pending {
+    border-left-color: var(--accent-color);
+}
+
+.status-card.approved {
+    border-left-color: var(--success-color);
+}
+
+.status-card.rejected {
+    border-left-color: var(--danger-color);
+}
+
+.status-info h3 {
+    font-size: 1em;
+    color: #666;
+    margin: 0 0 5px 0;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.status-info p {
+    font-size: 2.2em;
+    font-weight: 700;
+    color: var(--dark-grey);
+    margin: 0;
+}
+
+.status-icon i {
+    font-size: 2.5em;
+    color: var(--primary-blue);
+}
+
+.status-card.pending .status-icon i {
+    color: var(--accent-color);
+}
+
+.status-card.approved .status-icon i {
+    color: var(--success-color);
+}
+
+.status-card.rejected .status-icon i {
+    color: var(--danger-color);
+}
+
+/* CONTENT CARD */
+.content-card {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    max-width: 900px;
+    margin: 0 auto 30px auto;
+    position: relative;
+    overflow: hidden;
+}
+
+.content-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 8px;
+    background-color: var(--primary-blue);
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+
+.content-card h2 {
+    color: var(--dark-grey);
+    font-weight: 700;
+    font-size: 1.8em;
+    margin-bottom: 20px;
+    padding-top: 15px;
+    text-align: center;
+}
+
+/* ================== FORM & PROFIL STYLING (IDENTIK) ================== */
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px 40px;
+}
+
+.form-group {
+    margin-bottom: 25px;
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--dark-grey);
+    font-size: 0.95em;
+}
+
+.form-group input:not([type="submit"]),
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 13px;
+    border: 1px solid #dcdcdc;
+    border-radius: 8px;
+    font-family: var(--font);
+    font-size: 1em;
+    color: #444;
+    background-color: #fcfcfc;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    border-color: var(--primary-blue);
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(74, 144, 226, 0.15);
+}
+
+.full-width {
+    grid-column: 1 / -1;
+}
+
+/* Tombol Submit */
+.btn-submit {
+    background-color: var(--primary-blue);
+    color: #fff;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    display: block;
+    width: 100%;
+    margin-top: 20px;
+    box-shadow: 0 4px 10px rgba(74, 144, 226, 0.3);
+}
+
+.btn-submit:hover {
+    background-color: #387ac0;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(74, 144, 226, 0.4);
+}
+
+/* Profil Info Group */
+.profile-info-group {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 15px;
+    padding: 15px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.profile-info-group:last-child {
+    border-bottom: none;
+}
+
+.profile-info-group label {
+    font-weight: 600;
+    color: var(--primary-blue);
+    text-align: right;
+    padding-right: 15px;
+}
+
+.profile-info-group p {
+    margin: 0;
+    color: var(--dark-grey);
+    font-weight: 500;
+}
+
+.btn-edit-profile {
+    display: block;
+    width: 100%;
+    max-width: 300px;
+    margin: 30px auto 0;
+    background-color: var(--accent-color);
+    color: var(--dark-grey);
+    padding: 12px;
+    border-radius: 8px;
+    text-align: center;
+    text-decoration: none;
+    font-weight: 700;
+    transition: all 0.3s;
+}
+
+.btn-edit-profile:hover {
+    background-color: #e0a800;
+    transform: translateY(-2px);
+}
+
+
+/* ================== TABEL & BADGE STYLING (Konsisten) ================== */
+.status-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.status-table th,
+.status-table td {
+    padding: 16px;
+    text-align: left;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.status-table th {
+    background-color: var(--light-blue);
+    color: #fff;
+    padding: 16px;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.95em;
+}
+
+.status-table tr:hover {
+    background-color: #f5f9ff;
+}
+
+.badge {
+    padding: 7px 12px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.8em;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.badge.pending {
+    background-color: #fff3e0;
+    color: #ff9800;
+}
+
+.badge.approved,
+.badge.published {
+    background-color: #e8f5e9;
+    color: #43a047;
+}
+
+.badge.rejected {
+    background-color: #ffebee;
+    color: #e53935;
+}
+
+.badge.finished {
+    background-color: #e3f2fd;
+    color: #2196f3;
+}
+
+.badge.dibatalkan {
+    background-color: #f0f0f0;
+    color: #6c757d;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+.action-buttons a,
+.action-buttons button {
+    padding: 8px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.3s;
+}
+
+.action-buttons .detail-btn {
+    background-color: var(--primary-blue);
+    color: #fff;
+}
+
+.action-buttons .detail-btn:hover {
+    background-color: #387ac0;
+}
+
+/* ================== PUBLIKASI SPESIFIK ================== */
+.btn-add-pub {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    margin-bottom: 20px;
+    background-color: var(--success-color);
+    color: #fff;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.publication-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.pub-item {
+    background-color: #fcfcfc;
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.pub-info h3 {
+    margin: 0 0 5px 0;
+    color: var(--primary-blue);
+    font-size: 1.2em;
+}
+
+.pub-info p {
+    margin: 0;
+    color: #666;
+    font-size: 0.9em;
+}
+
+.pub-actions a,
+.pub-actions button {
+    margin-left: 10px;
+    font-weight: 600;
+}
+
+.pub-actions .btn-edit {
+    background-color: var(--accent-color);
+    color: var(--dark-grey);
+}
+
+.pub-actions .btn-delete {
+    background-color: var(--danger-color);
+    color: #fff;
+}
