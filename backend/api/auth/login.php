@@ -54,6 +54,21 @@ $_SESSION["username"] = $user["username"];
 $_SESSION["display_name"] = $user["display_name"];
 $_SESSION["email"] = $user["email"];
 
+// --- TAMBAHAN PENTING (Agar Profile & Peminjaman Mahasiswa Tidak Error) ---
+// Kita cek: Jika role-nya mahasiswa, ambil NIM-nya dari tabel 'mahasiswa'
+if ($user['role'] === 'mahasiswa') {
+    $stmtMhs = $conn->prepare("SELECT nim FROM mahasiswa WHERE user_id = :uid LIMIT 1");
+    $stmtMhs->execute(['uid' => $user['user_id']]);
+    $mhs = $stmtMhs->fetch(PDO::FETCH_ASSOC);
+
+    if ($mhs) {
+        $_SESSION['nim'] = $mhs['nim']; // <--- Ini kunci perbaikannya
+    } else {
+        // Antisipasi jika data di tabel mahasiswa belum ada
+        $_SESSION['nim'] = null;
+    }
+}
+
 // Output JSON ke frontend
 echo json_encode([
     "success" => true,

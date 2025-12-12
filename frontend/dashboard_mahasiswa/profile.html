@@ -12,58 +12,113 @@
 <body>
     <aside class="mhs-sidebar">
         <div class="mhs-logo-area">
-            <h2><i class="fas fa-graduation-cap"></i> MHS DASHBOARD</h2>
+            <h2><i class="fas fa-graduation-cap"></i>MAHASISWA DASHBOARD</h2>
         </div>
         <nav>
             <a href="index.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
             <a href="profile.html" class="active"><i class="fas fa-user-circle"></i> Profil</a>
-            <a href="peminjaman.html"><i class="fas fa-laptop-code"></i> Ajukan Peminjaman</a>
-            <a href="riwayat.html"><i class="fas fa-history"></i> Status & Riwayat</a>
+            <a href="../public/peminjaman-mahasiswa.html"><i class="fas fa-laptop-code"></i> Ajukan Peminjaman</a>
+            <a href="../public/status-peminjaman-mahasiswa.html"><i class="fas fa-history"></i> Status & Riwayat</a>
             <a href="#" id="logoutLink"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </nav>
     </aside>
 
-    <main class="main-content">
+<main class="main-content">
         <div class="content-card">
             <h2><i class="fas fa-id-badge"></i> Profil Mahasiswa</h2>
 
             <div class="profile-header">
-                <h3>Budi Santoso</h3>
-                <p style="color: #777;">20230101001 / Teknik Informatika</p>
+                <h3 id="header_nama"></h3>
+                <p style="color: #777;">
+                    <span id="header_nim"></span> / <span id="header_prodi"></span>
+                </p>
             </div>
 
             <div style="max-width: 600px; margin: 0 auto;">
-                <div class="profile-info-group"><label>NIM</label>
-                    <p>20230101001</p>
+                
+                <div class="profile-info-group">
+                    <label>NIM</label>
+                    <p id="view_nim">Loading...</p>
                 </div>
-                <div class="profile-info-group"><label>Nama Lengkap</label>
-                    <p>Budi Santoso</p>
+                
+                <div class="profile-info-group">
+                    <label>Nama Lengkap</label>
+                    <p id="view_nama">-</p>
                 </div>
-                <div class="profile-info-group"><label>Program Studi</label>
-                    <p>Teknik Informatika</p>
+                
+                <div class="profile-info-group">
+                    <label>Program Studi</label>
+                    <p id="view_prodi">-</p>
                 </div>
-                <div class="profile-info-group"><label>Angkatan</label>
-                    <p>2023</p>
+                
+                <div class="profile-info-group">
+                    <label>Tingkat / Semester</label>
+                    <p id="view_tingkat">-</p>
                 </div>
-                <div class="profile-info-group"><label>Status</label>
-                    <p style="font-weight: 700; color: var(--success-color);">Aktif</p>
+
+                <div class="profile-info-group">
+                    <label>Email</label>
+                    <p id="view_email">-</p>
                 </div>
-                <div class="profile-info-group"><label>Email</label>
-                    <p>budi.santoso@students.ac.id</p>
+                
+                <div class="profile-info-group">
+                    <label>Nomor HP</label>
+                    <p id="view_no_hp">-</p>
                 </div>
-                <div class="profile-info-group"><label>Nomor HP</label>
-                    <p>08123456789</p>
-                </div>
-                <div class="profile-info-group"><label>Alamat</label>
-                    <p>Jl. Merdeka No. 10, Jakarta Pusat</p>
+                
+                <div class="profile-info-group">
+                    <label>Status</label>
+                    <p style="font-weight: 700; color: #28a745;">Aktif</p>
                 </div>
             </div>
 
-            <a href="edit_profile.html" class="btn-edit-profile"><i class="fas fa-edit"></i> Edit Profil</a>
+            <a href="edit_profile.html" class="btn-edit-profile" style="display: block; width: max-content; margin: 30px auto 0; text-decoration: none; background: #007bff; color: white; padding: 10px 20px; border-radius: 5px; text-align: center;">
+                <i class="fas fa-edit"></i> Edit Profil
+            </a>
         </div>
     </main>
 
     <script>
+        const API_BASE_URL = '../../backend/api/';
+        async function loadProfile() {
+            try {
+                // Panggil detail.php. 
+                // Karena kita login sebagai mahasiswa, backend otomatis pakai $_SESSION['nim']
+                const response = await fetch(API_BASE_URL + 'mahasiswa/detail.php');
+                
+                // Cek jika session habis (401)
+                if (response.status === 401) {
+                    alert('Sesi habis. Silakan login kembali.');
+                    window.location.href = '../../public/index.html';
+                    return;
+                }
+
+                const result = await response.json();
+
+                if (result.success && result.data) {
+                    const d = result.data;
+                    // Isi data ke HTML
+                    document.getElementById('view_nim').textContent = d.nim;
+                    document.getElementById('header_nim').textContent = d.nim;
+                    document.getElementById('view_nama').textContent = d.nama;
+                    document.getElementById('header_nama').textContent = d.nama;
+                    document.getElementById('view_prodi').textContent = d.prodi;
+                    document.getElementById('header_prodi').textContent = d.prodi;
+                    document.getElementById('view_tingkat').textContent = d.tingkat || '-';
+                    document.getElementById('view_email').textContent = d.email || '-';
+                    document.getElementById('view_no_hp').textContent = d.no_hp || '-';
+                } else {
+                    document.querySelector('.profile-details').innerHTML = `<p style="color:red; text-align:center;">Gagal memuat data: ${result.message}</p>`;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                document.querySelector('.profile-details').innerHTML = '<p style="color:red; text-align:center;">Terjadi kesalahan koneksi.</p>';
+            }
+        }
+        // Jalankan saat halaman siap
+        document.addEventListener('DOMContentLoaded', loadProfile);
+        
+        //LOGOUT
         document.getElementById('logoutLink').addEventListener('click', function (e) {
             e.preventDefault(); // Mencegah navigasi default
 
@@ -71,10 +126,6 @@
             const isConfirmed = confirm('Apakah Anda yakin ingin keluar dari sistem?');
 
             if (isConfirmed) {
-                // 2. Tentukan path ke logout.php
-                // Asumsi: Jika dashboard_mahasiswa/index.html berada di project root/dashboard_mahasiswa/,
-                // dan logout.php berada di project root/backend/auth/logout.php
-                // Anda mungkin perlu menyesuaikan path ini tergantung pada struktur root project Anda
                 const logoutUrl = '../../backend/api/auth/logout.php';
 
                 fetch(logoutUrl, {
@@ -106,5 +157,4 @@
         });
     </script>
 </body>
-
 </html>
