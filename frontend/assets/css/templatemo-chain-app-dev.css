@@ -1663,6 +1663,8 @@ the-dosen-member / Anggota Dosen Style
   /* Padding atas dan bawah diperbesar untuk memberi ruang bayangan */
   margin-bottom: 30px;
   /* Jarak bawah kartu tetap 30px */
+  position: relative;
+  z-index: 10;
 }
 
 /* Efek Hover Melayang (SOLUSI CLIPPING DITERAPKAN) */
@@ -1676,6 +1678,39 @@ the-dosen-member / Anggota Dosen Style
   /* **SOLUSI CLIPPING:** Pastikan di lapisan teratas */
   position: relative;
   z-index: 100;
+}
+
+/*
+   Perbaikan Text Overflow di dalam Card Anggota
+*/
+
+/* Targetkan area yang berisi deskripsi/tulisan panjang */
+.member-card .down-content p {
+  /* Wajib: Batasi teks agar turun baris */
+  white-space: normal;
+
+  /* Opsional: Jika Anda ingin membatasi tinggi dan menampilkan elipsis (...) */
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  /* Batasi hingga 2 baris */
+  -webkit-box-orient: vertical;
+  text-overflow: ellipsis;
+  line-height: 1.5;
+  /* Jaga agar baris tidak terlalu rapat */
+  height: 3em;
+  /* 2 baris * 1.5 line-height = 3em */
+}
+
+
+/* Pastikan judul/nama juga tidak terlalu panjang (opsional) */
+.member-card .down-content h4 {
+  white-space: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  /* Bisa juga batasi line-clamp jika nama terlalu panjang dan Anda ingin memotongnya */
+  /* -webkit-line-clamp: 1; */
+  /* -webkit-box-orient: vertical; */
 }
 
 /* Gambar Dosen */
@@ -1700,6 +1735,26 @@ the-dosen-member / Anggota Dosen Style
   color: #1e1e1e;
   margin-bottom: 5px;
   font-size: 1.25rem;
+  height: 2.8em;
+  /* Sesuaikan. 1.4em untuk 1 baris, 2.8em untuk 2 baris, dst */
+  line-height: 1.4;
+  /* Atur jarak antar baris */
+
+  /* Kunci: Pastikan teks bisa turun baris */
+  white-space: normal;
+
+  /* Kunci: Potong teks yang melebihi batas dan tampilkan elipsis */
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  /* (Untuk memastikan batasan baris bekerja) */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  /* Batasi maksimal 2 baris nama */
+  -webkit-box-orient: vertical;
+
+  margin-bottom: 5px;
+  /* Jarak antara nama dan jabatan */
 }
 
 /* Jabatan */
@@ -3167,4 +3222,54 @@ responsive
   form#contact {
     padding: 30px;
   }
+}
+
+/* ========================================================== */
+/* CSS UNTUK HORIZONTAL SCROLL DOSEN (MENGGANTIKAN CAROUSEL)  */
+/* ========================================================== */
+
+/* 1. Container Utama: Mengaktifkan Horizontal Scroll */
+.dosen-scroll-container {
+  overflow-x: auto;
+  /* Kunci: Memungkinkan scroll horizontal jika konten melebihi lebar */
+  overflow-y: hidden;
+  padding-bottom: 20px;
+  /* Ruang untuk scrollbar agar tidak menutupi konten */
+  white-space: nowrap;
+  /* Mencegah item turun ke baris baru (opsional, tapi bagus) */
+  -webkit-overflow-scrolling: touch;
+  /* Perbaikan untuk iOS/touch devices */
+}
+
+/* 2. Wrapper: Mengatur Layout Kartu dengan Flexbox */
+.dosen-list-wrapper {
+  display: flex;
+  /* Semua item di dalamnya akan berdampingan */
+  gap: 30px;
+  /* Jarak antar kartu */
+  padding: 10px 0;
+  /* Padding vertikal di dalam wrapper */
+}
+
+/* 3. Kartu Dosen: Menetapkan Lebar Card */
+.dosen-list-wrapper .member-card {
+  /* Kunci: Mencegah kartu membesar atau mengecil, dan menetapkan lebar */
+  flex: 0 0 auto;
+  width: 320px;
+  /* Lebar setiap kartu (sesuaikan jika perlu) */
+  /* Pastikan .member-card Anda tidak memiliki margin kiri/kanan yang konflik */
+}
+
+/* Optional: Menyembunyikan Scrollbar di WebKit browsers */
+.dosen-scroll-container::-webkit-scrollbar {
+  height: 8px;
+}
+
+.dosen-scroll-container::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+}
+
+.dosen-scroll-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
 }
