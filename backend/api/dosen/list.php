@@ -24,7 +24,7 @@ try {
 
     // Cek Role
     if (function_exists('require_role')) {
-        require_role(['admin', 'dosen']);
+        require_role(['admin', 'dosen', 'mahasiswa']);
     } else {
         if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['admin', 'dosen'])) {
             http_response_code(403);
