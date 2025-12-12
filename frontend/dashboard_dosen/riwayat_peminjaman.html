@@ -54,8 +54,8 @@
                             <td>Praktikum PW</td>
                             <td><span class="badge approved">Disetujui</span></td>
                             <td>
-                                <div class="action-buttons"><a href="#" class="detail-btn"><i class="fas fa-eye"></i>
-                                        Detail</a></div>
+                                <div class="action-buttons"><a href="detail_peminjaman.html" class="detail-btn"><i
+                                            class="fas fa-eye"></i> Detail</a></div>
                             </td>
                         </tr>
                         <tr>
@@ -65,8 +65,8 @@
                             <td>Presentasi</td>
                             <td><span class="badge pending">Menunggu</span></td>
                             <td>
-                                <div class="action-buttons"><a href="#" class="detail-btn"><i class="fas fa-eye"></i>
-                                        Detail</a></div>
+                                <div class="action-buttons"><a href="detail_peminjaman.html" class="detail-btn"><i
+                                            class="fas fa-eye"></i> Detail</a></div>
                             </td>
                         </tr>
                     </tbody>
@@ -76,19 +76,20 @@
     </main>
 
     <script>
+        // Logika Logout
         document.getElementById('logoutLink').addEventListener('click', function (e) {
             e.preventDefault();
             if (confirm('Apakah Anda yakin ingin keluar dari sistem?')) {
-                const logoutUrl = '../../backend/auth/logout.php';
+                const logoutUrl = '../../backend/api/auth/logout.php';
                 fetch(logoutUrl, { method: 'POST' })
                     .then(response => response.json())
                     .then(data => {
                         alert(data.message);
-                        window.location.href = '../../index.html';
+                        window.location.href = '../public/index.html';
                     })
                     .catch(error => {
                         alert('Terjadi kesalahan saat logout.');
-                        window.location.href = '../../index.html';
+                        window.location.href = '../public/index.html';
                     });
             }
         });

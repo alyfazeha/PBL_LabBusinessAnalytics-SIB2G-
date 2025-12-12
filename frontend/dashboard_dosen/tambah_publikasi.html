@@ -79,19 +79,20 @@
     </main>
 
     <script>
+        // Logika Logout
         document.getElementById('logoutLink').addEventListener('click', function (e) {
             e.preventDefault();
             if (confirm('Apakah Anda yakin ingin keluar dari sistem?')) {
-                const logoutUrl = '../../backend/auth/logout.php';
+                const logoutUrl = '../../backend/api/auth/logout.php';
                 fetch(logoutUrl, { method: 'POST' })
                     .then(response => response.json())
                     .then(data => {
                         alert(data.message);
-                        window.location.href = '../../index.html';
+                        window.location.href = '../public/index.html';
                     })
                     .catch(error => {
                         alert('Terjadi kesalahan saat logout.');
-                        window.location.href = '../../index.html';
+                        window.location.href = '../public/index.html';
                     });
             }
         });
