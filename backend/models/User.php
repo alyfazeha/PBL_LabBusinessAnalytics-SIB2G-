@@ -1,6 +1,10 @@
 <?php
-header("Content-Type: application/json");
+// Pastikan path ke database.php benar (misal: dari models/ ke config/)
 require_once __DIR__ . "/../config/database.php";
+
+// Pastikan path ke model Dosen/Mahasiswa benar
+require_once __DIR__ . "/Dosen.php";
+require_once __DIR__ . "/Mahasiswa.php";
 
 class User
 {
@@ -11,86 +15,95 @@ class User
         $this->db = Database::getInstance();
     }
 
-    // Create user
+    // Fungsi wajib untuk cek duplikasi di register.php
+    public function findUserByUsername($username)
+    {
+        $sql = "SELECT user_id FROM users WHERE username = :u LIMIT 1";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute(['u' => $username]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    // FUNGSI CREATE LENGKAP DENGAN TRANSAKSI MULTI-TABEL
     public function create($data)
     {
-        $sql = "INSERT INTO users (username, password_hash, role, email, display_name)
-                VALUES (:username, :password_hash, :role, :email, :display_name)";
+        $db = $this->db;
+        $db->beginTransaction(); // Mulai Transaksi
 
-        $stmt = $this->db->prepare($sql);
-        return $stmt->execute([
-            ':username'      => $data['username'],
-            ':password_hash' => $data['password_hash'],
-            ':role'          => $data['role'],
-            ':email'         => $data['email'],
-            ':display_name'  => $data['display_name'] ?? null,
-        ]);
+        try {
+            // A. INSERT PERTAMA: KE TABEL USERS 
+            $user_sql = "INSERT INTO users (username, password_hash, role, email, display_name)
+                    VALUES (:username, :password_hash, :role, :email, :display_name)";
+
+            $user_stmt = $db->prepare($user_sql);
+            $user_stmt->execute([
+                ':username'      => $data['username'],
+                ':password_hash' => $data['password_hash'],
+                ':role'          => $data['role'],
+                ':email'         => $data['email'],
+                ':display_name'  => $data['display_name'] ?? null,
+            ]);
+
+            // Ambil ID user yang baru dibuat
+            $user_id = $db->lastInsertId();
+
+            if (!$user_id) {
+                // Walaupun execute berhasil, tapi ID tidak didapat (kasus jarang)
+                throw new Exception("Gagal mendapatkan User ID setelah insert ke users.");
+            }
+
+            // B. INSERT KEDUA: KE TABEL DETAIL (DOSEN/MAHASISWA)
+            if ($data['role'] === 'dosen') {
+                $dosenModel = new Dosen();
+                $dosen_data = [
+                    'nidn'  => $data['nidn'], // PENTING: data ini harus ada
+                    'user_id' => $user_id,
+                    'nama'  => $data['display_name'],
+                    'email' => $data['email'],
+                    // Isi kolom wajib lain dengan default/null agar tidak error NOT NULL
+                    'jabatan' => 'Asisten Ahli',
+                    'prodi' => 'Teknik Informatika',
+                    'foto_path' => null,
+                    'nip' => null,
+                    'pendidikan' => null,
+                    'sertifikasi' => null,
+                    'mata_kuliah' => null,
+                    'researchgate_url' => null,
+                    'scholar_url' => null,
+                    'sinta_url' => null,
+                ];
+
+                if (!$dosenModel->create($dosen_data)) {
+                    // Jika gagal, lempar exception agar di-rollBack
+                    throw new Exception("Gagal menyimpan data Dosen detail.");
+                }
+            } elseif ($data['role'] === 'mahasiswa') {
+                $mahasiswaModel = new Mahasiswa();
+                $mahasiswa_data = [
+                    'nim'     => $data['nim'],
+                    'user_id' => $user_id,
+                    'nama'    => $data['display_name'],
+                    'email'   => $data['email'],
+                    'prodi'   => 'Teknik Informatika',
+                    'tingkat' => 1,
+                    'no_hp'   => null,
+                ];
+
+                if (!$mahasiswaModel->create($mahasiswa_data)) {
+                    throw new Exception("Gagal menyimpan data Mahasiswa detail.");
+                }
+            }
+
+            // C. Jika semua sukses, baru Commit
+            $db->commit();
+            return true;
+        } catch (Exception $e) {
+            // Jika ada error di salah satu langkah, batalkan semua
+            $db->rollBack();
+            // error_log("Registrasi Error: " . $e->getMessage()); 
+            return false;
+        }
     }
 
-    // Get all users
-    public function all()
-    {
-        $sql = "SELECT * FROM users ORDER BY user_id DESC";
-        return $this->db->query($sql)->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    // Get single user
-    public function find($user_id)
-    {
-        $sql = "SELECT * FROM users WHERE user_id = :user_id";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([':user_id' => $user_id]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
-    }
-
-    // Update user
-    public function update($user_id, $data)
-    {
-        $sql = "UPDATE users
-                SET username = :username,
-                    email = :email,
-                    role = :role,
-                    display_name = :display_name,
-                    updated_at = NOW()
-                WHERE user_id = :user_id";
-
-        $stmt = $this->db->prepare($sql);
-        return $stmt->execute([
-            ':username'     => $data['username'],
-            ':email'        => $data['email'],
-            ':role'         => $data['role'],
-            ':display_name' => $data['display_name'],
-            ':user_id'      => $user_id
-        ]);
-    }
-
-    // Update password
-    public function updatePassword($user_id, $newHash)
-    {
-        $sql = "UPDATE users SET password_hash = :hash WHERE user_id = :user_id";
-        $stmt = $this->db->prepare($sql);
-
-        return $stmt->execute([
-            ':hash' => $newHash,
-            ':user_id' => $user_id
-        ]);
-    }
-
-    // Delete user
-    public function delete($user_id)
-    {
-        $sql = "DELETE FROM users WHERE user_id = :user_id";
-        $stmt = $this->db->prepare($sql);
-        return $stmt->execute([':user_id' => $user_id]);
-    }
-
-    // Login function
-    public function login($username)
-    {
-        $sql = "SELECT * FROM users WHERE username = :username";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([':username' => $username]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
-    }
+    // ... (Lanjutkan dengan fungsi all(), find(), update(), delete(), dll. yang sudah ada)
 }
-?>

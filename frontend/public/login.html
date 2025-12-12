@@ -9,6 +9,50 @@
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
         integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
     <link rel="stylesheet" href="../assets/css/csslogin.css">
+
+    <style>
+        /* Gaya tambahan untuk step form */
+        .step-content {
+            width: 100%;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px 0;
+        }
+
+        .step-content.active {
+            display: flex;
+        }
+
+        .role-button {
+            background-color: #4A90E2;
+            /* Warna primer */
+            color: #FFFFFF;
+            border: none;
+            padding: 15px 30px;
+            margin: 10px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: transform 80ms ease-in;
+            width: 80%;
+        }
+
+        .role-button:hover {
+            transform: scale(1.05);
+            background-color: #3a7fd4;
+        }
+
+        .back-button {
+            background-color: transparent;
+            border: 1px solid #BBBBBB;
+            color: #333;
+            margin-top: 15px;
+        }
+    </style>
 </head>
 
 <body>
@@ -23,17 +67,28 @@
                     <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
                     <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
                 </div>
-                <span>atau gunakan email Anda untuk registrasi</span>
-                <input type="text" placeholder="Nama Tampilan (Opsional)" name="display_name" />
-                <input type="text" placeholder="Username" name="username" required />
-                <input type="email" placeholder="Email (Opsional)" name="email" />
-                <input type="password" placeholder="Kata Sandi" name="password" required />
-                <select name="role" required>
-                    <option value="" disabled selected>Pilih Role</option>
-                    <option value="dosen">Dosen</option>
-                    <option value="mahasiswa">Mahasiswa</option>
-                </select>
-                <button type="submit">Daftar</button>
+
+                <div id="step1" class="step-content active">
+                    <span>Pilih peran Anda untuk melanjutkan registrasi</span>
+                    <button type="button" class="role-button" data-role="dosen">Saya Seorang Dosen</button>
+                    <button type="button" class="role-button" data-role="mahasiswa">Saya Seorang Mahasiswa</button>
+                    <input type="hidden" name="role" id="selectedRoleInput" required />
+                </div>
+
+                <div id="step2" class="step-content">
+                    <span>Masukkan detail data diri Anda</span>
+
+                    <input type="text" placeholder="Nama Tampilan Lengkap" name="display_name" required />
+                    <input type="text" placeholder="Username" name="username" required />
+                    <input type="email" placeholder="Email (Opsional)" name="email" />
+                    <input type="password" placeholder="Kata Sandi" name="password" required />
+
+                    <div id="role_specific_input" style="width: 100%;">
+                    </div>
+
+                    <button type="submit">Daftar</button>
+                    <button type="button" class="role-button back-button" onclick="goToStep(1)">Kembali</button>
+                </div>
             </form>
         </div>
 
@@ -76,29 +131,72 @@
         const loginForm = document.getElementById('loginForm');
         const registerForm = document.getElementById('registerForm');
 
+        // Elemen Multi-Step
+        const step1 = document.getElementById('step1');
+        const step2 = document.getElementById('step2');
+        const roleButtons = document.querySelectorAll('.role-button[data-role]');
+        const selectedRoleInput = document.getElementById('selectedRoleInput');
+        const roleSpecificInputContainer = document.getElementById('role_specific_input');
+
         // Logic pindah panel
         signUpButton.addEventListener('click', () => {
             container.classList.add("right-panel-active");
+            goToStep(1); // Reset ke Step 1 saat beralih ke register
         });
 
         signInButton.addEventListener('click', () => {
             container.classList.remove("right-panel-active");
         });
 
-        /**
-         * Fungsi untuk menampilkan notifikasi sederhana
-         */
         function showNotification(message, isSuccess) {
             alert((isSuccess ? "Sukses: " : "Error: ") + message);
         }
 
-        // --- LOGIC LOGIN ---
+        // --- LOGIC MULTI-STEP REGISTER ---
+
+        function goToStep(step) {
+            step1.classList.remove('active');
+            step2.classList.remove('active');
+
+            if (step === 1) {
+                step1.classList.add('active');
+                selectedRoleInput.value = ''; // Kosongkan role saat kembali
+            } else if (step === 2) {
+                step2.classList.add('active');
+            }
+        }
+
+        /**
+         * Fungsi untuk membuat input dinamis (NIM atau NIDN)
+         * PENTING: Gunakan name="nidn" atau name="nim" untuk PHP
+         */
+        function createRoleInput(role) {
+            let html = '';
+            if (role === 'dosen') {
+                html = '<input type="text" name="nidn" placeholder="NIDN" required />';
+            } else if (role === 'mahasiswa') {
+                html = '<input type="text" name="nim" placeholder="NIM" required />';
+            }
+            return html;
+        }
+
+        roleButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                const role = e.target.dataset.role;
+                selectedRoleInput.value = role; // Set nilai role
+                roleSpecificInputContainer.innerHTML = createRoleInput(role); // Tampilkan input NIM/NIDN
+                goToStep(2); // Pindah ke langkah 2
+            });
+        });
+
+
+        // --- LOGIC LOGIN (Diperbarui untuk pengalihan Role) ---
         if (loginForm) {
             loginForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
 
                 const formData = new FormData(loginForm);
-                // Path ke PHP: dari frontend/ ke backend/api/auth/login.php
+                // Pastikan path ke login.php benar
                 const url = '../../backend/api/auth/login.php';
 
                 try {
@@ -107,26 +205,29 @@
                         body: formData,
                     });
 
-                    if (response.status !== 200) {
-                        // Jika ada kesalahan server (404/500), tampilkan pesan
-                        showNotification(`Error: Gagal terhubung ke server. (Status: ${response.status})`, false);
-                        return;
-                    }
-
                     const result = await response.json();
 
                     if (result.success) {
                         showNotification(result.message, true);
 
                         // LOGIKA PENGALIHAN BERDASARKAN ROLE
-                        if (result.data.role === 'admin') {
-                            window.location.href = '../dashboard/admin.html'; // Pindah ke admin.html (di folder frontend/)
-                        } else if (result.data.role === 'mahasiswa') {
-                            window.location.href = '../dashboard_mahasiswa/index.html'; // Pindah ke admin.html (di folder frontend/)
-                        } else if (result.data.role === 'dosen') {
-                            window.location.href = '../dashboard_dosen/index.html'; // Pindah ke admin.html (di folder frontend/)
+                        if (result.data && result.data.role) {
+                            switch (result.data.role) {
+                                case 'admin':
+                                    window.location.href = '../dashboard/admin.html';
+                                    break;
+                                case 'mahasiswa':
+                                    window.location.href = '../dashboard_mahasiswa/index.html';
+                                    break;
+                                case 'dosen':
+                                    window.location.href = '../dashboard_dosen/index.html';
+                                    break;
+                                default:
+                                    window.location.href = '../homepage/index.html'; // Default ke halaman utama
+                            }
                         } else {
-                            window.location.href = 'index.html'; // Pindah ke index.html (di folder frontend/)
+                            // Jika data role tidak ada, asumsikan sukses tapi arahkan ke default
+                            window.location.href = '../homepage/index.html';
                         }
 
                     } else {
@@ -134,19 +235,25 @@
                     }
 
                 } catch (error) {
-                    showNotification("Error: Terjadi kesalahan jaringan. Cek server Anda.", false);
+                    showNotification("Error: Terjadi kesalahan jaringan atau server.", false);
                     console.error('Fetch Error:', error);
                 }
             });
         }
 
-        // --- LOGIC REGISTER ---
+        // --- LOGIC REGISTER (Diperbarui) ---
         if (registerForm) {
             registerForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
 
+                if (!selectedRoleInput.value) {
+                    showNotification("Silakan pilih peran Anda terlebih dahulu.", false);
+                    goToStep(1);
+                    return;
+                }
+
                 const formData = new FormData(registerForm);
-                // Path ke PHP: dari frontend/ ke backend/api/auth/register.php
+                // Pastikan path ke register.php benar!
                 const url = '../../backend/api/auth/register.php';
 
                 try {
@@ -155,6 +262,7 @@
                         body: formData,
                     });
 
+                    // Kita harus cek status HTTP, karena error 500 dari PHP tidak akan mengembalikan JSON yang valid
                     if (response.status !== 200) {
                         showNotification(`Error: Gagal terhubung ke server. (Status: ${response.status})`, false);
                         return;
@@ -166,7 +274,7 @@
                         showNotification(result.message + " Silakan masuk.", true);
                         // Pindah ke form login setelah sukses register
                         container.classList.remove("right-panel-active");
-
+                        goToStep(1); // Reset ke Step 1
                     } else {
                         showNotification(result.message, false);
                     }
