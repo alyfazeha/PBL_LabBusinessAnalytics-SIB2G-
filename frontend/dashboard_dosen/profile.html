@@ -28,34 +28,46 @@
             <h2><i class="fas fa-address-card"></i> Profil Dosen</h2>
 
             <div class="profile-header">
-                <h3>Prof. Dr. Budi Santosa, M.Kom</h3>
-                <p style="color: #777;">197801012005011001</p>
+                <img id="dosenFoto" src="../../frontend/assets/img/default-profile.png" alt="Foto Profil" 
+                     style="width: 100px; height: 100px; object-fit: cover; border-radius: 50%; margin-bottom: 10px; display:none;">
+                
+                <h3 id="headerNama">Memuat Nama...</h3>
+                <p id="headerNidn" style="color: #777;">...</p>
             </div>
 
             <div style="max-width: 600px; margin: 0 auto;">
-                <div class="profile-info-group"><label>NIDN/NIP</label>
-                    <p>197801012005011001</p>
+                <div class="profile-info-group">
+                    <label>NIDN</label>
+                    <p id="detailNidn">-</p>
                 </div>
-                <div class="profile-info-group"><label>Nama Lengkap</label>
-                    <p>Prof. Dr. Budi Santosa, M.Kom</p>
+                <div class="profile-info-group">
+                    <label>NIP</label>
+                    <p id="detailNip">-</p>
                 </div>
-                <div class="profile-info-group"><label>Fakultas</label>
-                    <p>Fakultas Teknik</p>
+                <div class="profile-info-group">
+                    <label>Nama Lengkap</label>
+                    <p id="detailNama">-</p>
                 </div>
-                <div class="profile-info-group"><label>Departemen</label>
-                    <p>Informatika</p>
+                <div class="profile-info-group">
+                    <label>Program Studi</label>
+                    <p id="detailProdi">-</p>
                 </div>
-                <div class="profile-info-group"><label>Jabatan Fungsional</label>
-                    <p style="font-weight: 700; color: var(--primary-blue);">Guru Besar</p>
+                <div class="profile-info-group">
+                    <label>Jabatan Fungsional</label>
+                    <p id="detailJabatan" style="font-weight: 700; color: var(--primary-blue);">-</p>
                 </div>
-                <div class="profile-info-group"><label>Email</label>
-                    <p>budi.santosa@university.ac.id</p>
+                <div class="profile-info-group">
+                    <label>Email</label>
+                    <p id="detailEmail">-</p>
                 </div>
-                <div class="profile-info-group"><label>Nomor HP</label>
-                    <p>0812111222</p>
+                <div class="profile-info-group">
+                    <label>Pendidikan Terakhir</label>
+                    <p id="detailPendidikan">-</p>
                 </div>
-                <div class="profile-info-group"><label>Alamat</label>
-                    <p>Jl. Kampus Utama No. 1</p>
+                
+                <div class="profile-info-group">
+                    <label>Tautan Eksternal</label>
+                    <p id="detailLinks">-</p>
                 </div>
             </div>
 
@@ -64,24 +76,93 @@
     </main>
 
     <script>
-        // Logika Logout
+        async function loadProfile() {
+            try {
+                // Request data dosen
+                // API ada di root/backend/api/dosen/me.php
+                // Kita di root/frontend/dashboard_dosen/profile.html
+                // ../../ ke Root, lalu masuk backend...
+                const response = await fetch('../../backend/api/dosen/me.php');
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    const data = result.data;
+
+                    // 1. Mengisi Teks
+                    document.getElementById('headerNama').textContent = data.nama;
+                    document.getElementById('headerNidn').textContent = data.nidn;
+                    document.getElementById('detailNidn').textContent = data.nidn || '-';
+                    document.getElementById('detailNip').textContent = data.nip || '-';
+                    document.getElementById('detailNama').textContent = data.nama || '-';
+                    document.getElementById('detailProdi').textContent = data.prodi || '-';
+                    document.getElementById('detailJabatan').textContent = data.jabatan || '-';
+                    document.getElementById('detailEmail').textContent = data.email || '-';
+                    document.getElementById('detailPendidikan').textContent = data.pendidikan || '-';
+
+                    // 2. Link Eksternal
+                    let links = [];
+                    if (data.sinta_url) links.push(`<a href="${data.sinta_url}" target="_blank">SINTA</a>`);
+                    if (data.scholar_url) links.push(`<a href="${data.scholar_url}" target="_blank">Google Scholar</a>`);
+                    document.getElementById('detailLinks').innerHTML = links.length > 0 ? links.join(' | ') : '-';
+
+                    // 3. PERBAIKAN PATH FOTO (Sesuai Struktur Folder create.php)
+                    const imgElem = document.getElementById('dosenFoto');
+                    
+                    // Path Default (Ke root/frontend/assets/...)
+                    let finalFotoPath = "../../frontend/assets/img/default-profile.png";
+
+                    if (data.foto_path && data.foto_path !== 'null' && data.foto_path !== '') {
+                        let path = data.foto_path;
+
+                        if (path.startsWith('http://') || path.startsWith('https://')) {
+                            finalFotoPath = path;
+                        } else {
+                            // [PENTING] Ambil nama file saja (hilangkan path lama dari database)
+                            // Contoh DB: "../../assets/uploads/dosen/foto.jpg" -> Jadi: "foto.jpg"
+                            if (path.includes('/')) {
+                                path = path.split('/').pop();
+                            }
+
+                            // [FIX] Gunakan path relatif yang benar dari folder dashboard_dosen ke assets
+                            // Folder kita: frontend/dashboard_dosen/
+                            // Target:      frontend/assets/uploads/dosen/
+                            // Maka: Mundur 1 langkah (../) lalu masuk assets
+                            finalFotoPath = `../assets/uploads/dosen/${path}`;
+                        }
+                    }
+                    
+                    imgElem.src = finalFotoPath;
+                    imgElem.style.display = 'block';
+                    
+                    // Debugging: Cek path ini di Console Browser (F12) jika masih tidak muncul
+                    console.log("Loading Foto dari:", finalFotoPath);
+
+                } else {
+                    alert('Sesi Anda telah berakhir. Silakan login kembali.');
+                    window.location.href = '../public/login.html';
+                }
+            } catch (error) {
+                console.error('Error memuat profil:', error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadProfile);
+
+        // Logout Logic
         document.getElementById('logoutLink').addEventListener('click', function (e) {
             e.preventDefault();
             if (confirm('Apakah Anda yakin ingin keluar dari sistem?')) {
                 const logoutUrl = '../../backend/api/auth/logout.php';
                 fetch(logoutUrl, { method: 'POST' })
-                    .then(response => response.json())
-                    .then(data => {
-                        alert(data.message);
+                    .then(response => {
                         window.location.href = '../public/index.html';
                     })
                     .catch(error => {
-                        alert('Terjadi kesalahan saat logout.');
+                        console.error('Logout error:', error);
                         window.location.href = '../public/index.html';
                     });
             }
         });
     </script>
 </body>
-
 </html>
