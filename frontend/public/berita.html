@@ -205,47 +205,48 @@
         let currentCategory = 'Semua'; // Menyimpan kategori yang sedang aktif
         // -----------------------------------------------------------------------
 
+        function getCorrectImagePath(path) {
+            if (!path) return '../assets/images/placeholder-berita.jpg';
+            if (path.startsWith('http')) return path; // Jika link luar
+            if (path.startsWith('../../')) return path.replace('../../', '../'); // Koreksi path lokal
+            return path;
+        }
 
         // --- 2. Fungsi untuk membuat kerangka Kartu Berita ---
         function createBeritaCard(data) {
-            const deskripsiMentah = data.excerpt || data.body || '';
-            const ringkasan = deskripsiMentah
-                ? deskripsiMentah.split(' ').slice(0, 25).join(' ') + '...'
-                : 'Klik untuk membaca selengkapnya...';
-
-            const tanggal = new Date(data.created_at).toLocaleDateString('id-ID', {
-                year: 'numeric', month: 'short', day: 'numeric'
-            });
-
-            // Pastikan URL detail menggunakan SLUG atau ID
-            const detailUrl = `detail_berita.html?slug=${data.slug || data.id}`;
-            const imageUrl = data.featured_image || '../assets/images/placeholder-berita.jpg';
-            // Pastikan API mengembalikan category_name
+            // Gunakan slug jika ada, jika tidak gunakan ID
+            const identifier = data.slug || data.id;
+            const detailUrl = `detail_berita.html?slug=${identifier}`;
+            const imageUrl = getCorrectImagePath(data.featured_image);
             const kategoriNama = data.category_name || 'Umum';
+            const tanggal = data.created_at ? new Date(data.created_at).toLocaleDateString('id-ID', {
+                year: 'numeric', month: 'long', day: 'numeric'
+            }) : '-';
 
             return `
-                <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.3s">
-                    <div class="berita-card">
-                        <a href="${detailUrl}">
-                            <div class="berita-thumb">
-                                <img src="${imageUrl}" alt="${data.title}">
-                                <span class="kategori">${kategoriNama}</span>
-                            </div>
-                        </a>
-                        <div class="berita-content">
-                            <div class="berita-meta">
-                                <i class="fa fa-calendar-alt"></i> ${tanggal}
-                            </div>
-                            <a href="${detailUrl}">
-                                <h4>${data.title}</h4>
-                            </a>
-                            <p>${ringkasan}</p>
-                            <a href="${detailUrl}" class="read-more">Baca Selengkapnya <i class="fa fa-arrow-right"></i></a>
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="berita-card">
+                    <a href="${detailUrl}">
+                        <div class="berita-thumb">
+                            <img src="${imageUrl}" alt="${data.title || 'Berita'}" onerror="this.src='../assets/images/placeholder-berita.jpg'">
+                            <span class="kategori">${kategoriNama}</span>
                         </div>
+                    </a>
+                    <div class="berita-content">
+                        <div class="berita-meta">
+                            <span><i class="fa fa-calendar-alt"></i> ${tanggal}</span>
+                        </div>
+                        <a href="${detailUrl}">
+                            <h4 class="text-truncate-2">${data.title}</h4>
+                        </a>
+                        <p class="text-truncate-3">${data.excerpt || ''}</p>
+                        <a href="${detailUrl}" class="read-more">Baca Selengkapnya <i class="fa fa-arrow-right"></i></a>
                     </div>
                 </div>
-            `;
+            </div>
+        `;
         }
+
 
 
         // --- 3. Fungsi Pembuat Pagination ---
