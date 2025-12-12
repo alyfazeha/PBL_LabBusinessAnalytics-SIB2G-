@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Publikasi</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../../frontend/assets/css/dashboarddns.css">
+</head>
+
+<body>
+    <aside class="dsn-sidebar">
+        <div class="dsn-logo-area">
+            <h2><i class="fas fa-chalkboard-teacher"></i> DSN <br> DASHBOARD</h2>
+        </div>
+        <nav>
+            <a href="index.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="profile.html"><i class="fas fa-user-tie"></i> Profil & Akun</a>
+            <a href="riwayat_peminjaman.html"><i class="fas fa-book-reader"></i> Riwayat Peminjaman</a>
+            <a href="publikasi.html" class="active"><i class="fas fa-file-invoice"></i> Kelola Publikasi</a>
+            <a href="#" id="logoutLink"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <div class="content-card">
+            <h2><i class="fas fa-edit"></i> Edit Publikasi: Implementasi AI</h2>
+
+            <form action="publikasi.html" method="POST">
+                <input type="hidden" name="id_publikasi" value="PBL001">
+
+                <div class="form-grid">
+
+                    <div class="form-group full-width">
+                        <label for="judul">Judul Publikasi</label>
+                        <input type="text" id="judul" name="judul_publikasi"
+                            value="Implementasi AI dalam Kurikulum 2024" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="jenis">Jenis Publikasi</label>
+                        <select id="jenis" name="jenis_publikasi" required>
+                            <option value="Jurnal Internasional" selected>Jurnal Internasional</option>
+                            <option value="Jurnal Nasional">Jurnal Nasional</option>
+                            <option value="Artikel Konferensi">Artikel Konferensi</option>
+                            <option value="Buku">Buku</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tanggal">Tanggal Publikasi</label>
+                        <input type="date" id="tanggal" name="tanggal_publikasi" value="2025-01-10" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="doi">DOI Publikasi</label>
+                        <input type="text" id="doi" name="doi_publikasi" value="10.1234/ai.2025.1"
+                            placeholder="Opsional">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="status">Status Publikasi</label>
+                        <select id="status" name="status_publikasi" required>
+                            <option value="Published" selected>Published</option>
+                            <option value="Draft">Draft</option>
+                            <option value="Review">Review</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="abstrak">Abstrak/Ringkasan Publikasi</label>
+                        <textarea id="abstrak" name="abstrak" rows="5"
+                            required>Penelitian ini membahas tentang integrasi Artificial Intelligence...</textarea>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="link">Link Dokumen / Jurnal (URL)</label>
+                        <input type="url" id="link" name="link_dokumen"
+                            value="https://jurnal.universitas.ac.id/implementasi-ai"
+                            placeholder="Contoh: https://jurnal.universitas.ac.id/...">
+                    </div>
+
+                    <div class="form-group full-width">
+                        <button type="submit" class="btn-submit"><i class="fas fa-save"></i> Perbarui Publikasi</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        document.getElementById('logoutLink').addEventListener('click', function (e) {
+            e.preventDefault();
+            if (confirm('Apakah Anda yakin ingin keluar dari sistem?')) {
+                const logoutUrl = '../../backend/auth/logout.php';
+                fetch(logoutUrl, { method: 'POST' })
+                    .then(response => response.json())
+                    .then(data => {
+                        alert(data.message);
+                        window.location.href = '../../index.html';
+                    })
+                    .catch(error => {
+                        alert('Terjadi kesalahan saat logout.');
+                        window.location.href = '../../index.html';
+                    });
+            }
+        });
+    </script>
+</body>
+
+</html>

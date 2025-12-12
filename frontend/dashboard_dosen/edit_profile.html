@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profil Dosen</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../../frontend/assets/css/dashboarddns.css">
+</head>
+
+<body>
+    <aside class="dsn-sidebar">
+        <div class="dsn-logo-area">
+            <h2><i class="fas fa-chalkboard-teacher"></i> DSN <br> DASHBOARD</h2>
+        </div>
+        <nav>
+            <a href="index.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="profile.html" class="active"><i class="fas fa-user-tie"></i> Profil & Akun</a>
+            <a href="riwayat_peminjaman.html"><i class="fas fa-book-reader"></i> Riwayat Peminjaman</a>
+            <a href="publikasi.html"><i class="fas fa-file-invoice"></i> Kelola Publikasi</a>
+            <a href="#" id="logoutLink"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <div class="content-card">
+            <h2><i class="fas fa-pencil-alt"></i> Edit Profil Dosen</h2>
+
+            <form action="profile.html" method="POST">
+                <div class="form-grid">
+
+                    <div class="form-group"><label for="nip">NIP/NIDN</label><input type="text" id="nip"
+                            name="nip_dosen" value="197801012005011001" readonly></div>
+                    <div class="form-group"><label for="fakultas">Fakultas</label><input type="text" id="fakultas"
+                            name="fakultas_dosen" value="Fakultas Teknik" readonly></div>
+                    <div class="form-group"><label for="departemen">Departemen</label><input type="text" id="departemen"
+                            name="departemen_dosen" value="Informatika" readonly></div>
+                    <div class="form-group"><label for="jabatan">Jabatan Fungsional</label><input type="text"
+                            id="jabatan" name="jabatan_fungsional_dosen" value="Guru Besar" readonly></div>
+
+                    <div class="form-group full-width"><label for="nama_lengkap">Nama Lengkap</label><input type="text"
+                            id="nama_lengkap" name="nama_dosen" value="Prof. Dr. Budi Santosa, M.Kom" required></div>
+
+                    <div class="form-group"><label for="email">Alamat Email</label><input type="email" id="email"
+                            name="email_dosen" value="budi.santosa@university.ac.id" required></div>
+                    <div class="form-group"><label for="no_hp">Nomor HP Aktif</label><input type="tel" id="no_hp"
+                            name="hp_dosen" value="0812111222" required></div>
+
+                    <div class="form-group full-width">
+                        <label for="alamat">Alamat Tinggal Lengkap</label>
+                        <textarea id="alamat" name="alamat_dosen" rows="3"
+                            required>Jl. Kampus Utama No. 1, Jakarta</textarea>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="password">Ubah Password (kosongkan jika tidak ingin diubah)</label>
+                        <input type="password" id="password" name="password" placeholder="Masukkan password baru">
+                    </div>
+
+                    <div class="form-group full-width">
+                        <button type="submit" class="btn-submit"><i class="fas fa-save"></i> Simpan Perubahan</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        document.getElementById('logoutLink').addEventListener('click', function (e) {
+            e.preventDefault();
+            if (confirm('Apakah Anda yakin ingin keluar dari sistem?')) {
+                const logoutUrl = '../../backend/auth/logout.php';
+                fetch(logoutUrl, { method: 'POST' })
+                    .then(response => response.json())
+                    .then(data => {
+                        alert(data.message);
+                        window.location.href = '../../index.html';
+                    })
+                    .catch(error => {
+                        alert('Terjadi kesalahan saat logout.');
+                        window.location.href = '../../index.html';
+                    });
+            }
+        });
+    </script>
+</body>
+
+</html>
