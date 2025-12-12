@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Publikasi</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="/frontend/assets/css/dashboarddns.css">
+    <link rel="stylesheet" href="../assets/css/dashboarddns.css">
 </head>
 
 <body>
@@ -28,44 +28,55 @@
             <h2><i class="fas fa-edit"></i> Edit Publikasi</h2>
 
             <form id="formEditPublikasi">
-                <input type="hidden" name="id" id="pub_id">
-                <input type="hidden" name="dosen_nidn" id="dosen_nidn">
+                <input type="hidden" name="publikasi_id" id="publikasi_id">
 
                 <div class="form-grid">
-
                     <div class="form-group full-width">
                         <label for="judul">Judul Publikasi</label>
-                        <input type="text" id="judul" name="judul" required>
+                        <input type="text" name="judul" id="judul" class="form-control"
+                            placeholder="Masukkan judul penelitian..." required>
                     </div>
 
                     <div class="form-group">
-                        <label for="tahun">Tahun Publikasi</label>
-                        <input type="number" id="tahun" name="tahun" required>
+                        <label for="tahun">Tahun Terbit</label>
+                        <input type="number" name="tahun" id="tahun" class="form-control" placeholder="Contoh: 2023"
+                            required>
                     </div>
 
                     <div class="form-group">
-                        <label for="kategori_id">Kategori Publikasi</label>
-                        <select id="kategori_id" name="kategori_id" required>
-                            <option value="">-- Memuat... --</option>
+                        <label for="kategori_id">Kategori</label>
+                        <select name="kategori_id" id="kategori_id" class="form-control" required>
+                            <option value="">Pilih Kategori</option>
                         </select>
                     </div>
 
                     <div class="form-group">
-                        <label for="focus_id">Topik Riset</label>
-                        <select id="focus_id" name="focus_id" required>
-                            <option value="">-- Memuat... --</option>
+                        <label for="focus_id">Fokus Riset</label>
+                        <select name="focus_id" id="focus_id" class="form-control" required>
+                            <option value="">Pilih Fokus Riset</option>
                         </select>
                     </div>
 
-                    <div class="form-group full-width">
-                        <label for="link">Link Dokumen / Jurnal (URL)</label>
-                        <input type="url" id="external_link" name="external_link"
-                            placeholder="Contoh: https://jurnal.universitas.ac.id/...">
+                    <div class="form-group">
+                        <label for="dosen_nidn">NIDN Pengampu</label>
+                        <input type="text" name="dosen_nidn" id="dosen_nidn" class="form-control" readonly
+                            style="background-color: #f4f4f4;">
                     </div>
 
                     <div class="form-group full-width">
-                        <button type="submit" id="btnSimpan" class="btn-submit"><i class="fas fa-save"></i> Perbarui Publikasi</button>
+                        <label for="external_link">Link Publikasi (URL)</label>
+                        <input type="url" name="external_link" id="external_link" class="form-control"
+                            placeholder="https://example.com/paper-id">
                     </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" id="btnSimpan" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Perbarui Publikasi
+                    </button>
+                    <a href="publikasi.html" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Kembali
+                    </a>
                 </div>
             </form>
         </div>
@@ -73,14 +84,57 @@
 
     <style>
         /* Mempertahankan style asli */
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .full-width { grid-column: span 2; }
-        .form-group { display: flex; flex-direction: column; }
-        .form-group label { margin-bottom: 5px; font-weight: bold; }
-        .form-group input, .form-group select, .form-group textarea { padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
-        .btn-submit { background-color: #007bff; color: white; padding: 10px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
-        .btn-submit:hover { background-color: #0056b3; }
-        @media (max-width: 768px) { .form-grid { grid-template-columns: 1fr; } .full-width { grid-column: span 1; } }
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .full-width {
+            grid-column: span 2;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .btn-submit {
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .btn-submit:hover {
+            background-color: #0056b3;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .full-width {
+                grid-column: span 1;
+            }
+        }
     </style>
 
     <script>
@@ -178,4 +232,5 @@
         });
     </script>
 </body>
+
 </html>
