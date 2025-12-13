@@ -23,7 +23,6 @@ try {
     $db = Database::getInstance();
     $role = $_SESSION['role'];
     
-    // Tangkap ID
     $id = $_POST['publikasi_id'] ?? $_POST['id'] ?? null;
 
     // 2. Tangkap Data
@@ -34,7 +33,7 @@ try {
         'focus_id'      => $_POST['focus_id'] ?? null,
         'tahun'         => $_POST['tahun'] ?? null,
         'dosen_nidn'    => $_POST['dosen_nidn'] ?? null,
-        'abstrak'       => $_POST['abstrak'] ?? null // Pastikan kolom abstrak di-handle
+        'abstrak'       => $_POST['abstrak'] ?? null
     ];
 
     // 3. Validasi Sederhana
