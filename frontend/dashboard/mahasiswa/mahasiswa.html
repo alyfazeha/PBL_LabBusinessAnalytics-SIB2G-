@@ -11,8 +11,7 @@
     <link rel="stylesheet" href="../../assets/css/cssmahasiswa.css">
 
     <style>
-        /* Sisakan gaya yang sangat spesifik dan tidak bisa di generalisasi jika perlu, */
-        /* tetapi untuk kasus ini, HAPUS SEMUA style yang terkait tabel dan data-table-container. */
+        /* CSS Hapus Cache Visual */
     </style>
 </head>
 
@@ -88,16 +87,26 @@
             }, 3000);
         }
 
-        // --- FUNGSI FETCH MAHASISWA ---
+        // --- FUNGSI FETCH MAHASISWA (DENGAN ANTI-CACHE) ---
         const mahasiswaTableBody = document.getElementById('mahasiswaTableBody');
 
         async function fetchMahasiswa() {
-            // Path ke API Mahasiswa
-            const url = '../../../backend/api/mahasiswa/list.php';
+            // PERBAIKAN UTAMA: Tambahkan timestamp (?t=...) agar browser TIDAK menyimpan cache
+            const timestamp = new Date().getTime(); 
+            const url = `../../../backend/api/mahasiswa/list.php?t=${timestamp}`;
+            
             mahasiswaTableBody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Memuat data...</td></tr>';
 
             try {
-                const response = await fetch(url);
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                        'Pragma': 'no-cache',
+                        'Expires': '0'
+                    }
+                });
+                
                 const data = await response.json();
 
                 if (response.ok && Array.isArray(data)) {
@@ -128,7 +137,7 @@
                         <td>${mhs.email || '-'}</td>
                         <td>${mhs.no_hp || '-'}</td>
                         <td>
-                            <a href="edit_mahasiswa.html?nim=${mhs.nim}" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i> Edit</a>
+                            <button onclick="editMahasiswa('${mhs.nim}')" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i> Edit</button>
                             <button onclick="deleteMahasiswa('${mhs.nim}', '${mhs.nama}')" class="btn btn-danger btn-sm"><i class="fas fa-trash-alt"></i> Hapus</button>
                         </td>
                     </tr>
@@ -137,13 +146,20 @@
             });
         }
 
+        // --- FUNGSI EDIT ---
+        window.editMahasiswa = (nim) => {
+            // Simpan NIM ke LocalStorage
+            localStorage.setItem('editMahasiswaNim', nim);
+            // Redirect
+            window.location.href = 'edit_mahasiswa.html';
+        };
+
         // --- FUNGSI DELETE ---
         window.deleteMahasiswa = async (nim, nama) => {
             if (!confirm(`Apakah Anda yakin ingin menghapus Mahasiswa: ${nama} (${nim})? Tindakan ini tidak dapat dibatalkan.`)) {
                 return;
             }
 
-            // Path ke API Delete Mahasiswa
             const url = '../../../backend/api/mahasiswa/delete.php';
             const formData = new FormData();
             formData.append('nim', nim);
@@ -158,7 +174,7 @@
 
                 if (result.success) {
                     displayMessage('success', result.message || `Mahasiswa ${nama} berhasil dihapus.`);
-                    fetchMahasiswa(); // Muat ulang data tabel
+                    fetchMahasiswa(); // Reload data otomatis
                 } else {
                     displayMessage('error', result.message || `Gagal menghapus Mahasiswa ${nama}.`);
                 }
@@ -169,11 +185,21 @@
             }
         };
 
+        // Event Listener Search (Opsional - agar pencarian jalan)
+        document.getElementById('searchInput').addEventListener('keyup', function() {
+            const value = this.value.toLowerCase();
+            const rows = mahasiswaTableBody.getElementsByTagName('tr');
+            
+            for (let i = 0; i < rows.length; i++) {
+                const text = rows[i].textContent.toLowerCase();
+                rows[i].style.display = text.indexOf(value) > -1 ? '' : 'none';
+            }
+        });
 
         // Panggil fungsi saat halaman dimuat
         document.addEventListener('DOMContentLoaded', fetchMahasiswa);
 
-        // Logika Logout (PERBAIKAN AGAR TIDAK MUNCUL DI AWAL)
+        // --- Logic Logout ---
         const logoutModal = document.getElementById('logoutModal');
         const logoutTrigger = document.getElementById('logoutTrigger');
         const cancelLogoutBtn = document.getElementById('cancelLogoutBtn');
@@ -181,38 +207,22 @@
 
         logoutTrigger.addEventListener('click', (e) => {
             e.preventDefault();
-            // GANTI style.display = 'flex' DENGAN classList.add('show')
             logoutModal.classList.add('show');
         });
 
         cancelLogoutBtn.addEventListener('click', () => {
-            // GANTI style.display = 'none' DENGAN classList.remove('show')
             logoutModal.classList.remove('show');
         });
 
         confirmLogoutBtn.addEventListener('click', async () => {
             const url = '../../../backend/api/auth/logout.php';
-
             try {
-                const response = await fetch(url, {
-                    method: 'POST',
-                });
-                const result = await response.json();
-
-                if (result.success) {
-                    // Tutup modal sebelum redirect
-                    logoutModal.classList.remove('show');
-                    window.location.href = '../../public/index.html'; // Redirect ke halaman utama
-                } else {
-                    window.location.href = '../../public/index.html';
-                }
-
+                await fetch(url, { method: 'POST' });
+                window.location.href = '../../public/index.html';
             } catch (error) {
-                console.error('Logout Error:', error);
                 window.location.href = '../../public/index.html';
             }
         });
     </script>
 </body>
-
 </html>

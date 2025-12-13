@@ -1,11 +1,9 @@
 <?php
-// 1. Matikan error text HTML SEBELUM session dimulai
 ini_set('display_errors', 0);
 error_reporting(E_ALL);
 
 header("Content-Type: application/json");
 
-// 2. Baru mulai session (Cek dulu biar gak muncul Notice)
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -14,26 +12,24 @@ try {
     require_once __DIR__ . "/../../models/Mahasiswa.php";
     require_once __DIR__ . "/../../config/auth.php";
 
-    if (function_exists('require_role2')) {
-        require_role2(['admin', 'mahasiswa']);
-    }
+    require_admin();
 
     $mahasiswaModel = new Mahasiswa();
 
-    // 3. Validasi NIM (Wajib Ada)
-    if (!isset($_POST['nim']) || empty($_POST['nim'])) {
-        throw new Exception('NIM tidak ditemukan. Pastikan Frontend mengirimkan key "nim".');
+    // 1. Ambil NIM (Ini adalah kunci, TIDAK BOLEH BERUBAH)
+    $nim = $_POST['nim'] ?? null;
+
+    if (empty($nim)) {
+        throw new Exception('NIM wajib dikirim.');
     }
 
-    $nim = $_POST['nim'];
-
-    // 4. Cek Data Lama
+    // 2. Cek Data Lama
     $current = $mahasiswaModel->find($nim);
     if (!$current) {
-        throw new Exception('Data Mahasiswa tidak ditemukan di database.');
+        throw new Exception("Data Mahasiswa dengan NIM $nim tidak ditemukan.");
     }
 
-    // 5. Siapkan Data Baru
+    // 3. Siapkan Data Baru (HANYA Data profil, NIM TIDAK dimasukkan ke sini)
     $data = [
         'nama'    => trim($_POST['nama'] ?? $current['nama']),
         'prodi'   => trim($_POST['prodi'] ?? $current['prodi']),
@@ -45,13 +41,16 @@ try {
     if ($data['nama'] === "" || $data['prodi'] === "") {
         throw new Exception("Nama dan Prodi tidak boleh kosong.");
     }
-
+    
+    // 4. Update
+    // Parameter 1: NIM (kunci WHERE)
+    // Parameter 2: Data yang mau diubah (SET nama=..., prodi=...)
     if ($mahasiswaModel->update($nim, $data)) {
-        echo json_encode(['success' => true, 'message' => 'Mahasiswa berhasil diupdate']);
+        echo json_encode(['success' => true, 'message' => 'Data mahasiswa berhasil diperbarui.']);
     } else {
         throw new Exception("Gagal update database.");
     }
-
+    
 } catch (Exception $e) {
     http_response_code(500);
     echo json_encode(['success' => false, 'message' => $e->getMessage()]);

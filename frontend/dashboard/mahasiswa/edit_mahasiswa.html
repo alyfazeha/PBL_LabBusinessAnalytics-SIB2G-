@@ -10,6 +10,37 @@
     <link rel="stylesheet" href="../../assets/css/cssadmin.css">
     <link rel="stylesheet" href="../../assets/css/cssmahasiswa.css">
 
+    <style>
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal.show {
+            display: flex;
+        }
+        .modal-content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            width: 300px;
+            text-align: center;
+        }
+        .btn-secondary {
+            background: #6c757d; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;
+        }
+        .btn-primary {
+            background: #007bff; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;
+        }
+    </style>
 </head>
 
 <body>
@@ -33,7 +64,7 @@
         <header>
             <div class="page-title-group">
                 <a href="mahasiswa.html" class="back-icon-link"><i class="fas fa-arrow-left"></i></a>
-                <h1>Edit Data Mahasiswa: <span id="mahasiswaNimDisplay">Memuat...</span></h1>
+                <h1>Edit Data Mahasiswa <span id="headerNimDisplay"></span></h1>
             </div>
         </header>
 
@@ -41,11 +72,10 @@
             <div id="message" class="message-area" style="display: none;"></div>
 
             <form id="editMahasiswaForm" class="data-form">
-                <input type="hidden" id="nim_hidden" name="nim">
 
                 <div class="form-group">
-                    <label for="nim_display">NIM (Tidak dapat diubah)</label>
-                    <input type="text" id="nim_display" disabled>
+                    <label for="nim">NIM (Tidak dapat diubah)</label>
+                    <input type="text" id="nim" name="nim" required placeholder="NIM Mahasiswa" readonly style="background-color: #e9ecef; cursor: not-allowed; color: #555;">
                 </div>
 
                 <div class="form-group">
@@ -56,19 +86,21 @@
                 <div class="form-group">
                     <label for="prodi">Program Studi (*)</label>
                     <select id="prodi" name="prodi" required>
-                        <option value="D3 TI">D3 Teknologi Informasi</option>
-                        <option value="D4 TI">D4 Teknologi Informasi</option>
-                        <option value="S2 Terapan">S2 Terapan</option>
+                        <option value="D-II PPLS">D-II PPLS</option>
+                        <option value="D-IV Teknik Informatika">D-IV Teknik Informatika</option>
+                        <option value="D-IV Sistem Informasi Bisnis">D-IV Sistem Informasi Bisnis</option>
+                        <option value="S2 Magister Terapan">S2 Magister Terapan</option>
                     </select>
                 </div>
 
                 <div class="form-group">
                     <label for="tingkat">Tingkat/Semester (*)</label>
                     <select id="tingkat" name="tingkat" required>
+                        <option value="">-- Pilih Tingkat --</option>
                         <option value="1">Tingkat 1</option>
                         <option value="2">Tingkat 2</option>
                         <option value="3">Tingkat 3</option>
-                        <option value="4">Tingkat 4 (D4/S1)</option>
+                        <option value="4">Tingkat 4</option>
                         <option value="S2">S2</option>
                     </select>
                 </div>
@@ -83,7 +115,7 @@
                     <input type="text" id="no_hp" name="no_hp" placeholder="Contoh: 081234567890">
                 </div>
 
-                <button type="submit" class="submit-button"><i class="fas fa-sync-alt"></i> Update Mahasiswa</button>
+                <button type="submit" id="btnSimpan" class="submit-button"><i class="fas fa-sync-alt"></i> Update Mahasiswa</button>
             </form>
         </div>
     </div>
@@ -91,158 +123,170 @@
     <div id="logoutModal" class="modal">
         <div class="modal-content">
             <h2>Konfirmasi Logout</h2>
-            <p>Apakah Anda yakin ingin keluar dari Dashboard Admin?</p>
-            <button id="cancelLogoutBtn" class="btn btn-secondary">Batal</button>
-            <button id="confirmLogoutBtn" class="btn btn-primary"
-                style="text-align: center; padding-left: 25px;">Logout</button>
+            <p>Apakah Anda yakin ingin keluar?</p>
+            <div style="margin-top: 20px;">
+                <button id="cancelLogoutBtn" class="btn-secondary">Batal</button>
+                <button id="confirmLogoutBtn" class="btn-primary">Logout</button>
+            </div>
         </div>
     </div>
-
-
+    
     <script>
-        // Fungsi utilitas untuk menampilkan pesan
-        function displayMessage(type, message) {
-            const messageArea = document.getElementById('message');
-            messageArea.textContent = message;
-            messageArea.className = `message-area ${type}`;
-            messageArea.style.display = 'block';
-            setTimeout(() => {
-                messageArea.style.display = 'none';
-            }, 3000);
+    const API_BASE_URL = '../../../backend/api/mahasiswa/';
+    const AUTH_LOGOUT_URL = '../../../backend/api/auth/logout.php';
+    
+    // 1. FUNGSI: Mengisi Form dengan Data Lama
+    async function loadData() {
+        const nimTarget = localStorage.getItem('editMahasiswaNim');
+        console.log("NIM target dari LocalStorage:", nimTarget); 
+
+        if (!nimTarget) {
+            alert("Error: NIM mahasiswa tidak terdeteksi. Kembali ke halaman daftar.");
+            window.location.href = 'mahasiswa.html';
+            return;
         }
 
-        // Fungsi untuk mengambil NIM dari URL
-        function getNimFromUrl() {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get('nim');
-        }
-
-        const mahasiswaNimDisplay = document.getElementById('mahasiswaNimDisplay');
-        const form = document.getElementById('editMahasiswaForm');
-
-        // --- FUNGSI AMBIL DETAIL MAHASISWA ---
-        async function fetchMahasiswaDetail(nim) {
-            // Endpoint Detail Mahasiswa
-            const url = `../../../backend/api/mahasiswa/detail.php?nim=${nim}`;
-
-            try {
-                const response = await fetch(url);
-                const data = await response.json();
-
-                if (response.ok && data && !data.error) {
-                    // Isi form dengan data yang didapat
-                    mahasiswaNimDisplay.textContent = data.nim;
-                    document.getElementById('nim_hidden').value = data.nim;
-                    document.getElementById('nim_display').value = data.nim;
-                    document.getElementById('nama').value = data.nama;
-                    document.getElementById('prodi').value = data.prodi;
-                    document.getElementById('tingkat').value = data.tingkat;
-                    document.getElementById('email').value = data.email || '';
-                    document.getElementById('no_hp').value = data.no_hp || '';
-
-                } else {
-                    displayMessage('error', data.error || 'Data Mahasiswa tidak ditemukan.');
-                    mahasiswaNimDisplay.textContent = 'Error';
-                }
-            } catch (error) {
-                console.error('Fetch Error:', error);
-                displayMessage('error', 'Terjadi kesalahan jaringan/server saat memuat data.');
+        try {
+            const url = `${API_BASE_URL}detail.php?nim=${nimTarget}`;
+            const response = await fetch(url);
+            
+            if (!response.ok) {
+                console.error(`Gagal ambil data. Status: ${response.status}`);
+                alert(`Gagal mengambil data mahasiswa. Status: ${response.status}`);
+                return;
             }
-        }
-
-        // --- SUBMIT UPDATE FORM ---
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            const formData = new FormData(form);
-            // Endpoint Update Mahasiswa
-            const url = '../../../backend/api/mahasiswa/update.php';
-
-            const submitButton = form.querySelector('.submit-button');
-            submitButton.disabled = true;
-            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
-
-
+            
+            let mhs;
             try {
-                const response = await fetch(url, {
-                    method: 'POST',
-                    body: formData // Kirim FormData
-                });
-
-                const result = await response.json();
-
-                if (result.success) {
-                    displayMessage('success', result.message || 'Data Mahasiswa berhasil diubah!');
-
-                    setTimeout(() => {
-                        window.location.href = 'mahasiswa.html'; // Redirect
-                    }, 1500);
-                } else {
-                    displayMessage('error', result.message || 'Gagal mengubah Mahasiswa.');
-                }
-
-            } catch (error) {
-                console.error('Error updating Mahasiswa:', error);
-                displayMessage('error', 'Terjadi kesalahan jaringan/server saat mengubah Mahasiswa.');
-            } finally {
-                submitButton.disabled = false;
-                submitButton.innerHTML = '<i class="fas fa-sync-alt"></i> Update Mahasiswa';
+                const json = await response.json();
+                mhs = json.data || json; 
+            } catch (e) {
+                console.error("Error parsing JSON:", e);
+                alert("Error: Data dari server bukan JSON yang valid.");
+                return;
             }
-        });
 
-        // Panggil fungsi saat halaman dimuat
-        document.addEventListener('DOMContentLoaded', () => {
-            const nim = getNimFromUrl();
-            if (nim) {
-                fetchMahasiswaDetail(nim);
+            if (mhs && mhs.nim) {
+                // Isi Form
+                document.getElementById('nim').value = mhs.nim; // Akan terisi tapi readonly
+                document.getElementById('nama').value = mhs.nama;
+                document.getElementById('prodi').value = mhs.prodi;
+                document.getElementById('tingkat').value = mhs.tingkat;
+                document.getElementById('no_hp').value = mhs.no_hp;
+                document.getElementById('email').value = mhs.email;
+                
+                // Update Judul Kecil
+                const headerNim = document.getElementById('headerNimDisplay');
+                if(headerNim) headerNim.textContent = `: ${mhs.nim}`;
+                
             } else {
-                mahasiswaNimDisplay.textContent = 'Error';
-                displayMessage('error', 'NIM Mahasiswa tidak ditemukan di URL. Tidak bisa melakukan edit.');
+                alert("Data mahasiswa tidak ditemukan (kosong).");
+                window.location.href = 'mahasiswa.html';
             }
-        });
 
-        // Logika Logout (PERTAMBAHAN BARU)
-        const logoutModal = document.getElementById('logoutModal');
-        const logoutTrigger = document.getElementById('logoutTrigger');
-        const cancelLogoutBtn = document.getElementById('cancelLogoutBtn');
-        const confirmLogoutBtn = document.getElementById('confirmLogoutBtn');
+        } catch (error) {
+            console.error("Fatal Fetch Error:", error);
+            alert("Terjadi kesalahan koneksi server.");
+        }
+    }
 
+    // 2. FUNGSI: Simpan Perubahan (Update)
+    document.getElementById('editMahasiswaForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const btnSimpan = document.getElementById('btnSimpan');
+        const originalText = btnSimpan.innerHTML;
+        btnSimpan.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+        btnSimpan.disabled = true;
+
+        const formData = new FormData(this);
+        
+        try {
+            const response = await fetch(`${API_BASE_URL}update.php`, {
+                method: 'POST',
+                body: formData
+            });
+            
+            let result;
+            try {
+                result = await response.json();
+            } catch (e) {
+                alert("Error: Respon server bukan JSON.");
+                console.log(await response.text()); 
+                btnSimpan.innerHTML = originalText;
+                btnSimpan.disabled = false;
+                return;
+            }
+
+            if (result.success) {
+                alert('Data mahasiswa berhasil diperbarui!');
+                localStorage.removeItem('editMahasiswaNim'); 
+                window.location.href = 'mahasiswa.html';
+            } else {
+                alert('Gagal update: ' + (result.message || 'Terjadi kesalahan.'));
+                btnSimpan.innerHTML = originalText;
+                btnSimpan.disabled = false;
+            }
+
+        } catch (error) {
+            console.error('Update Error:', error);
+            alert('Terjadi kesalahan jaringan/server.');
+            btnSimpan.innerHTML = originalText;
+            btnSimpan.disabled = false;
+        }
+    });
+
+    // Jalankan loadData saat halaman siap
+    document.addEventListener('DOMContentLoaded', loadData);
+
+    // --- LOGIC LOGOUT ---
+    const logoutTrigger = document.getElementById('logoutTrigger');
+    const logoutModal = document.getElementById('logoutModal');
+    const cancelLogoutBtn = document.getElementById('cancelLogoutBtn');
+    const confirmLogoutBtn = document.getElementById('confirmLogoutBtn');
+    const closeModal = document.querySelector('.close'); // Cek jika ada tombol X
+
+    function toggleModal(show) {
+        if (logoutModal) {
+            if (show) {
+                logoutModal.classList.add('show');
+            } else {
+                logoutModal.classList.remove('show');
+            }
+        }
+    }
+
+    if(logoutTrigger) {
         logoutTrigger.addEventListener('click', (e) => {
             e.preventDefault();
-            // Ganti: logoutModal.style.display = 'flex';
-            // Tambahkan kelas 'show' yang memiliki display: flex di CSS
-            logoutModal.classList.add('show');
+            toggleModal(true);
         });
+    }
 
-        cancelLogoutBtn.addEventListener('click', () => {
-            // Ganti: logoutModal.style.display = 'none';
-            // Hapus kelas 'show'
-            logoutModal.classList.remove('show');
-        });
+    if(cancelLogoutBtn) {
+        cancelLogoutBtn.addEventListener('click', () => toggleModal(false));
+    }
+    
+    // Pengecekan aman untuk tombol close
+    if (closeModal) {
+        closeModal.addEventListener('click', () => toggleModal(false));
+    }
 
+    window.onclick = (event) => {
+        if (event.target == logoutModal) toggleModal(false);
+    };
+
+    if(confirmLogoutBtn) {
         confirmLogoutBtn.addEventListener('click', async () => {
-            const url = '../../../backend/api/auth/logout.php';
-
             try {
-                const response = await fetch(url, {
-                    method: 'POST',
-                });
-                const result = await response.json();
-
-                if (result.success) {
-                    // Pastikan modal ditutup
-                    logoutModal.classList.remove('show');
-                    window.location.href = '../../public/index.html'; // Redirect ke halaman utama
-                } else {
-                    window.location.href = '../../public/index.html';
-                }
-
+                await fetch(AUTH_LOGOUT_URL, { method: 'POST' });
+                window.location.href = '../../public/index.html';
             } catch (error) {
                 console.error('Logout Error:', error);
                 window.location.href = '../../public/index.html';
             }
         });
+    }
     </script>
 </body>
-
 </html>
