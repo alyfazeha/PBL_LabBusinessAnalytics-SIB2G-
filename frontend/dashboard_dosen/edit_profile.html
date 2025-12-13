@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Profil Dosen</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="/frontend/assets/css/dashboarddns.css">
+    <link rel="stylesheet" href="../../frontend/assets/css/dashboarddns.css">
 </head>
 
 <body>
@@ -30,7 +30,7 @@
             <form id="formEditProfile" enctype="multipart/form-data" style="max-width: 700px; margin-top: 20px;">
                 
                 <div class="form-group" style="margin-bottom: 20px; text-align: center;">
-                    <img id="previewFoto" src="/frontend/assets/img/default-profile.png" 
+                    <img id="previewFoto" src="../../frontend/assets/img/default-profile.png" 
                          style="width: 120px; height: 120px; object-fit: cover; border-radius: 50%; border: 2px solid #ddd; margin-bottom: 10px;">
                     <br>
                     <label for="foto" style="cursor: pointer; color: #007bff; font-size: 14px;">
@@ -48,25 +48,26 @@
                     <label>NIP</label>
                     <input type="text" id="nip" name="nip" class="form-control">
                 </div>
-
-                <div class="profile-info-group">
-                    <label>Program Studi</label>
-                    <input type="text" id="prodi" name="prodi" class="form-control">
-                </div>
-
-                <div class="profile-info-group">
-                    <label>Jabatan Fungsional</label>
-                    <input type="text" id="jabatan" name="jabatan" class="form-control" placeholder="Contoh: Lektor Kepala">
-                </div>
-
                 <div class="profile-info-group">
                     <label>Email</label>
                     <input type="email" id="email" name="email" class="form-control" required>
                 </div>
-
+                <div class="profile-info-group">
+                    <label>Jabatan</label>
+                    <input type="text" id="jabatan" name="jabatan" class="form-control" placeholder="Contoh: Lektor Kepala">
+                </div>
+                <div class="profile-info-group">
+                    <label>Prodi</label>
+                    <input type="text" id="prodi" name="prodi" class="form-control">
+                </div>
                 <div class="profile-info-group">
                     <label>Pendidikan Terakhir</label>
                     <input type="text" id="pendidikan" name="pendidikan" class="form-control" placeholder="Contoh: S3 Ilmu Komputer">
+                </div>
+
+                <div class="profile-info-group">
+                    <label>Sertifikasi</label>
+                    <input type="text" id="sertifikasi" name="sertifikasi" class="form-control" placeholder="Contoh: Sertifikat Dosen, AWS Certified">
                 </div>
 
                 <hr>
@@ -79,7 +80,17 @@
 
                 <div class="profile-info-group">
                     <label>Link Google Scholar</label>
-                    <input type="url" id="scholar_url" name="scholar_url" class="form-control" placeholder="https://scholar.google.com/...">
+                    <input type="url" id="scholar_url" name="scholar_url" class="form-control" placeholder="https://scholar.google.com/citations?user=...">
+                </div>
+
+                 <div class="profile-info-group">
+                    <label>Link Scopus</label>
+                    <input type="url" id="scopus_url" name="scopus_url" class="form-control" placeholder="https://www.scopus.com/authid/...">
+                </div>
+                
+                <div class="profile-info-group">
+                    <label>Link ResearchGate</label>
+                    <input type="url" id="researchgate_url" name="researchgate_url" class="form-control" placeholder="https://www.researchgate.net/profile/...">
                 </div>
 
                 <div class="form-actions" style="margin-top: 30px; display: flex; gap: 10px;">
@@ -126,27 +137,30 @@
                     document.getElementById('jabatan').value = data.jabatan || '';
                     document.getElementById('email').value = data.email || '';
                     document.getElementById('pendidikan').value = data.pendidikan || '';
+                    document.getElementById('sertifikasi').value = data.sertifikasi || ''; 
                     document.getElementById('sinta_url').value = data.sinta_url || '';
                     document.getElementById('scholar_url').value = data.scholar_url || '';
+                    document.getElementById('researchgate_url').value = data.researchgate_url || ''; 
+                    document.getElementById('scopus_url').value = data.scopus_url || '';
                     
-                    // --- PATH ABSOLUT UNTUK PREVIEW FOTO ---
+                    // --- PATH PRATINJAU FOTO (FIXED) ---
+                    const imgElem = document.getElementById('previewFoto');
+
                     if (data.foto_path && data.foto_path !== "") {
                         let path = data.foto_path;
-                        let finalPath = "/frontend/assets/img/default-profile.png"; // Default Absolute
+                        let finalPath = "../../frontend/assets/img/default-profile.png"; // Default Path Dosen
 
-                        // Bersihkan path jika ada folder lama
-                        if (path.includes('/')) {
-                            path = path.split('/').pop();
-                        }
-
+                        // Ambil nama file terakhir dari path yang tersimpan di DB
+                        let fileName = path.split('/').pop();
+                        
                         if (path.startsWith('http')) {
                             finalPath = path;
                         } else {
-                            // Gunakan path absolut dari root domain
-                            finalPath = `/frontend/assets/uploads/dosen/${path}`;
+                            // [FIX] Gunakan path relatif yang panjang dan KONSISTEN dengan profile.html
+                            finalPath = `../../frontend/assets/uploads/dosen/${fileName}`;
                         }
                         
-                        document.getElementById('previewFoto').src = finalPath;
+                        imgElem.src = finalPath;
                     }
                     // ------------------------------------------
 

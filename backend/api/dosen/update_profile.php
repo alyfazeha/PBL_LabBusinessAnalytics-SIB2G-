@@ -23,7 +23,7 @@ try {
     $dosenModel = new Dosen();
     $userId = $_SESSION['user_id'];
 
-    // 2. Cari NIDN Dosen
+    // 2. Cari Data Dosen
     $stmt = $db->prepare("SELECT * FROM dosen WHERE user_id = :uid");
     $stmt->execute([':uid' => $userId]);
     $currentData = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -37,30 +37,38 @@ try {
     // 3. Ambil Data Input
     $nama = $_POST['nama'] ?? $currentData['nama'];
     $nip = $_POST['nip'] ?? $currentData['nip'];
+    $prodi = $_POST['prodi'] ?? $currentData['prodi'];
     $jabatan = $_POST['jabatan'] ?? $currentData['jabatan'];
     $email = $_POST['email'] ?? $currentData['email'];
-    $prodi = $_POST['prodi'] ?? $currentData['prodi'];
     $pendidikan = $_POST['pendidikan'] ?? $currentData['pendidikan'];
+    $sertifikasi = $_POST['sertifikasi'] ?? $currentData['sertifikasi'];
     
     // Link Eksternal
     $sinta = $_POST['sinta_url'] ?? $currentData['sinta_url'];
     $scholar = $_POST['scholar_url'] ?? $currentData['scholar_url'];
     $researchgate = $_POST['researchgate_url'] ?? $currentData['researchgate_url'];
-    
-    // [BARU] Tambahkan scopus jika kolomnya ada di database
-    // $scopus = $_POST['scopus_url'] ?? $currentData['scopus_url']; 
+    $scopus = $_POST['scopus_url'] ?? $currentData['scopus_url'];
 
-    // 4. Handle Upload Foto
-    $fotoPath = $currentData['foto_path'];
+    // [FIX PATH] Tetapkan fotoPath = foto lama secara default
+    $fotoPath = $currentData['foto_path']; 
 
+    // 4. Proses Upload Foto (jika ada)
     if (isset($_FILES['foto']) && $_FILES['foto']['error'] === UPLOAD_ERR_OK) {
         
-        // [PERBAIKAN UTAMA] Tambahkan '/frontend' agar lokasi simpan sesuai dengan lokasi baca HTML
-        $uploadDir = __DIR__ . '/../../../frontend/assets/uploads/dosen/';
+        // --- LOGIKA UPLOAD DAN PATH HARUS SAMA DENGAN CREATE.PHP (KONSISTENSI PATH) ---
+        $uploadDir = __DIR__ . "/../../../frontend/assets/uploads/dosen/";
         
-        // Buat folder jika belum ada
+        // Pastikan direktori ada
         if (!is_dir($uploadDir)) {
             mkdir($uploadDir, 0777, true);
+        }
+
+        // Hapus foto lama jika ada (jika path lama tidak kosong)
+        if ($currentData['foto_path']) {
+            $oldFileName = basename($currentData['foto_path']); 
+            if (file_exists($uploadDir . $oldFileName)) {
+                unlink($uploadDir . $oldFileName);
+            }
         }
 
         $fileExt = pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION);
@@ -68,9 +76,8 @@ try {
         $targetFile = $uploadDir . $fileName;
 
         if (move_uploaded_file($_FILES['foto']['tmp_name'], $targetFile)) {
-            // Simpan path relatif untuk database
-            // Frontend HTML/JS nanti akan membersihkan path ini (mengambil nama file saja)
-            $fotoPath = '../../assets/uploads/dosen/' . $fileName;
+            // Simpan path yang sama dengan yang dibaca Dosen/Admin
+            $fotoPath = '../../assets/uploads/dosen/' . $fileName; 
         } else {
             throw new Exception("Gagal mengupload foto. Cek permission folder.");
         }
@@ -81,21 +88,22 @@ try {
         'nama' => $nama,
         'jabatan' => $jabatan,
         'email' => $email,
-        'foto_path' => $fotoPath,
+        'foto_path' => $fotoPath, // Nilai yang benar dari langkah 4
         'researchgate_url' => $researchgate,
         'scholar_url' => $scholar,
         'sinta_url' => $sinta,
+        'scopus_url' => $scopus,
         'nip' => $nip,
         'prodi' => $prodi,
         'pendidikan' => $pendidikan,
-        'sertifikasi' => $currentData['sertifikasi'],
+        'sertifikasi' => $sertifikasi,
         'mata_kuliah' => $currentData['mata_kuliah']
     ];
 
     if ($dosenModel->update($nidn, $dataUpdate)) {
         echo json_encode(['status' => 'success', 'message' => 'Profil berhasil diperbarui.']);
     } else {
-        throw new Exception("Gagal mengupdate database.");
+        throw new Exception("Gagal memperbarui data profil di database.");
     }
 
 } catch (Exception $e) {
