@@ -84,6 +84,7 @@ class Dosen
                 researchgate_url = :researchgate_url,
                 scholar_url = :scholar_url,
                 sinta_url = :sinta_url,
+                scopus_url = :scopus_url,  -- WAJIB DITAMBAHKAN
                 nip = :nip,
                 prodi = :prodi,
                 pendidikan = :pendidikan,
@@ -101,6 +102,7 @@ class Dosen
             ':researchgate_url' => $data['researchgate_url'],
             ':scholar_url' => $data['scholar_url'],
             ':sinta_url' => $data['sinta_url'],
+            ':scopus_url' => $data['scopus_url'],  // WAJIB DITAMBAHKAN
             ':nip' => $data['nip'],
             ':prodi' => $data['prodi'],
             ':pendidikan' => $data['pendidikan'],
@@ -109,7 +111,6 @@ class Dosen
             ':nidn' => $nidn
         ]);
     }
-
     // --- BAGIAN INI DIMODIFIKASI SEDIKIT (AMAN) ---
     public function delete($nidn)
     {

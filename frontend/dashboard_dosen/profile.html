@@ -49,27 +49,30 @@
                     <p id="detailNama">-</p>
                 </div>
                 <div class="profile-info-group">
-                    <label>Program Studi</label>
-                    <p id="detailProdi">-</p>
+                    <label>Email</label>
+                    <p id="detailEmail">-</p>
                 </div>
                 <div class="profile-info-group">
-                    <label>Jabatan Fungsional</label>
+                    <label>Jabatan</label>
                     <p id="detailJabatan" style="font-weight: 700; color: var(--primary-blue);">-</p>
                 </div>
                 <div class="profile-info-group">
-                    <label>Email</label>
-                    <p id="detailEmail">-</p>
+                    <label>Prodi</label>
+                    <p id="detailProdi">-</p>
                 </div>
                 <div class="profile-info-group">
                     <label>Pendidikan Terakhir</label>
                     <p id="detailPendidikan">-</p>
                 </div>
-                
+                <div class="profile-info-group">
+                    <label> Sertifikasi</label>
+                    <p id="detailSertifikasi">-</p> </div>
                 <div class="profile-info-group">
                     <label>Tautan Eksternal</label>
                     <p id="detailLinks">-</p>
                 </div>
             </div>
+
 
             <a href="edit_profile.html" class="btn-edit-profile"><i class="fas fa-edit"></i> Edit Profil</a>
         </div>
@@ -78,10 +81,6 @@
     <script>
         async function loadProfile() {
             try {
-                // Request data dosen
-                // API ada di root/backend/api/dosen/me.php
-                // Kita di root/frontend/dashboard_dosen/profile.html
-                // ../../ ke Root, lalu masuk backend...
                 const response = await fetch('../../backend/api/dosen/me.php');
                 const result = await response.json();
 
@@ -98,18 +97,20 @@
                     document.getElementById('detailJabatan').textContent = data.jabatan || '-';
                     document.getElementById('detailEmail').textContent = data.email || '-';
                     document.getElementById('detailPendidikan').textContent = data.pendidikan || '-';
+                    document.getElementById('detailSertifikasi').textContent = data.sertifikasi || '-'; 
 
                     // 2. Link Eksternal
                     let links = [];
                     if (data.sinta_url) links.push(`<a href="${data.sinta_url}" target="_blank">SINTA</a>`);
                     if (data.scholar_url) links.push(`<a href="${data.scholar_url}" target="_blank">Google Scholar</a>`);
+                    if (data.researchgate_url) links.push(`<a href="${data.researchgate_url}" target="_blank">ResearchGate</a>`);
+                    if (data.scopus_url) links.push(`<a href="${data.scopus_url}" target="_blank">Scopus</a>`); 
                     document.getElementById('detailLinks').innerHTML = links.length > 0 ? links.join(' | ') : '-';
 
-                    // 3. PERBAIKAN PATH FOTO (Sesuai Struktur Folder create.php)
+                    // 3. PERBAIKAN PATH FOTO (Menggunakan Path Relatif yang Teruji)
                     const imgElem = document.getElementById('dosenFoto');
                     
-                    // Path Default (Ke root/frontend/assets/...)
-                    let finalFotoPath = "../../frontend/assets/img/default-profile.png";
+                    let finalFotoPath = "../../frontend/assets/img/default-profile.png"; // Default path
 
                     if (data.foto_path && data.foto_path !== 'null' && data.foto_path !== '') {
                         let path = data.foto_path;
@@ -117,24 +118,19 @@
                         if (path.startsWith('http://') || path.startsWith('https://')) {
                             finalFotoPath = path;
                         } else {
-                            // [PENTING] Ambil nama file saja (hilangkan path lama dari database)
-                            // Contoh DB: "../../assets/uploads/dosen/foto.jpg" -> Jadi: "foto.jpg"
+                            // Ambil nama file saja (hilangkan path lama dari database)
                             if (path.includes('/')) {
                                 path = path.split('/').pop();
                             }
 
-                            // [FIX] Gunakan path relatif yang benar dari folder dashboard_dosen ke assets
-                            // Folder kita: frontend/dashboard_dosen/
-                            // Target:      frontend/assets/uploads/dosen/
-                            // Maka: Mundur 1 langkah (../) lalu masuk assets
-                            finalFotoPath = `../assets/uploads/dosen/${path}`;
+                            // Gunakan Path Relatif Paling Kuat (Sama dengan CSS)
+                            finalFotoPath = `../../frontend/assets/uploads/dosen/${path}`;
                         }
                     }
                     
                     imgElem.src = finalFotoPath;
                     imgElem.style.display = 'block';
                     
-                    // Debugging: Cek path ini di Console Browser (F12) jika masih tidak muncul
                     console.log("Loading Foto dari:", finalFotoPath);
 
                 } else {
