@@ -7,6 +7,25 @@
     <title>Riwayat Peminjaman</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="../../frontend/assets/css/dashboarddns.css">
+    <style>
+        /* Tambahan style untuk badge status */
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: 600;
+            color: #fff !important;
+
+        }
+
+        .badge.approved, .badge.disetujui, .badge.kembali { background-color: #28a745; }
+        .badge.pending, .badge.menunggu { background-color: #ffc107; color: #333; }
+        .badge.rejected, .badge.ditolak { background-color: #dc3545; }
+        /* Jika Anda memiliki status 'Dipinjam' atau 'Selesai' */
+        .badge.dipinjam { background-color: #007bff; }
+        .badge.selesai { background-color: #6c757d; }
+    </style>
 </head>
 
 <body>
@@ -46,51 +65,99 @@
                             <th>Aksi</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td>15/12/2025</td>
-                            <td>2023001 | A. Fadli</td>
-                            <td>Laptop Lab (1)</td>
-                            <td>Praktikum PW</td>
-                            <td><span class="badge approved">Disetujui</span></td>
-                            <td>
-                                <div class="action-buttons"><a href="detail_peminjaman.html" class="detail-btn"><i
-                                            class="fas fa-eye"></i> Detail</a></div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>10/12/2025</td>
-                            <td>2023002 | R. Sinta</td>
-                            <td>Proyektor (1)</td>
-                            <td>Presentasi</td>
-                            <td><span class="badge pending">Menunggu</span></td>
-                            <td>
-                                <div class="action-buttons"><a href="detail_peminjaman.html" class="detail-btn"><i
-                                            class="fas fa-eye"></i> Detail</a></div>
-                            </td>
-                        </tr>
-                    </tbody>
+                    <tbody id="peminjamanTableBody">
+                        </tbody>
                 </table>
             </div>
         </div>
     </main>
 
     <script>
+        const tableBody = document.getElementById('peminjamanTableBody');
+
+        function getStatusClass(status) {
+            const lowerStatus = status ? status.toLowerCase() : '';
+            if (lowerStatus.includes('setuju') || lowerStatus.includes('approved')) return 'approved';
+            if (lowerStatus.includes('tolak') || lowerStatus.includes('rejected')) return 'rejected';
+            if (lowerStatus.includes('kembali') || lowerStatus.includes('returned')) return 'kembali';
+            if (lowerStatus.includes('dipinjam')) return 'dipinjam';
+            return 'pending'; // Menunggu
+        }
+        
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        }
+
+
+        function renderPeminjaman(data) {
+            if (data.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center;">Tidak ada riwayat peminjaman dari mahasiswa bimbingan Anda.</td></tr>`;
+                return;
+            }
+
+            let html = '';
+            data.forEach(item => {
+                // Perhatikan: item.status, item.tanggal_peminjaman, item.aset_dipinjam, item.keperluan 
+                // harus cocok dengan kolom yang di-SELECT di list.php
+                const statusText = item.status ? item.status.charAt(0).toUpperCase() + item.status.slice(1).toLowerCase() : 'Menunggu';
+                const statusClass = getStatusClass(item.status);
+                const tglPinjam = formatDate(item.tanggal_peminjaman);
+
+                html += `
+                    <tr>
+                        <td>${tglPinjam}</td>
+                        <td>${item.nim_mahasiswa || '-'} | ${item.nama_mahasiswa || '-'}</td>
+                        <td>${item.aset_dipinjam || '-'}</td>
+                        <td>${item.keperluan || '-'}</td>
+                        <td><span class="badge ${statusClass}">${statusText}</span></td>
+                        <td>
+                            <div class="action-buttons">
+                                <a href="detail_peminjaman.html?id=${item.id}" class="detail-btn">
+                                    <i class="fas fa-eye"></i> Detail
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+            tableBody.innerHTML = html;
+        }
+
+
+        async function loadPeminjaman() {
+            tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center;">Memuat data peminjaman...</td></tr>`;
+
+            try {
+                // [PATH API] Menggunakan path yang disesuaikan
+                const response = await fetch('../../backend/api/booking/list_dosen.php'); 
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    renderPeminjaman(result.data);
+                } else {
+                    // Tampilkan pesan error dari server PHP (termasuk error SQL)
+                    tableBody.innerHTML = `<tr><td colspan="6" style="color: red; text-align: center;">Gagal memuat data: ${result.message}</td></tr>`;
+                }
+
+            } catch (error) {
+                console.error('Error loading peminjaman:', error);
+                tableBody.innerHTML = `<tr><td colspan="6" style="color: red; text-align: center;">Terjadi kesalahan koneksi jaringan.</td></tr>`;
+            }
+        }
+
+        // Panggil fungsi saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', loadPeminjaman);
+
         // Logika Logout
         document.getElementById('logoutLink').addEventListener('click', function (e) {
             e.preventDefault();
             if (confirm('Apakah Anda yakin ingin keluar dari sistem?')) {
                 const logoutUrl = '../../backend/api/auth/logout.php';
                 fetch(logoutUrl, { method: 'POST' })
-                    .then(response => response.json())
-                    .then(data => {
-                        alert(data.message);
-                        window.location.href = '../public/index.html';
-                    })
-                    .catch(error => {
-                        alert('Terjadi kesalahan saat logout.');
-                        window.location.href = '../public/index.html';
-                    });
+                    .then(() => window.location.href = '../public/index.html')
+                    .catch(() => window.location.href = '../public/index.html');
             }
         });
     </script>
