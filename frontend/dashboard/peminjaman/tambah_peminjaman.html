@@ -8,10 +8,18 @@
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../../assets/css/cssadmin.css">
+
+    <style>
+        .data-form .form-text {
+            display: block;
+            margin-top: 4px;
+            font-size: 0.85em;
+            color: #6c757d;
+        }
+    </style>
 </head>
 
 <body>
-
     <div class="sidebar">
         <div class="logo-area">
             <h3>Lab Admin</h3>
@@ -30,94 +38,103 @@
     <div class="main-content">
         <header>
             <div class="header-title">
-                <h2>Tambah Peminjaman</h2>
-                <a href="peminjaman.html" class="back-link"><i class="fas fa-arrow-left"></i> Kembali</a>
+                <a href="peminjaman.html" class="back-icon-in-header"><i class="fas fa-arrow-left"></i></a>
+                <h2>Tambah Data Peminjaman</h2>
             </div>
+            <div></div>
         </header>
 
         <main>
-            <div id="statusMessage" class="status-message" style="display:none; padding: 10px; margin-bottom: 20px;">
-            </div>
+            <div id="statusMessage" class="status-message" style="display:none;"></div>
 
-            <div class="card">
+            <div class="form-card">
+                <div class="form-card-header"></div>
+
                 <form id="formPeminjaman" class="data-form">
 
-                    <div class="form-group">
-                        <label for="sarana_id">Sarana / Ruangan <span class="required">*</span></label>
-                        <select id="sarana_id" name="sarana_id" required>
-                            <option value="">Memuat Sarana...</option>
-                        </select>
-                    </div>
+                    <div class="form-grid-2">
+                        <div class="column-left">
+                            <div class="form-group">
+                                <label for="sarana_id">Sarana / Ruangan <span class="required">*</span></label>
+                                <select id="sarana_id" name="sarana_id" required>
+                                    <option value="">Memuat Sarana...</option>
+                                </select>
+                            </div>
 
-                    <div class="form-group">
-                        <label for="tanggal">Tanggal Peminjaman <span class="required">*</span></label>
-                        <input type="date" id="tanggal" name="tanggal" required>
-                    </div>
+                            <div class="form-group">
+                                <label for="tanggal">Tanggal Peminjaman <span class="required">*</span></label>
+                                <input type="date" id="tanggal" name="tanggal" required>
+                            </div>
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="nidn">Dosen Penanggung Jawab <span class="required">*</span></label>
-                            <select id="nidn" name="nidn" required>
-                                <option value="">-- Memuat Data Dosen... --</option>
-                            </select>
+                            <div class="form-group">
+                                <label for="nidn">Dosen Penanggung Jawab <span class="required">*</span></label>
+                                <select id="nidn" name="nidn" required>
+                                    <option value="">-- Memuat Data Dosen... --</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="nim">NIM Mahasiswa</label>
+                                <input type="text" id="nim" name="nim" placeholder="Wajib diisi">
+                            </div>
                         </div>
 
-                        <div class="form-group">
-                            <label for="nim">NIM Mahasiswa</label>
-                            <input type="text" id="nim" name="nim" placeholder="Wajib diisi">
+                        <div class="column-right">
+                            <div class="form-group time-split">
+                                <div class="time-group">
+                                    <label for="sks">Jumlah SKS <span class="required">*</span></label>
+                                    <input type="number" id="sks" name="sks" required min="1" max="10"
+                                        placeholder="Contoh: 4">
+                                    <small class="form-text">1 SKS setara ±100 menit.</small>
+                                </div>
+                                <div class="time-group">
+                                    <label for="start_time">Waktu Mulai <span class="required">*</span></label>
+                                    <input type="time" id="start_time" name="start_time" required>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="keperluan">Keperluan / Keterangan <span class="required">*</span></label>
+                                <textarea id="keperluan" name="keperluan" rows="4" required
+                                    placeholder="Contoh: Digunakan untuk praktikum mata kuliah Pemrograman Web"></textarea>
+                            </div>
+
+                            <div class="form-actions align-bottom">
+                                <button type="submit" id="submitBtn" class="btn btn-action"><i class="fas fa-save"></i>
+                                    Ajukan Peminjaman</button>
+                                <a href="peminjaman.html" class="btn btn-secondary"><i class="fas fa-times"></i>
+                                    Batal</a>
+                            </div>
                         </div>
                     </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="sks">Jumlah SKS <span class="required">*</span></label>
-                            <input type="number" id="sks" name="sks" required min="1" max="10" placeholder="Contoh: 4">
-                            <small class="form-text">1 SKS setara ±100 menit.</small>
-                        </div>
-                        <div class="form-group">
-                            <label for="start_time">Waktu Mulai <span class="required">*</span></label>
-                            <input type="time" id="start_time" name="start_time" required>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="keperluan">Keperluan / Keterangan <span class="required">*</span></label>
-                        <textarea id="keperluan" name="keperluan" rows="4" required
-                            placeholder="Contoh: Digunakan untuk praktikum mata kuliah Pemrograman Web"></textarea>
-                    </div>
-
-                    <button type="submit" id="submitBtn" class="btn btn-action"><i class="fas fa-save"></i> Ajukan
-                        Peminjaman</button>
                 </form>
             </div>
         </main>
     </div>
 
-    <div id="logoutModal" class="modal"
-        style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4); justify-content: center; align-items: center;">
-        <div class="modal-content"
-            style="background-color: #fefefe; margin: auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 400px; border-radius: 10px;">
+    <div id="logoutModal" class="modal logout-modal">
+        <div class="modal-content">
             <span class="close-btn" onclick="logoutModal.style.display='none';">&times;</span>
-            <p>Anda yakin ingin keluar?</p>
-            <button id="confirmLogoutBtn" class="btn btn-danger">Ya, Logout</button>
-            <button id="cancelLogoutBtn" class="btn btn-secondary">Batal</button>
+            <h4><i class="fas fa-sign-out-alt"></i> Konfirmasi Logout</h4>
+            <p>Anda yakin ingin mengakhiri sesi dan keluar dari Panel Admin?</p>
+            <div class="modal-buttons">
+                <button id="cancelLogoutBtn" class="btn btn-secondary">Batal</button>
+                <button id="confirmLogoutBtn" class="btn btn-danger">Ya, Logout</button>
+            </div>
         </div>
     </div>
 
     <script>
         const PEMINJAMAN_API_URL = '../../../backend/api/booking/';
-        const SARANA_API_URL = '../../../backend/api/sarana/list.php'; // Asumsi API Sarana
-        const DOSEN_API_URL = '../../../backend/api/dosen/list.php'; // Asumsi API Dosen
+        const SARANA_API_URL = '../../../backend/api/sarana/list.php';
+        const DOSEN_API_URL = '../../../backend/api/dosen/list.php';
 
         // --- FUNGSI UTILITY ---
         function showStatusMessage(message, type = 'error') {
             const statusDiv = document.getElementById('statusMessage');
             statusDiv.textContent = message;
-            statusDiv.style.backgroundColor = type === 'success' ? '#4CAF50' : '#f44336';
-            statusDiv.style.color = 'white';
-            statusDiv.style.padding = '10px';
-            statusDiv.style.marginBottom = '20px';
-            statusDiv.style.borderRadius = '5px';
+            // Gunakan class CSS yang sudah didefinisikan 
+            statusDiv.className = `status-message ${type}`;
             statusDiv.style.display = 'block';
             setTimeout(() => { statusDiv.style.display = 'none'; }, 5000);
         }
@@ -130,10 +147,11 @@
                 const result = await response.json();
                 const data = result.data || result;
 
+                saranaSelect.innerHTML = '<option value="" disabled selected>Pilih Sarana</option>';
+
                 if (Array.isArray(data)) {
-                    saranaSelect.innerHTML = '<option value="">-- Pilih Sarana --</option>';
                     data.forEach(item => {
-                        // Asumsi data sarana memiliki sarana_id dan nama_sarana
+                        // Pastikan field API yang digunakan: sarana_id dan nama_sarana
                         saranaSelect.innerHTML += `<option value="${item.sarana_id}">${item.nama_sarana}</option>`;
                     });
                 } else {
@@ -153,10 +171,11 @@
                 const result = await response.json();
                 const data = result.data || result;
 
+                dosenSelect.innerHTML = '<option value="" disabled selected>-- Pilih Dosen PJ --</option>';
+
                 if (Array.isArray(data)) {
-                    dosenSelect.innerHTML = '<option value="">-- Pilih Dosen PJ --</option>';
                     data.forEach(item => {
-                        // Asumsi data dosen memiliki nidn dan nama
+                        // Pastikan field API yang digunakan: nidn dan nama
                         dosenSelect.innerHTML += `<option value="${item.nidn}">${item.nama} (${item.nidn})</option>`;
                     });
                 } else {
@@ -180,7 +199,6 @@
             const form = e.target;
             const formData = new FormData(form);
 
-            // Periksa SKS
             const sks = parseInt(formData.get('sks'));
             if (isNaN(sks) || sks <= 0) {
                 showStatusMessage('Jumlah SKS harus lebih dari 0.');
@@ -189,14 +207,7 @@
                 return;
             }
 
-            // Backend create.php memerlukan semua field yang terdaftar.
-            // Pastikan nim dikirim sebagai string kosong jika user tidak mengisinya (opsional)
-            if (!formData.get('nim')) {
-                formData.set('nim', '');
-            }
-
-            // Hapus end_time dari FormData jika ada (karena dihitung oleh backend)
-            formData.delete('end_time');
+            formData.append('status', 'DIAJUKAN'); // Status default
 
             try {
                 const response = await fetch(PEMINJAMAN_API_URL + 'create.php', {
@@ -208,7 +219,6 @@
                 if (response.ok && result.success) {
                     showStatusMessage('Peminjaman berhasil diajukan! Menunggu persetujuan admin.', 'success');
                     form.reset();
-                    // Redirect setelah beberapa saat
                     setTimeout(() => { window.location.href = 'peminjaman.html'; }, 1500);
                 } else {
                     showStatusMessage(result.message || 'Gagal menyimpan data.');
@@ -226,19 +236,41 @@
         document.addEventListener('DOMContentLoaded', () => {
             fetchSarana();
             fetchDosen();
-            // Set minimal tanggal hari ini agar tidak bisa memilih tanggal lampau
+            // Set minimal tanggal hari ini
             document.getElementById('tanggal').min = new Date().toISOString().split('T')[0];
         });
 
-        // Logout Logic
+        // --- LOGIKA LOGOUT ---
         const logoutModal = document.getElementById('logoutModal');
-        document.getElementById('logoutTrigger').onclick = (e) => { e.preventDefault(); logoutModal.style.display = 'flex'; };
-        document.getElementById('cancelLogoutBtn').onclick = () => logoutModal.style.display = 'none';
-        document.getElementById('confirmLogoutBtn').onclick = async () => {
-            try { await fetch('../../../backend/api/auth/logout.php', { method: 'POST' }); } catch (e) { console.error('Logout Error:', e); }
-            window.location.href = '../../public/index.html';
-        };
+        const logoutTrigger = document.getElementById('logoutTrigger');
+        const cancelLogoutBtn = document.getElementById('cancelLogoutBtn');
+        const confirmLogoutBtn = document.getElementById('confirmLogoutBtn');
 
+        logoutTrigger.addEventListener('click', (e) => {
+            e.preventDefault();
+            logoutModal.style.display = 'flex';
+        });
+
+        cancelLogoutBtn.addEventListener('click', () => {
+            logoutModal.style.display = 'none';
+        });
+
+        confirmLogoutBtn.addEventListener('click', async () => {
+            const url = '../../../backend/api/auth/logout.php';
+            try {
+                await fetch(url, { method: 'POST' });
+                window.location.href = '../../public/index.html';
+            } catch (error) {
+                console.error('Logout Error:', error);
+                window.location.href = '../../public/index.html';
+            }
+        });
+
+        window.addEventListener('click', (e) => {
+            if (e.target === logoutModal) {
+                logoutModal.style.display = 'none';
+            }
+        });
     </script>
 </body>
 
