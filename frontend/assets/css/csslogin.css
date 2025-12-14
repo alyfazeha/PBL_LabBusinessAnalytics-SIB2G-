@@ -42,10 +42,14 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    /* KEMBALIKAN KE CENTER (default) */
     flex-direction: column;
     padding: 0 50px;
     height: 100%;
     text-align: center;
+
+    /* Hapus/Komentari overflow-y: auto; di sini */
+    /* Hapus/Komentari padding-bottom: 30px; di sini */
 }
 
 .form-container h1 {
@@ -94,6 +98,69 @@ body {
     transition: transform 80ms ease-in;
     margin-top: 10px;
     cursor: pointer;
+}
+
+/* Gaya tambahan untuk step form */
+.step-content {
+    width: 100%;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 0;
+
+    /* --- MODIFIKASI DIMULAI DI SINI --- */
+    /* Memastikan Step Content mengisi ruang vertikal yang tersedia */
+    height: 100%;
+    /* Mengaktifkan scroll untuk step yang memiliki banyak konten */
+    /* Secara default, kita beri padding bottom agar tombol 'Daftar' dan 'Kembali' tidak terpotong */
+    padding-bottom: 30px;
+}
+
+.step-content.active {
+    display: flex;
+
+    /* KHUSUS UNTUK STEP 2 (FORM INPUT) */
+    /* Mengatur form agar bisa di-scroll dan konten dimulai dari atas */
+    overflow-y: auto;
+    justify-content: flex-start;
+    /* Konten dimulai dari atas */
+}
+
+/* Tambahkan aturan khusus untuk Step 1 agar tetap di tengah */
+#step1.active {
+    justify-content: center;
+    /* Konten terpusat vertikal */
+    overflow-y: hidden;
+    /* Pastikan tidak ada scroll di step 1 */
+}
+
+.role-button {
+    background-color: #4A90E2;
+    /* Warna primer */
+    color: #FFFFFF;
+    border: none;
+    padding: 15px 30px;
+    margin: 10px;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: transform 80ms ease-in;
+    width: 80%;
+}
+
+.role-button:hover {
+    transform: scale(1.05);
+    background-color: #3a7fd4;
+}
+
+.back-button {
+    background-color: transparent;
+    border: 1px solid #BBBBBB;
+    color: #333;
+    margin-top: 15px;
 }
 
 .form-container button:active {
