@@ -261,6 +261,114 @@ header h1 {
     }
 }
 
+/* ================== GAYA DETAIL VIEW (DETAIL_PEMINJAMAN.HTML) ================== */
+
+.detail-card {
+    background-color: #ffffff;
+    padding: 30px 40px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+    /* Lebar penuh seperti form-card */
+    max-width: 100%;
+    margin: 30px 0;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid #e0e0e0;
+    padding-top: 35px;
+    /* Sama dengan form card */
+}
+
+/* Header Biru Tipis 8px */
+.detail-card-header-blue {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 8px;
+    background-color: var(--primary-blue);
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+
+.detail-header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+    margin-bottom: 25px;
+}
+
+.detail-header-section h3 {
+    margin: 0;
+    font-weight: 600;
+    color: var(--dark-grey);
+    font-size: 1.2em;
+}
+
+.detail-actions button {
+    margin-left: 10px;
+}
+
+/* Grid Layout untuk detail 2 kolom */
+.detail-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    margin-bottom: 30px;
+}
+
+.detail-section {
+    padding: 15px;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+}
+
+.detail-section h4,
+.keterangan-title {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: var(--primary-blue);
+    font-weight: 700;
+    font-size: 1em;
+    border-bottom: 2px solid #dee2e6;
+    padding-bottom: 5px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.detail-item {
+    margin-bottom: 10px;
+    font-size: 0.95em;
+    display: flex;
+    /* Menggunakan flex untuk alignment */
+}
+
+.detail-item strong {
+    display: inline-block;
+    width: 180px;
+    /* Lebar tetap untuk label */
+    color: #495057;
+    font-weight: 600;
+}
+
+.detail-full-width {
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+.keterangan-text {
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    padding: 15px;
+    border-radius: 8px;
+    white-space: pre-wrap;
+    font-size: 0.95em;
+    min-height: 80px;
+}
+
 /* ================== DATA TABLE & BUTTONS ================== */
 .data-section {
     background-color: #fff;
@@ -1660,4 +1768,59 @@ header h1 {
 
 .back-icon-link:hover {
     color: var(--primary-blue);
+}
+
+/* CSS untuk Status Badge dan Detail Card (Konsisten) */
+.status-badge {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.85em;
+    display: inline-block;
+    text-transform: uppercase;
+}
+
+
+.status-DIAJUKAN {
+    background-color: #ff9800;
+    color: #fff8e1;
+    border: 1px solid #ffecb3;
+}
+
+.status-DISETUJUI {
+    background-color: #4caf50;
+    color: #e8f5e9;
+    border: 1px solid #c8e6c9;
+}
+
+.status-DITOLAK {
+    background-color: #f44336;
+    color: #ffebee;
+    border: 1px solid #ffcdd2;
+}
+
+/* Card Wrapper (Mirip data-container atau data-form) */
+.detail-card-wrapper {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+/* Container untuk 2 kolom detail */
+.detail-columns {
+    display: flex;
+    justify-content: space-between;
+    padding: 30px;
+}
+
+.detail-column {
+    width: 48%;
+    box-sizing: border-box;
+}
+
+.detail-item {
+    margin-bottom: 15px;
 }
