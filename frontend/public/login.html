@@ -9,50 +9,6 @@
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
         integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
     <link rel="stylesheet" href="../assets/css/csslogin.css">
-
-    <style>
-        /* Gaya tambahan untuk step form */
-        .step-content {
-            width: 100%;
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            padding: 10px 0;
-        }
-
-        .step-content.active {
-            display: flex;
-        }
-
-        .role-button {
-            background-color: #4A90E2;
-            /* Warna primer */
-            color: #FFFFFF;
-            border: none;
-            padding: 15px 30px;
-            margin: 10px;
-            border-radius: 25px;
-            font-size: 14px;
-            font-weight: bold;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: transform 80ms ease-in;
-            width: 80%;
-        }
-
-        .role-button:hover {
-            transform: scale(1.05);
-            background-color: #3a7fd4;
-        }
-
-        .back-button {
-            background-color: transparent;
-            border: 1px solid #BBBBBB;
-            color: #333;
-            margin-top: 15px;
-        }
-    </style>
 </head>
 
 <body>
@@ -61,7 +17,7 @@
 
         <div class="form-container sign-up-container">
             <form id="registerForm">
-                <h1>Buat Akun</h1>
+                <h1>Registrasi Akun</h1>
                 <div class="social-container">
                     <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
                     <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
@@ -86,15 +42,16 @@
                     <div id="role_specific_input" style="width: 100%;">
                     </div>
 
-                    <button type="submit">Daftar</button>
-                    <button type="button" class="role-button back-button" onclick="goToStep(1)">Kembali</button>
+                    <button type="submit">Register</button>
+                    <button type="button" class="role-button back-button" onclick="goToStep(1)">Kembali ke
+                        pilihan peran</button>
                 </div>
             </form>
         </div>
 
         <div class="form-container sign-in-container">
             <form id="loginForm">
-                <h1>Masuk</h1>
+                <h1>Login Sistem</h1>
                 <div class="social-container">
                     <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
                     <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
@@ -104,21 +61,21 @@
                 <input type="text" placeholder="Username" name="username" required />
                 <input type="password" placeholder="Kata Sandi" name="password" required />
                 <a href="#">Lupa Kata Sandi?</a>
-                <button type="submit">Masuk</button>
+                <button type="submit">Login</button>
             </form>
         </div>
 
         <div class="overlay-container">
             <div class="overlay">
                 <div class="overlay-panel overlay-left">
-                    <h1>Selamat Datang Kembali!</h1>
-                    <p>Untuk tetap terhubung, silakan masuk dengan informasi pribadi Anda.</p>
-                    <button class="ghost" id="signIn">Masuk</button>
+                    <h1>Verifikasi Akun</h1>
+                    <p>Silakan masuk menggunakan kredensial Anda untuk melanjutkan ke Dashboard Sistem.</p>
+                    <button class="ghost" id="signIn">Login</button>
                 </div>
                 <div class="overlay-panel overlay-right">
-                    <h1>Hai, Teman!</h1>
-                    <p>Masukkan detail pribadi Anda dan mulailah perjalanan dengan kami.</p>
-                    <button class="ghost" id="signUp">Daftar</button>
+                    <h1>Selamat Datang!</h1>
+                    <p>Daftarkan akun Anda untuk mengakses layanan dari Laboratorium Business Analytics.</p>
+                    <button class="ghost" id="signUp">Register</button>
                 </div>
             </div>
         </div>
