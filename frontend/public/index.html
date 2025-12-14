@@ -905,19 +905,41 @@
           if (loadingDosen) loadingDosen.style.display = 'none';
 
           container.innerHTML = res.data.map(d => {
+            // SCRIPT BARU (Menangani Link Eksternal ATAU File Lokal untuk list)
+            // index.html - di dalam fetchDosen()
+            // index.html - di dalam res.data.map(d => { ...
+
             let foto = DEFAULT_FOTO;
+
             if (d.foto_path && d.foto_path !== 'null') {
-              foto = d.foto_path.startsWith('http') ? d.foto_path : `../assets/uploads/dosen/${d.foto_path}`;
+              // 1. Cek Link Eksternal (Dr. Rakhmat)
+              if (d.foto_path.startsWith('http')) {
+                foto = d.foto_path;
+              } else {
+                // 2. Jika Path Lokal (berdasarkan path yang benar di dosen.html)
+
+                let pathLokal = d.foto_path;
+
+                // Hapus 2 level "../" yang berlebihan di depan path.
+                // Ini diasumsikan sebagai "offset" antara lokasi admin dan public.
+
+                // Cari dan ganti 2 tingkat ../ pertama dengan string kosong
+                pathLokal = pathLokal.replace('../', '');
+                pathLokal = pathLokal.replace('../', '');
+
+                // Tambahkan path yang benar dari folder public/ (yaitu 1 tingkat ../)
+                foto = '../' + pathLokal;
+              }
             }
 
             return `
                         <div class="member-card">
-                            <img src="${foto}" alt="${d.nama}" onerror="this.src='${DEFAULT_FOTO}'" style="object-fit: cover;">
+        <img src="${foto}" alt="${d.nama}" onerror="this.src='${DEFAULT_FOTO}'" style="object-fit: cover;">
                             <h5>${d.nama}</h5>
                             <span>${d.jabatan || 'Dosen'}</span>
                             <p>${d.nidn ? `NIDN: ${d.nidn}` : ''}</p>
                             <div class="main-blue-button">
-                                <a href="detail-dosen.html?nidn=${d.nidn}">Info Detail</a>
+                                <a href="detail_dosen.html?nidn=${d.nidn}">Info Detail</a>
                             </div>
                         </div>`;
           }).join('');

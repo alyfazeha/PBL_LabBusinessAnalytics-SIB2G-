@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detail Dosen | Laboratorium TI</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
+        integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="../assets/css/templatemo-chain-app-dev.css">
+
+    <style>
+        /* Variabel Warna Sesuai Template */
+        :root {
+            --primary-blue: #4A90E2;
+            --secondary-blue: #86b8ee;
+            --text-color: #333;
+            --light-bg: #f7f7f7;
+        }
+
+        /* Hero Section Styling */
+        .page-heading {
+            padding: 100px 0 50px 0;
+            background-color: var(--light-bg);
+            border-bottom: 1px solid #ddd;
+            text-align: center;
+        }
+
+        .page-heading h2 {
+            color: var(--primary-blue);
+            font-size: 2.8em;
+            font-weight: 900;
+            margin-bottom: 5px;
+        }
+
+        .page-heading h6 {
+            color: #555;
+            font-size: 1.1em;
+            font-weight: 300;
+        }
+
+        /* Container Detail Utama */
+        .detail-container {
+            max-width: 1100px;
+            /* Diperlebar agar layout dua kolom terlihat jelas */
+            margin: 50px auto 100px auto;
+            padding: 40px;
+            background-color: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+
+            /* --- PROPERTI UTAMA UNTUK LAYOUT DUA KOLOM --- */
+            display: flex;
+            gap: 30px;
+            /* Jarak antara kolom kiri dan kanan */
+            text-align: left;
+            /* Mengatur ulang agar teks rata kiri */
+        }
+
+        /* --- KOLOM KIRI (Info Utama) --- */
+        .sidebar-info {
+            flex: 0 0 300px;
+            /* Lebar tetap 300px untuk sidebar */
+            text-align: center;
+            padding: 20px;
+            border-right: none
+                /* Garis pemisah */
+        }
+
+        .profile-picture {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 25px;
+            border: 5px solid var(--primary-blue);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-info h2 {
+            font-size: 1.8em;
+            margin-bottom: 8px;
+            color: var(--text-color);
+        }
+
+        .sidebar-info .jabatan {
+            color: var(--primary-blue);
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+
+        .sidebar-info p {
+            font-size: 0.95em;
+            color: #777;
+            margin-bottom: 5px;
+        }
+
+        .sidebar-info p span {
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        /* --- KOLOM KANAN (Detail Konten) --- */
+        .main-content-detail {
+            flex-grow: 1;
+            /* Mengisi sisa ruang yang tersedia */
+            padding: 20px 0;
+        }
+
+        .section-title {
+            margin-top: 15px;
+            font-size: 1.5em;
+            color: var(--primary-blue);
+            border-bottom: none;
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        /* Kartu Info */
+        .info-card {
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            background-color: var(--light-bg);
+            border-left: 5px solid var(--primary-blue);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1em;
+        }
+
+        .info-card strong {
+            color: var(--text-color);
+            font-weight: 600;
+            flex-basis: 35%;
+        }
+
+        .info-card span {
+            font-weight: 400;
+            color: #555;
+            text-align: right;
+            flex-basis: 60%;
+        }
+
+        .info-card a {
+            color: var(--primary-blue);
+            text-decoration: none;
+        }
+
+        /* Link Publikasi */
+        .social-links {
+            margin-top: 15px;
+            margin-bottom: 25px;
+            text-align: center;
+            /* Dipindahkan ke sidebar, jadi tengah */
+        }
+
+        .social-links a {
+            margin: 0 12px;
+            font-size: 2em;
+            color: var(--primary-blue);
+            transition: color 0.3s;
+        }
+
+        .social-links a:hover {
+            color: gray;
+        }
+
+        /* Tombol Kembali */
+        .back-button-link {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 12px 30px;
+            background-color: var(--primary-blue);
+            ;
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: background-color 0.3s;
+            box-shadow: 0 4px 10px rgba(50, 67, 76, 0.3);
+        }
+
+        .back-button-link:hover {
+            background-color: gray;
+        }
+
+        /* --- RESPONSIVE MOBILE --- */
+        @media (max-width: 992px) {
+            .detail-container {
+                flex-direction: column;
+                /* Ubah menjadi satu kolom */
+                padding: 20px;
+                margin: 20px auto;
+            }
+
+            .sidebar-info {
+                flex: none;
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #eee;
+                /* Garis pemisah di bawah sidebar */
+                padding-bottom: 20px;
+            }
+
+            .main-content-detail {
+                padding: 20px 0 0 0;
+            }
+
+            .profile-picture {
+                width: 120px;
+                height: 120px;
+            }
+
+            .info-card {
+                flex-direction: column;
+                /* Tumpuk label dan nilai di mobile */
+                align-items: flex-start;
+                padding: 10px;
+            }
+
+            .info-card strong {
+                margin-bottom: 2px;
+                flex-basis: auto;
+            }
+
+            .info-card span {
+                text-align: left;
+                flex-basis: auto;
+                width: 100%;
+            }
+
+            .social-links {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page-heading">
+        <div class="container">
+            <h2>PROFIL DOSEN</h2>
+            <h6>Detail Informasi Dosen Laboratorium TI</h6>
+        </div>
+    </div>
+
+    <div class="detail-container">
+        <div id="loading" style="display: block; padding: 40px;">
+            <i class="fas fa-spinner fa-spin" style="font-size: 24px; color: var(--primary-blue);"></i> Memuat data
+            dosen...
+        </div>
+        <div id="error-message"
+            style="display: none; color: red; padding: 20px; border: 1px solid #f9caca; background-color: #fceceb; border-radius: 8px;">
+        </div>
+
+        <div id="dosen-detail" style="display: none;">
+
+            <div class="sidebar-info">
+                <img src="" alt="Foto Dosen" class="profile-picture" id="dosen-foto">
+
+                <h2 id="dosen-nama"></h2>
+                <p class="jabatan" id="dosen-jabatan"></p>
+                <p>NIDN: <span id="dosen-nidn"></span></p>
+                <p>NIP: <span id="dosen-nip"></span></p>
+
+                <div class="section-title" style="border: none; margin-top: 25px;">Publikasi dan Riset</div>
+                <div class="social-links">
+                    <a href="#" id="link-researchgate" target="_blank" title="ResearchGate" style="display:none;"><i
+                            class="fab fa-researchgate"></i></a>
+                    <a href="#" id="link-scholar" target="_blank" title="Google Scholar" style="display:none;"><i
+                            class="fas fa-graduation-cap"></i></a>
+                    <a href="#" id="link-sinta" target="_blank" title="SINTA" style="display:none;"><i
+                            class="fas fa-search"></i></a>
+                </div>
+            </div>
+            <div class="main-content-detail">
+
+                <div class="section-title">Kontak & Riwayat Akademik</div>
+
+                <div class="info-card">
+                    <strong>Email:</strong> <span id="dosen-email"></span>
+                </div>
+                <div class="info-card">
+                    <strong>Program Studi:</strong> <span id="dosen-prodi"></span>
+                </div>
+                <div class="info-card">
+                    <strong>Pendidikan Tertinggi:</strong> <span id="dosen-pendidikan"></span>
+                </div>
+
+                <div class="section-title">Peran & Keahlian Lab</div>
+
+                <div class="info-card">
+                    <strong>Mata Kuliah Diampu:</strong> <span id="dosen-matkul"></span>
+                </div>
+                <div class="info-card">
+                    <strong>Sertifikasi:</strong> <span id="dosen-sertifikasi"></span>
+                </div>
+
+                <a href="index.html" class="back-button-link">Kembali ke Daftar Dosen</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const detailContainer = document.getElementById('dosen-detail');
+            const loading = document.getElementById('loading');
+            const errorMessage = document.getElementById('error-message');
+
+            // 1. Ambil NIDN dari URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const nidn = urlParams.get('nidn');
+
+            if (!nidn) {
+                loading.style.display = 'none';
+                errorMessage.textContent = 'Error: Parameter NIDN tidak ditemukan.';
+                errorMessage.style.display = 'block';
+                return;
+            }
+
+            // 2. TENTUKAN PATH API BARU (detail_public.php)
+            const API_URL = `../../backend/api/dosen/detail_public.php?nidn=${nidn}`;
+            const DEFAULT_FOTO = '../assets/images/default-profile.png';
+
+            // 3. Ambil Data dari API
+            fetch(API_URL)
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => {
+                            throw new Error(err.message || 'Gagal memuat data dosen.');
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    loading.style.display = 'none';
+
+                    if (!data || data.length === 0 || data.message) {
+                        errorMessage.textContent = data.message || 'Data dosen tidak ditemukan untuk NIDN ini.';
+                        errorMessage.style.display = 'block';
+                        return;
+                    }
+
+                    // 4. Isi Data ke Template
+                    document.getElementById('dosen-nama').textContent = data.nama || 'Nama Dosen Tidak Tersedia';
+                    document.getElementById('dosen-jabatan').textContent = data.jabatan || 'Dosen';
+                    document.getElementById('dosen-nidn').textContent = data.nidn || '-';
+                    document.getElementById('dosen-nip').textContent = data.nip || '-';
+                    document.getElementById('dosen-email').textContent = data.email || '-';
+                    document.getElementById('dosen-prodi').textContent = data.prodi || '-';
+                    document.getElementById('dosen-pendidikan').textContent = data.pendidikan || '-';
+                    document.getElementById('dosen-matkul').textContent = data.mata_kuliah || '-';
+                    document.getElementById('dosen-sertifikasi').textContent = data.sertifikasi || '-';
+
+                    // Foto
+                    // SCRIPT BARU (Menangani Link Eksternal ATAU File Lokal)
+                    // detail_dosen.html - di dalam fetch().then(data => { ...
+
+                    let fotoPath = DEFAULT_FOTO;
+
+                    if (data.foto_path && data.foto_path !== 'null') {
+                        if (data.foto_path.startsWith('http')) {
+                            fotoPath = data.foto_path; // Link eksternal
+                        } else {
+                            // Jika Path Lokal (mengurangi 2 tingkat ../ yang berlebihan)
+
+                            let pathLokal = data.foto_path;
+
+                            // Hapus 2 level "../" yang berlebihan di depan path.
+                            pathLokal = pathLokal.replace('../', '');
+                            pathLokal = pathLokal.replace('../', '');
+
+                            // Tambahkan path yang benar dari folder public/ (yaitu 1 tingkat ../)
+                            fotoPath = '../' + pathLokal;
+                        }
+                    }
+                    document.getElementById('dosen-foto').src = fotoPath;
+                    // ...
+
+                    // Link Publikasi
+                    const setLink = (id, url) => {
+                        const element = document.getElementById(id);
+                        if (url && url !== 'null' && url !== '') {
+                            element.href = url.startsWith('http') ? url : 'https://' + url;
+                            element.style.display = 'inline-block';
+                        } else {
+                            element.style.display = 'none';
+                        }
+                    };
+
+                    setLink('link-researchgate', data.researchgate_url);
+                    setLink('link-scholar', data.scholar_url);
+                    setLink('link-sinta', data.sinta_url);
+
+                    detailContainer.style.display = 'flex'; // Ubah dari 'block' ke 'flex'
+                })
+                .catch(error => {
+                    console.error('Fetch Error:', error);
+                    loading.style.display = 'none';
+                    errorMessage.textContent = `Gagal memuat detail dosen. Pastikan detail_public.php sudah dibuat. Error: ${error.message}`;
+                    errorMessage.style.display = 'block';
+                });
+        });
+    </script>
+</body>
+
+</html>
