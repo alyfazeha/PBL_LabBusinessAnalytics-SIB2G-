@@ -7,33 +7,61 @@ header("Content-Type: application/json");
 ini_set('display_errors', 0);
 error_reporting(E_ALL);
 
-try {
-    require_once __DIR__ . "/../../models/Dosen.php";
-    require_once __DIR__ . "/../../config/auth.php";
+// Pastikan koneksi database juga di-include
+require_once __DIR__ . "/../../config/database.php"; 
+require_once __DIR__ . "/../../models/Dosen.php";
+require_once __DIR__ . "/../../config/auth.php";
 
+try {
     if (function_exists('require_role')) {
-        require_role(['admin', 'dosen']);
+        require_role(['admin']);
     }
 
     $dosenModel = new Dosen();
+    $db = Database::getInstance(); // Ambil instance database untuk transaksi
+    
     $nidn = $_POST['nidn'] ?? null;
 
     if (!$nidn) {
-        throw new Exception('NIDN required for deletion.');
+        throw new Exception('NIDN diperlukan untuk penghapusan.');
     }
 
-    // Cek apakah dosen ada
+    // 1. Cek apakah dosen ada dan ambil user_id
     $currentDosen = $dosenModel->find($nidn);
     if (!$currentDosen) {
         throw new Exception('Dosen tidak ditemukan.');
     }
+    $user_id_to_delete = $currentDosen['user_id'];
+    $dosen_nama = $currentDosen['nama'];
 
-    $success = $dosenModel->delete($nidn);
+    // Mulai Transaksi
+    $db->beginTransaction();
 
-    if ($success) {
-        echo json_encode(['success' => true, 'message' => 'Dosen deleted successfully']);
-    } else {
-        throw new Exception('Failed to delete dosen.');
+    try {
+        // 2. Hapus Dosen dari tabel dosen
+        $successDosen = $dosenModel->delete($nidn); 
+
+        // 3. Hapus User dari tabel users (hanya jika user_id valid)
+        $successUser = false;
+        if ($user_id_to_delete) {
+            $stmt = $db->prepare("DELETE FROM users WHERE user_id = :user_id");
+            $successUser = $stmt->execute([':user_id' => $user_id_to_delete]);
+        } else {
+             // Jika tidak ada user_id, kita anggap sukses menghapus user (karena memang tidak ada)
+             $successUser = true;
+        }
+
+        if ($successDosen && $successUser) {
+            $db->commit(); // Commit jika keduanya sukses
+            echo json_encode(['success' => true, 'message' => "Dosen ($dosen_nama) dan akun user berhasil dihapus."]);
+        } else {
+            $db->rollBack();
+            throw new Exception('Gagal menghapus data dosen atau akun user terkait.');
+        }
+
+    } catch (Exception $ex) {
+        $db->rollBack(); // Rollback jika ada error dalam transaksi
+        throw $ex; 
     }
 
 } catch (Exception $e) {

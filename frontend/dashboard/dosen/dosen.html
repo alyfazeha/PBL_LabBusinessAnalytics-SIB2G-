@@ -25,7 +25,6 @@
         .data-table td {
             white-space: normal;
             vertical-align: middle;
-            /* Foto lebih rapi dengan middle */
             padding: 10px;
         }
 
@@ -106,6 +105,18 @@
         .delete-btn {
             background-color: #e74c3c;
         }
+        
+        /* Style untuk Search Input */
+        .search-container {
+            margin-bottom: 15px;
+        }
+        .search-container input {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 300px;
+            max-width: 100%;
+        }
     </style>
 
 </head>
@@ -141,7 +152,10 @@
                     <i class="fas fa-plus"></i> Tambah Dosen
                 </a>
             </div>
-
+            
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Cari NIDN, Nama, Email, Jabatan, atau Prodi..." onkeyup="filterDosen()">
+            </div>
             <div class="data-table-container">
                 <table class="data-table">
                     <thead>
@@ -179,6 +193,9 @@
     </div>
 
     <script>
+        // Variabel global untuk menyimpan semua data dosen yang diambil
+        let allDosenData = []; 
+        
         // --- LOGIKA LOGOUT ---
         const logoutTrigger = document.getElementById('logoutTrigger');
         const logoutModal = document.getElementById('logoutModal');
@@ -195,11 +212,9 @@
         });
 
         confirmLogoutBtn.addEventListener('click', async () => {
-            // Path API: Mundur 3 langkah (Dosen -> Dashboard -> Frontend -> Root) -> Backend
             const url = '../../../backend/api/auth/logout.php';
             try {
                 await fetch(url, { method: 'POST' });
-                // Path Redirect: Mundur 2 langkah (Dosen -> Dashboard -> Frontend) -> Public
                 window.location.href = '../../public/index.html';
             } catch (error) {
                 console.error('Logout Error:', error);
@@ -213,24 +228,43 @@
             }
         });
 
-        // --- UTILITY FUNCTION ---
+        // --- UTILITY FUNCTION & DOM ELEMENTS ---
         const messageDiv = document.getElementById('message');
         const dosenTableBody = document.getElementById('dosenTableBody');
-
+        
         function displayMessage(type, text) {
-            messageDiv.textContent = text;
-            messageDiv.className = `alert alert-${type}`;
-            messageDiv.style.display = 'block';
-            setTimeout(() => {
-                messageDiv.style.display = 'none';
-                messageDiv.className = 'message';
-            }, 5000);
+            const messageArea = document.getElementById('message');
+            
+            // Tambahkan tombol tutup (X) ke dalam konten pesan
+            messageArea.innerHTML = `
+                ${text}
+                <span class="close-btn" 
+                      style="cursor: pointer; font-weight: bold; margin-left: 10px; float: right; font-size: 1.2em;">
+                    &times;
+                </span>
+            `;
+            
+            messageArea.className = `alert alert-${type}`;
+            messageArea.style.display = 'block';
+            
+            // Tambahkan event listener untuk tombol tutup
+            const closeBtn = messageArea.querySelector('.close-btn');
+            if (closeBtn) {
+                closeBtn.onclick = () => {
+                    messageArea.style.display = 'none';
+                    messageArea.className = 'message';
+                    messageArea.innerHTML = ''; // Bersihkan konten
+                };
+            }
         }
 
         // --- FUNGSI RENDER TABEL ---
         function renderDosen(dosenArray) {
             let html = '';
             const totalCols = 8;
+            const DEFAULT_IMG_URL = 'https://via.placeholder.com/50?text=No+Img'; 
+            const ERROR_IMG_URL = 'https://via.placeholder.com/50?text=Error'; 
+            const LOCAL_BASE_PATH = '../../'; // Mundur 2 level dari /admin/dosen/
 
             if (dosenArray.length === 0) {
                 dosenTableBody.innerHTML = `<tr><td colspan="${totalCols}" style="text-align: center;">Tidak ada data Dosen yang ditemukan.</td></tr>`;
@@ -239,18 +273,16 @@
 
             dosenArray.forEach(dosen => {
                 // ============================================================
-                // PERBAIKAN UTAMA: LOGIKA PATH FOTO
+                // LOGIKA PATH FOTO
                 // ============================================================
-                let fotoSrc = 'https://via.placeholder.com/50?text=No+Img';
+                let fotoSrc = DEFAULT_IMG_URL;
 
                 if (dosen.foto_path && dosen.foto_path !== 'NULL' && dosen.foto_path !== '') {
                     if (dosen.foto_path.startsWith('http')) {
-                        // Jika Link Online (http...), pakai langsung
                         fotoSrc = dosen.foto_path;
                     } else {
-                        // Jika File Lokal (assets/...), tambahkan '../../' di depan
-                        // agar mundur dari folder 'dosen' ke folder 'frontend'
-                        fotoSrc = '../../' + dosen.foto_path;
+                        // Path dari DB: assets/uploads/dosen/file.jpg
+                        fotoSrc = LOCAL_BASE_PATH + dosen.foto_path;
                     }
                 }
 
@@ -264,7 +296,7 @@
                                 src="${fotoSrc}" 
                                 alt="Foto" 
                                 class="dosen-photo" 
-                                onerror="this.src='https://via.placeholder.com/50?text=Error';" 
+                                onerror="this.src='${ERROR_IMG_URL}';" 
                             />
                         </td>
                         <td>${dosen.nidn}</td>
@@ -295,12 +327,40 @@
             });
             dosenTableBody.innerHTML = html;
         }
+        
+        // --- FUNGSI FILTER DATA MULTI-FIELD ---
+        window.filterDosen = function() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            if (searchTerm === "") {
+                renderDosen(allDosenData);
+                return;
+            }
+            
+            const filteredData = allDosenData.filter(dosen => {
+                // Konversi semua field yang dicari ke string lowercase
+                const nidn = String(dosen.nidn).toLowerCase();
+                const nama = String(dosen.nama).toLowerCase();
+                const email = String(dosen.email).toLowerCase();
+                const jabatan = String(dosen.jabatan).toLowerCase();
+                const prodi = String(dosen.prodi).toLowerCase();
+                
+                // Cek kecocokan di setiap field (menggunakan operator OR ||)
+                return nidn.includes(searchTerm) || 
+                       nama.includes(searchTerm) || 
+                       email.includes(searchTerm) || 
+                       jabatan.includes(searchTerm) || 
+                       prodi.includes(searchTerm);
+            });
+            
+            renderDosen(filteredData);
+        }
+
 
         // --- FUNGSI FETCH DATA (READ) ---
         async function fetchDosen() {
             dosenTableBody.innerHTML = `<tr><td colspan="8" style="text-align: center;">Memuat data...</td></tr>`;
 
-            // Path API: Mundur 3 langkah (Sesuai struktur folder dalam)
             const url = '../../../backend/api/dosen/list.php';
 
             try {
@@ -311,7 +371,10 @@
                 }
 
                 const data = await response.json();
-                renderDosen(data);
+                
+                // Simpan data ke variabel global sebelum merender
+                allDosenData = data; 
+                renderDosen(allDosenData);
 
             } catch (error) {
                 console.error('Error fetching Dosen:', error);
