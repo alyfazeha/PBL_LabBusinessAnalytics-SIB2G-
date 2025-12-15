@@ -9,37 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../../assets/css/cssadmin.css">
     <link rel="stylesheet" href="../../assets/css/cssmahasiswa.css">
-    
-    <style>
-        .filter-container {
-            display: flex;
-            gap: 15px;
-            margin-top: 15px;
-            margin-bottom: 20px;
-            align-items: center;
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid #e9ecef;
-        }
-        .filter-group {
-            display: flex;
-            flex-direction: column;
-        }
-        .filter-group label {
-            font-size: 12px;
-            font-weight: 600;
-            margin-bottom: 5px;
-            color: #666;
-        }
-        .filter-select {
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            min-width: 200px;
-            cursor: pointer;
-        }
-    </style>
+
 </head>
 
 <body>
@@ -61,24 +31,27 @@
 
     <div class="main-content">
         <header>
-            <h1>Kelola Berita & Konten</h1>
-        </header>
-
-        <div class="data-section">
-            <div id="message" class="message-area" style="display: none;"></div>
-
-            <a href="tambah_konten.html" class="add-button"><i class="fas fa-plus"></i> Tambah Konten</a>
-
-            <div class="filter-container">
-                <div class="filter-group">
-                    <label for="filterKategori"> Filter Kategori Berita:</label>
-                    <select id="filterKategori" class="filter-select">
-                        <option value="">-- Tampilkan Semua --</option>
-                    </select>
-                </div>
+            <div class="header-title">
+                <h2>Kelola Berita & Konten</h2>
             </div>
 
-            <div class="data-table-container">
+            <div class="header-actions">
+                <div class="filter-icon-group">
+                    <i class="fas fa-filter filter-icon"></i>
+                    <select id="filterKategori" class="filter-select">
+                        <option value=""> Tampilkan Semua </option>
+                    </select>
+                </div>
+
+                <a href="tambah_konten.html" class="btn btn-primary btn-add"><i class="fas fa-plus"></i> Tambah
+                    Konten</a>
+            </div>
+        </header>
+
+        <main>
+            <div id="statusMessage" class="status-message" style="display:none; padding: 10px; margin-bottom: 20px;">
+            </div>
+            <div class="table-wrapper">
                 <table class="data-table">
                     <thead>
                         <tr>
@@ -93,19 +66,28 @@
                         </tr>
                     </thead>
                     <tbody id="kontenTableBody">
-                        <tr><td colspan="8" style="text-align:center;">Sedang memuat data...</td></tr>
+                        <tr>
+                            <td colspan="8" style="text-align:center;">Sedang memuat data...</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
-        </div>
+        </main>
     </div>
 
-    <div id="logoutModal" class="modal">
+    <div id="logoutModal" class="modal logout-modal">
         <div class="modal-content">
-            <h2>Konfirmasi Logout</h2>
-            <p>Apakah Anda yakin ingin keluar dari Dashboard Admin?</p>
-            <button id="confirmLogoutBtn" class="btn btn-danger">Logout</button>
-            <button id="cancelLogoutBtn" class="btn btn-secondary">Batal</button>
+            <span class="close-btn" onclick="logoutModal.style.display='none';">&times;</span>
+
+            <h4><i class="fas fa-sign-out-alt"></i> Konfirmasi Logout</h4>
+
+            <p>Anda yakin ingin mengakhiri sesi dan keluar dari Panel Admin?</p>
+
+            <div class="modal-buttons">
+                <button id="cancelLogoutBtn" class="btn btn-secondary">Batal</button>
+                <button id="confirmLogoutBtn" class="btn btn-danger">Ya, Logout</button>
+            </div>
+
         </div>
     </div>
 
@@ -131,17 +113,17 @@
                 const select = document.getElementById('filterKategori');
 
                 // Reset dropdown
-                select.innerHTML = '<option value="">-- Tampilkan Semua --</option>';
+                select.innerHTML = '<option value=""> Tampilkan Semua </option>';
 
                 if (result.status === 'success' && Array.isArray(result.data)) {
                     result.data.forEach(item => {
                         const option = document.createElement('option');
-                        
+
                         // PERBAIKAN: Gunakan 'item.nama' sesuai kolom database Anda
-                        const namaKategori = item.nama; 
-                        
+                        const namaKategori = item.nama;
+
                         // Value kita set nama kategori agar mudah dicocokkan dengan tabel berita
-                        option.value = namaKategori; 
+                        option.value = namaKategori;
                         option.textContent = namaKategori;
                         select.appendChild(option);
                     });
@@ -212,7 +194,7 @@
 
                 row.innerHTML = `
                     <td>${id}</td>
-                    <td>${imgDisplay}</td>
+                    <td class="table-img-cell">${imgDisplay}</td> 
                     <td>${konten.title}</td>
                     <td>${konten.category_name || '-'}</td>
                     <td>${penulis}</td>
@@ -261,7 +243,7 @@
 
         // 6. Fungsi Toggle Publish
         async function togglePublish(id, currentStatus) {
-            const newStatus = !currentStatus; 
+            const newStatus = !currentStatus;
 
             const url = '../../../backend/api/contents/publish.php';
             const formData = new FormData();
@@ -299,7 +281,7 @@
         document.getElementById('logoutTrigger').onclick = (e) => { e.preventDefault(); logoutModal.classList.add('show'); };
         document.getElementById('cancelLogoutBtn').onclick = () => logoutModal.classList.remove('show');
         document.getElementById('confirmLogoutBtn').onclick = async () => {
-            try { await fetch('../../../backend/api/auth/logout.php', { method: 'POST' }); } catch(e){}
+            try { await fetch('../../../backend/api/auth/logout.php', { method: 'POST' }); } catch (e) { }
             window.location.href = '../../public/index.html';
         };
 
@@ -308,4 +290,5 @@
         };
     </script>
 </body>
+
 </html>
