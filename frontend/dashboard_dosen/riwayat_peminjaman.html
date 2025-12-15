@@ -47,9 +47,9 @@
             <h2><i class="fas fa-history"></i> Riwayat Peminjaman Aset Mahasiswa</h2>
 
             <div style="margin-bottom: 20px; display: flex; gap: 15px;">
-                <input type="text" placeholder="Cari berdasarkan Nama/NIM..."
-                    style="flex-grow: 1; padding: 10px; border-radius: 6px; border: 1px solid #ddd;">
-                <button class="btn-submit" style="width: 150px; margin: 0; padding: 10px;"><i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="Cari berdasarkan Nama/NIM..."
+                style="flex-grow: 1; padding: 10px; border-radius: 6px; border: 1px solid #ddd;">
+                    <button id="searchButton" class="btn-submit" style="width: 150px; margin: 0; padding: 10px;"><i class="fas fa-search"></i>
                     Cari</button>
             </div>
 
@@ -73,94 +73,127 @@
     </main>
 
     <script>
-        const tableBody = document.getElementById('peminjamanTableBody');
+    const tableBody = document.getElementById('peminjamanTableBody');
 
-        function getStatusClass(status) {
-            const lowerStatus = status ? status.toLowerCase() : '';
-            if (lowerStatus.includes('setuju') || lowerStatus.includes('approved')) return 'approved';
-            if (lowerStatus.includes('tolak') || lowerStatus.includes('rejected')) return 'rejected';
-            if (lowerStatus.includes('kembali') || lowerStatus.includes('returned')) return 'kembali';
-            if (lowerStatus.includes('dipinjam')) return 'dipinjam';
-            return 'pending'; // Menunggu
-        }
-        
-        function formatDate(dateString) {
-            if (!dateString) return '-';
-            const date = new Date(dateString);
-            return date.toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' });
-        }
+    function getStatusClass(status) {
+        const lowerStatus = status ? status.toLowerCase() : '';
+        if (lowerStatus.includes('setuju') || lowerStatus.includes('approved')) return 'approved';
+        if (lowerStatus.includes('tolak') || lowerStatus.includes('rejected')) return 'rejected';
+        if (lowerStatus.includes('kembali') || lowerStatus.includes('returned')) return 'kembali';
+        if (lowerStatus.includes('dipinjam')) return 'dipinjam';
+        return 'pending'; // Menunggu
+    }
+    
+    function formatDate(dateString) {
+        if (!dateString) return '-';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    }
 
-
-        function renderPeminjaman(data) {
-            if (data.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center;">Tidak ada riwayat peminjaman dari mahasiswa bimbingan Anda.</td></tr>`;
-                return;
-            }
-
-            let html = '';
-            data.forEach(item => {
-                // Perhatikan: item.status, item.tanggal_peminjaman, item.aset_dipinjam, item.keperluan 
-                // harus cocok dengan kolom yang di-SELECT di list.php
-                const statusText = item.status ? item.status.charAt(0).toUpperCase() + item.status.slice(1).toLowerCase() : 'Menunggu';
-                const statusClass = getStatusClass(item.status);
-                const tglPinjam = formatDate(item.tanggal_peminjaman);
-
-                html += `
-                    <tr>
-                        <td>${tglPinjam}</td>
-                        <td>${item.nim_mahasiswa || '-'} | ${item.nama_mahasiswa || '-'}</td>
-                        <td>${item.aset_dipinjam || '-'}</td>
-                        <td>${item.keperluan || '-'}</td>
-                        <td><span class="badge ${statusClass}">${statusText}</span></td>
-                        <td>
-                            <div class="action-buttons">
-                                <a href="detail_peminjaman.html?id=${item.id}" class="detail-btn">
-                                    <i class="fas fa-eye"></i> Detail
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            });
-            tableBody.innerHTML = html;
+    function renderPeminjaman(data) {
+        if (data.length === 0) {
+            tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center;">Tidak ada riwayat peminjaman yang cocok dengan pencarian Anda.</td></tr>`;
+            return;
         }
 
+        let html = '';
+        data.forEach(item => {
+            const statusText = item.status ? item.status.charAt(0).toUpperCase() + item.status.slice(1).toLowerCase() : 'Menunggu';
+            const statusClass = getStatusClass(item.status);
+            const tglPinjam = formatDate(item.tanggal_peminjaman);
 
-        async function loadPeminjaman() {
-            tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center;">Memuat data peminjaman...</td></tr>`;
-
-            try {
-                // [PATH API] Menggunakan path yang disesuaikan
-                const response = await fetch('../../backend/api/booking/list_dosen.php'); 
-                const result = await response.json();
-
-                if (result.status === 'success') {
-                    renderPeminjaman(result.data);
-                } else {
-                    // Tampilkan pesan error dari server PHP (termasuk error SQL)
-                    tableBody.innerHTML = `<tr><td colspan="6" style="color: red; text-align: center;">Gagal memuat data: ${result.message}</td></tr>`;
-                }
-
-            } catch (error) {
-                console.error('Error loading peminjaman:', error);
-                tableBody.innerHTML = `<tr><td colspan="6" style="color: red; text-align: center;">Terjadi kesalahan koneksi jaringan.</td></tr>`;
-            }
-        }
-
-        // Panggil fungsi saat halaman dimuat
-        document.addEventListener('DOMContentLoaded', loadPeminjaman);
-
-        // Logika Logout
-        document.getElementById('logoutLink').addEventListener('click', function (e) {
-            e.preventDefault();
-            if (confirm('Apakah Anda yakin ingin keluar dari sistem?')) {
-                const logoutUrl = '../../backend/api/auth/logout.php';
-                fetch(logoutUrl, { method: 'POST' })
-                    .then(() => window.location.href = '../public/index.html')
-                    .catch(() => window.location.href = '../public/index.html');
-            }
+            html += `
+                <tr>
+                    <td>${tglPinjam}</td>
+                    <td>${item.nim_mahasiswa || '-'} | ${item.nama_mahasiswa || '-'}</td>
+                    <td>${item.aset_dipinjam || '-'}</td>
+                    <td>${item.keperluan || '-'}</td>
+                    <td><span class="badge ${statusClass}">${statusText}</span></td>
+                    <td>
+                        <div class="action-buttons">
+                            <a href="detail_peminjaman.html?id=${item.id}" class="detail-btn">
+                                <i class="fas fa-eye"></i> Detail
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            `;
         });
-    </script>
+        tableBody.innerHTML = html;
+    }
+
+    // FUNGSI UTAMA: Menerima parameter pencarian
+async function loadPeminjaman(searchQuery = null) {
+    // Tentukan apakah ini adalah permintaan load awal (tanpa ada klik tombol Cari)
+    const isInitialLoad = searchQuery === null;
+
+    // Jika ini adalah load awal, kita set query menjadi string kosong ('') untuk menghindari
+    // masalah parameter null, dan menambahkan cachebuster.
+    if (isInitialLoad) {
+        searchQuery = '';
+    }
+
+    tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center;">Memuat data peminjaman...</td></tr>`;
+
+    let apiUrl = '../../backend/api/booking/list_dosen.php';
+    const params = new URLSearchParams();
+
+    // 1. Tambahkan Query Pencarian (hanya jika ada teks yang dicari)
+    if (searchQuery.trim() !== '') {
+        params.append('search', searchQuery.trim());
+    } 
+
+    // 2. Tambahkan Cache Buster pada permintaan awal
+    if (isInitialLoad) {
+        params.append('cache_buster', new Date().getTime());
+    }
+
+    if (params.toString()) {
+        apiUrl += `?${params.toString()}`;
+    }
+
+    try {
+        const response = await fetch(apiUrl); 
+        const result = await response.json();
+
+        if (result.status === 'success') {
+            renderPeminjaman(result.data);
+        } else {
+            // Tampilkan pesan error dari server PHP 
+            tableBody.innerHTML = `<tr><td colspan="6" style="color: red; text-align: center;">Gagal memuat data: ${result.message}</td></tr>`;
+        }
+
+    } catch (error) {
+        console.error('Error loading peminjaman:', error);
+        tableBody.innerHTML = `<tr><td colspan="6" style="color: red; text-align: center;">Terjadi kesalahan koneksi jaringan.</td></tr>`;
+    }
+}
+
+// Panggil fungsi saat halaman dimuat
+document.addEventListener('DOMContentLoaded', () => {
+    // Panggil tanpa argumen, sehingga searchQuery = null
+    loadPeminjaman(); 
+});
+
+// Event Listener untuk Tombol Cari tetap sama, memanggil loadPeminjaman(query)
+document.getElementById('searchButton').addEventListener('click', function(e) {
+    e.preventDefault();
+    const searchInput = document.getElementById('searchInput');
+    const query = searchInput.value.trim();
+    loadPeminjaman(query);
+});
+
+    // Logika Logout
+    document.getElementById('logoutLink').addEventListener('click', function (e) {
+        e.preventDefault();
+        if (confirm('Apakah Anda yakin ingin keluar dari sistem?')) {
+            const logoutUrl = '../../backend/api/auth/logout.php';
+            fetch(logoutUrl, { method: 'POST' })
+                .then(() => window.location.href = '../public/index.html')
+                .catch(() => window.location.href = '../public/index.html');
+        }
+    });
+</script>
 </body>
 
 </html>
