@@ -90,7 +90,7 @@
 
             <div class="modal-buttons">
                 <button class="btn btn-secondary" onclick="closeApproveModal()">Batal</button>
-                <button class="btn btn-action" onclick="approvePeminjaman()">Ya, Setujui</button>
+                <button class="btn btn-ijo" onclick="approvePeminjaman()">Ya, Setujui</button>
             </div>
         </div>
     </div>
@@ -194,7 +194,7 @@
                                 <a href="detail_peminjaman.html?id=${item.booking_id}" class="btn btn-detail action-full-width"><i class="fas fa-eye"></i> Detail</a>
                                 ${isPending ? `
                                 <div class="action-buttons-list action-buttons-split">
-                                    <button class="btn btn-action" onclick="showApproveModal(${item.booking_id})"><i class="fas fa-check"></i> Setuju</button>
+                                    <button class="btn btn-ijo" onclick="showApproveModal(${item.booking_id})"><i class="fas fa-check"></i> Setuju</button>
                                     <button class="btn btn-danger" onclick="showRejectModal(${item.booking_id})"><i class="fas fa-times"></i> Tolak</button>
                                 </div>
                                 ` : ''}
