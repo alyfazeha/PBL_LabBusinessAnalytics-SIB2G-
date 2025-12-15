@@ -1,128 +1,267 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detail Peminjaman</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="../../frontend/assets/css/dashboarddns.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detail Peminjaman</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../../frontend/assets/css/dashboarddns.css">
+
+    <style>
+        /* Menggunakan Flexbox untuk memastikan label dan konten berada dalam satu baris yang rapi */
+        .profile-info-group {
+            display: flex;
+            align-items: flex-start; /* Sejajarkan di bagian atas */
+            margin-bottom: 10px; 
+            padding: 5px 0;
+            border-bottom: 1px solid #eee; /* Garis pemisah */
+        }
+        
+        /* Mengatur lebar tetap untuk LABEL dan mengatur warna biru */
+        .profile-info-group label {
+            width: 170px; 
+            font-weight: 600;
+            margin-right: 15px;
+            flex-shrink: 0; 
+            text-align: left; 
+            color: #4791e0; /* <--- WARNA BIRU UNTUK LABEL */
+        }
+
+        /* Mengatur agar konten (p) mengisi sisa ruang dan rata kiri */
+        .profile-info-group p {
+            flex-grow: 1; 
+            margin-bottom: 0; 
+            word-break: break-word; 
+            line-height: 1.5; 
+            text-align: left; 
+            color: #333; /* Konten tetap hitam/abu-abu agar mudah dibaca */
+        }
+
+        /* Perbaikan Kontras Badge */
+        .badge {
+            font-size: 0.8em;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        .badge.approved, .badge.disetujui {
+            background-color: #28a745; 
+            color: #fff !important; /* Dipaksa putih agar kontras dengan hijau */
+        }
+        .badge.pending, .badge.menunggu {
+            background-color: #ffc107;
+            color: #333;
+        }
+    </style>
 </head>
 
 <body>
-    <aside class="dsn-sidebar">
-        <div class="dsn-logo-area">
-            <h2><i class="fas fa-chalkboard-teacher"></i> DSN <br> DASHBOARD</h2>
-        </div>
-        <nav>
-            <a href="index.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-            <a href="profile.html"><i class="fas fa-user-tie"></i> Profil & Akun</a>
-            <a href="riwayat_peminjaman.html" class="active"><i class="fas fa-book-reader"></i> Riwayat Peminjaman</a>
-            <a href="publikasi.html"><i class="fas fa-file-invoice"></i> Kelola Publikasi</a>
-            <a href="#" id="logoutLink"><i class="fas fa-sign-out-alt"></i> Logout</a>
-        </nav>
-    </aside>
+    <aside class="dsn-sidebar">
+        <div class="dsn-logo-area">
+            <h2><i class="fas fa-chalkboard-teacher"></i> DSN <br> DASHBOARD</h2>
+        </div>
+        <nav>
+            <a href="index.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="profile.html"><i class="fas fa-user-tie"></i> Profil & Akun</a>
+            <a href="riwayat_peminjaman.html" class="active"><i class="fas fa-book-reader"></i> Riwayat Peminjaman</a>
+            <a href="publikasi.html"><i class="fas fa-file-invoice"></i> Kelola Publikasi</a>
+            <a href="#" id="logoutLink"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </nav>
+    </aside>
 
-    <main class="main-content">
-        <div class="content-card">
-            <h2><i class="fas fa-file-alt"></i> Detail Peminjaman #20251210-001</h2>
+    <main class="main-content">
+        <div class="content-card">
+                        <h2><i class="fas fa-file-alt"></i> Detail Peminjaman <span id="headerBookingId">Memuat...</span></h2>
 
-            <div class="detail-group">
-                <h3><i class="fas fa-info-circle"></i> Informasi Peminjaman</h3>
-                <div class="profile-info-group"><label>Tanggal Pengajuan</label>
-                    <p>10 Desember 2025</p>
-                </div>
-                <div class="profile-info-group"><label>Tanggal Mulai Pinjam</label>
-                    <p>15 Desember 2025</p>
-                </div>
-                <div class="profile-info-group"><label>Tanggal Selesai Pinjam</label>
-                    <p>15 Desember 2025</p>
-                </div>
-                <div class="profile-info-group"><label>Tujuan Peminjaman</label>
-                    <p>Presentasi Mata Kuliah Big Data</p>
-                </div>
-                <div class="profile-info-group">
-                    <label>Status Saat Ini</label>
-                    <p><span class="badge approved">Disetujui</span></p>
-                </div>
-                <div class="profile-info-group"><label>Catatan Dosen</label>
-                    <p>Mohon gunakan dengan hati-hati dan kembalikan tepat waktu.</p>
-                </div>
-            </div>
+            <div class="detail-group">
+                <h3><i class="fas fa-info-circle"></i> Informasi Peminjaman</h3>
+                
+                                <div class="profile-info-group"><label>Tanggal Pengajuan</label>
+                    <p id="tglPengajuan">Memuat...</p>
+                </div>
+                
+                                <div class="profile-info-group"><label>Tujuan Peminjaman</label>
+                    <p id="tujuan">Memuat...</p>
+                </div>
+                
+                                <div class="profile-info-group"><label>Status Saat Ini</label>
+                    <p id="statusBadge"><span class="badge pending">Memuat...</span></p>
+                </div>
+                
+                                <div class="profile-info-group"><label>Catatan Dosen</label>
+                    <p id="catatanAdmin">Memuat...</p>
+                </div>
+            </div>
 
-            <div class="detail-group">
-                <h3><i class="fas fa-user"></i> Informasi Peminjam</h3>
-                <div class="profile-info-group"><label>NIM / ID</label>
-                    <p>2023002</p>
-                </div>
-                <div class="profile-info-group"><label>Nama Mahasiswa</label>
-                    <p>R. Sinta</p>
-                </div>
-                <div class="profile-info-group"><label>Kontak (HP)</label>
-                    <p>0812-3456-7890</p>
-                </div>
-                <div class="profile-info-group"><label>Email</label>
-                    <p>sinta.r@student.university.ac.id</p>
-                </div>
-            </div>
+            <div class="detail-group">
+                <h3><i class="fas fa-user"></i> Informasi Peminjam</h3>
+                                <div class="profile-info-group"><label>NIM / ID</label>
+                    <p id="nimMhs">Memuat...</p>
+                </div>
+                                <div class="profile-info-group"><label>Nama Mahasiswa</label>
+                    <p id="namaMhs">Memuat...</p>
+                </div>
+                                <div class="profile-info-group"><label>Kontak (HP)</label>
+                    <p id="noHpMhs">Memuat...</p>
+                </div>
+                                <div class="profile-info-group"><label>Email</label>
+                    <p id="emailMhs">Memuat...</p>
+                </div>
+            </div>
 
-            <div class="detail-group">
-                <h3><i class="fas fa-box-open"></i> Aset yang Dipinjam</h3>
-                <table class="status-table">
-                    <thead>
-                        <tr>
-                            <th>Nama Aset</th>
-                            <th>Kode Aset</th>
-                            <th>Jumlah</th>
-                            <th>Kondisi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Proyektor (Model A)</td>
-                            <td>AST-PRJ-004</td>
-                            <td>1 Unit</td>
-                            <td>Baik</td>
-                        </tr>
-                        <tr>
-                            <td>Kabel HDMI</td>
-                            <td>AST-KBL-012</td>
-                            <td>1 Buah</td>
-                            <td>Baik</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
+            <div class="detail-group">
+                <h3><i class="fas fa-box-open"></i> Aset yang Dipinjam</h3>
+                <table class="status-table">
+                    <thead>
+                        <tr>
+                            <th>Nama Aset</th>
+                            <th>Kode Aset</th>
+                            <th>Jumlah</th>
+                            <th>Kondisi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="asetTableBody">
+                        <tr><td colspan="4" style="text-align: center;">Memuat data aset...</td></tr>
+                    </tbody>
+                </table>
+            </div>
 
             <div style="text-align: center; margin-top: 30px;">
                 <a href="riwayat_peminjaman.html" class="btn-submit"
-                    style="width: auto; padding: 12px 25px; display: inline-block;"><i class="fas fa-arrow-left"></i>
-                    Kembali ke Riwayat</a>
+                    style="width: auto; padding: 12px 25px; display: inline-block; text-decoration: none;">
+                    <i class="fas fa-arrow-left"></i>
+                    Kembali ke Riwayat
+                </a>
             </div>
 
         </div>
-    </main>
+   
 
-    <script>
-        // Logika Logout
-        document.getElementById('logoutLink').addEventListener('click', function (e) {
-            e.preventDefault();
-            if (confirm('Apakah Anda yakin ingin keluar dari sistem?')) {
-                const logoutUrl = '../../backend/api/auth/logout.php';
-                fetch(logoutUrl, { method: 'POST' })
-                    .then(response => response.json())
-                    .then(data => {
-                        alert(data.message);
-                        window.location.href = '../public/index.html';
-                    })
-                    .catch(error => {
-                        alert('Terjadi kesalahan saat logout.');
-                        window.location.href = '../public/index.html';
-                    });
-            }
-        });
-    </script>
+        </div>
+    </main>
+
+    <script>
+        // Fungsi utilitas untuk format tanggal
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            const options = { day: '2-digit', month: 'long', year: 'numeric' };
+            try {
+                return new Date(dateString).toLocaleDateString('id-ID', options);
+            } catch (e) {
+                return dateString;
+            }
+        }
+
+        // Fungsi utilitas untuk mendapatkan kelas status
+        function getStatusClass(status) {
+            const lowerStatus = status ? status.toLowerCase() : '';
+            if (lowerStatus.includes('setuju') || lowerStatus.includes('approved')) return 'approved';
+            if (lowerStatus.includes('tolak') || lowerStatus.includes('rejected')) return 'rejected';
+            if (lowerStatus.includes('kembali') || lowerStatus.includes('returned') || lowerStatus.includes('selesai')) return 'kembali';
+            if (lowerStatus.includes('dipinjam')) return 'dipinjam';
+            return 'pending';
+        }
+
+
+        async function loadDetailPeminjaman() {
+            // 1. Ambil ID dari URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const bookingId = urlParams.get('id');
+
+            // Ambil elemen-elemen kunci
+            const headerBookingId = document.getElementById('headerBookingId'); 
+            const asetTableBody = document.getElementById('asetTableBody');
+            
+            // Set loading state awal
+            if (headerBookingId) headerBookingId.textContent = 'Memuat...';
+            if (asetTableBody) asetTableBody.innerHTML = `<tr><td colspan="4" style="text-align: center;">Memuat data aset...</td></tr>`;
+            
+            if (!bookingId) {
+                if (headerBookingId) headerBookingId.textContent = 'ID Tidak Ditemukan';
+                alert('ID Peminjaman tidak ditemukan di URL.');
+                return;
+            }
+
+            if (headerBookingId) headerBookingId.textContent = `#${bookingId}`;
+            
+            // 2. Tentukan PATH API BACKEND Anda
+            // PATH DIJAGA KONSISTEN SESUAI PERMINTAAN
+            const apiPath = `../../backend/api/booking/detail_booking.php?id=${bookingId}`;
+            
+            try {
+                // 3. Panggil API Backend
+                const response = await fetch(apiPath);
+                const result = await response.json();
+
+                if (result.status === 'success' && result.data) {
+                    const data = result.data;
+                    
+                    // A. Isi Informasi Peminjaman
+                    document.getElementById('tglPengajuan').textContent = formatDate(data.tanggal) || '-';
+                    document.getElementById('tujuan').textContent = data.keperluan || '-';
+
+                    const statusText = data.status ? data.status.charAt(0).toUpperCase() + data.status.slice(1).toLowerCase() : 'Menunggu';
+                    const statusClass = getStatusClass(data.status);
+                    document.getElementById('statusBadge').innerHTML = `<span class="badge ${statusClass}">${statusText}</span>`;
+                    
+                    document.getElementById('catatanAdmin').textContent = data.admin_response || '-'; 
+
+
+                    // B. Isi Informasi Peminjam
+                    document.getElementById('nimMhs').textContent = data.mahasiswa_nim || '-';
+                    document.getElementById('namaMhs').textContent = data.nama_mahasiswa || '-';
+                    document.getElementById('noHpMhs').textContent = data.no_hp || '-';
+                    document.getElementById('emailMhs').textContent = data.email || '-'; 
+                    
+                    // C. Isi Aset yang Dipinjam
+                    
+                    if (data.nama_sarana) { 
+                        asetTableBody.innerHTML = `
+                            <tr>
+                                <td>${data.nama_sarana || '-'}</td>
+                                <td>${data.sarana_id || '-'}</td>
+                                <td>1 Unit</td>
+                                <td>Baik</td>
+                            </tr>
+                        `;
+                    } else {
+                        asetTableBody.innerHTML = `<tr><td colspan="4" style="text-align: center;">Tidak ada detail aset terkait.</td></tr>`;
+                    }
+
+
+                } else if (result.status === 'error') {
+                    if (headerBookingId) headerBookingId.textContent = 'Error';
+                    alert('Gagal memuat detail peminjaman: ' + result.message);
+                } else {
+                    alert('Data peminjaman tidak ditemukan.');
+                }
+
+            } catch (error) {
+                console.error('Error memuat detail:', error);
+                if (headerBookingId) headerBookingId.textContent = 'Error Jaringan';
+                alert('Terjadi kesalahan jaringan atau server.');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadDetailPeminjaman);
+        
+        // Logika Logout (PATH TIDAK DIUBAH SAMA SEKALI)
+        document.getElementById('logoutLink').addEventListener('click', function (e) {
+            e.preventDefault();
+            if (confirm('Apakah Anda yakin ingin keluar dari sistem?')) {
+                const logoutUrl = '../../backend/api/auth/logout.php';
+                fetch(logoutUrl, { method: 'POST' })
+                    .then(response => response.json())
+                    .then(data => {
+                        alert(data.message);
+                        window.location.href = '../public/index.html';
+                    })
+                    .catch(error => {
+                        alert('Terjadi kesalahan saat logout.');
+                        window.location.href = '../public/index.html';
+                    });
+            }
+        });
+    </script>
 </body>
 
 </html>

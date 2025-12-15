@@ -1,6 +1,5 @@
 <?php
-// backend/api/booking/list_by_dosen.php
-
+// backend/api/booking/list_dosen.php
 ini_set('display_errors', 0);
 error_reporting(E_ALL); 
 
@@ -20,7 +19,7 @@ try {
     $db = Database::getInstance();
     $userId = $_SESSION['user_id'];
     
-    // 2. Ambil NIDN Dosen yang sedang Login (Menggunakan user_id)
+    // 2. Ambil NIDN Dosen yang sedang Login
     $stmtDosen = $db->prepare("SELECT nidn FROM dosen WHERE user_id = :uid");
     $stmtDosen->execute([':uid' => $userId]);
     $nidnDosen = $stmtDosen->fetchColumn();
@@ -46,17 +45,50 @@ try {
         LEFT JOIN mahasiswa m ON b.mahasiswa_nim = m.nim
     ";
     
-    // 4. DEFENISIKAN QUERY SQL Dosen (TANPA KOMENTAR PHP DI DALAM STRING)
-    $sql = "
-        SELECT {$select_fields}
-        {$join_tables}
-        WHERE b.booking_dosen_nidn = :nidn_dosen
-        ORDER BY b.tanggal DESC, b.booking_id DESC
-    ";
+    // 4. LOGIKA PENCARIAN (Dual Query Logic)
+    
+    // Ambil keyword pencarian (trim() untuk membersihkan spasi)
+    $searchQuery = trim($_GET['search'] ?? ''); 
+    
+    // Filter Wajib (NIDN Dosen)
+    $where_base = " WHERE b.booking_dosen_nidn = :nidn_dosen";
+    $params = [':nidn_dosen' => $nidnDosen];
+    
+    // Cek apakah ada keyword pencarian
+    if (!empty($searchQuery)) {
+        // --- QUERY DENGAN PENCARIAN ---
+        
+        $searchTerm = "%{$searchQuery}%"; 
+        
+        // Tambahkan filter NIM/Nama ke klausa WHERE
+        // Menggunakan ILIKE untuk PostgreSQL atau LIKE untuk kompatibilitas MySQL
+        $where_search = " AND (m.nim ILIKE :search_term OR m.nama ILIKE :search_term)";
+        
+        // Tambahkan parameter pencarian ke array params
+        $params[':search_term'] = $searchTerm;
+        
+        // Gabungkan SQL untuk pencarian
+        $sql = "
+            SELECT {$select_fields}
+            {$join_tables}
+            {$where_base} {$where_search}
+            ORDER BY b.tanggal DESC, b.booking_id DESC
+        ";
+    } else {
+        // --- QUERY LOAD NORMAL (TANPA PENCARIAN) ---
+        
+        // Gunakan where_base saja
+        $sql = "
+            SELECT {$select_fields}
+            {$join_tables}
+            {$where_base}
+            ORDER BY b.tanggal DESC, b.booking_id DESC
+        ";
+    }
     
     // 5. Eksekusi Query
     $stmtPeminjaman = $db->prepare($sql);
-    $stmtPeminjaman->execute([':nidn_dosen' => $nidnDosen]);
+    $stmtPeminjaman->execute($params); 
     $peminjamanList = $stmtPeminjaman->fetchAll(PDO::FETCH_ASSOC);
 
     echo json_encode([
@@ -65,7 +97,6 @@ try {
     ]);
 
 } catch (Exception $e) {
-    // Di lingkungan produksi, Anda mungkin ingin menyembunyikan $e->getMessage()
     http_response_code(500);
     echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
 }
