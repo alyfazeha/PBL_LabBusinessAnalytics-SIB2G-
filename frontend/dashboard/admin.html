@@ -6,8 +6,94 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Utama | Admin</title>
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" crossorigin="anonymous">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="../assets/css/cssadmin.css">
+
+    <style>
+        /* --- STYLE TAMBAHAN --- */
+        
+        /* Agar link statistik tidak merusak desain kartu */
+        .stat-link {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            transition: transform 0.2s;
+        }
+
+        .stat-link:hover {
+            transform: translateY(-5px); /* Efek naik dikit pas di hover */
+        }
+
+        /* Pastikan kursor berubah jadi tangan */
+        .stat-card {
+            cursor: pointer;
+        }
+
+        /* --- SISA STYLE LAMA ANDA --- */
+        .controls-wrapper {
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+            border: 1px solid #eee;
+        }
+
+        .filter-container {
+            display: flex; gap: 15px; align-items: center; flex-wrap: wrap;
+        }
+
+        .filter-input, .filter-select {
+            padding: 12px 15px; border: 1px solid #e0e0e0; border-radius: 8px;
+            font-size: 14px; font-family: 'Poppins', sans-serif; background: #f9f9f9; transition: all 0.3s;
+        }
+
+        .filter-input:focus, .filter-select:focus {
+            outline: none; border-color: #007bff; background: #fff; box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+        }
+
+        .filter-input { flex: 1; min-width: 250px; }
+        .filter-select { min-width: 180px; }
+
+        .btn-refresh {
+            background-color: #007bff; color: white; border: none; padding: 12px 20px;
+            border-radius: 8px; cursor: pointer; font-weight: 500; display: flex; align-items: center; gap: 8px; transition: all 0.3s;
+        }
+        .btn-refresh:hover { background-color: #0056b3; transform: translateY(-1px); }
+        .btn-refresh:active { transform: translateY(0); }
+        .btn-refresh:disabled { background-color: #ccc; cursor: not-allowed; }
+
+        .table-card {
+            background: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            overflow: hidden; border: 1px solid #eee;
+        }
+        .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .data-table { width: 100%; border-collapse: collapse; white-space: nowrap; }
+        .data-table thead th {
+            background-color: #f8f9fa; color: #444; font-weight: 600; font-size: 0.85rem;
+            text-transform: uppercase; letter-spacing: 0.5px; padding: 18px 15px;
+            border-bottom: 2px solid #e9ecef; text-align: left;
+        }
+        .data-table tbody td {
+            padding: 15px; border-bottom: 1px solid #f1f1f1; vertical-align: top;
+            font-size: 0.9rem; color: #333;
+        }
+        .data-table tbody tr:hover { background-color: #fcfcfc; }
+        .col-id { font-weight: 700; color: #007bff; }
+        .status-badge {
+            padding: 6px 12px; border-radius: 30px; font-size: 0.75rem; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .status-diajukan { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+        .status-disetujui { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .status-ditolak { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info-primary { font-weight: 600; color: #2c3e50; margin-bottom: 3px; display: block; }
+        .info-secondary { font-size: 0.8rem; color: #888; display: block; }
+        .info-tertiary { font-size: 0.75rem; color: #aaa; margin-top: 4px; display: block; font-style: italic;}
+        .cell-wrap { white-space: normal; min-width: 200px; max-width: 300px; line-height: 1.5; }
+        .td-icon { color: #ccc; margin-right: 5px; width: 15px; text-align: center;}
+    </style>
 </head>
 
 <body>
@@ -28,115 +114,287 @@
     </div>
 
     <div class="main-content">
-        <header>
-            <h1>Selamat Datang, Admin!</h1>
+        <header style="margin-bottom: 25px;">
+            <h1 style="font-size: 1.8rem; color: #333;">Selamat Datang, <span id="welcomeName">Admin</span>!</h1>
         </header>
 
-        <div class="stats-grid">
-            <div class="stat-card blue">
-                <i class="fas fa-calendar-check"></i>
-                <h2>120</h2>
-                <p>Total Peminjaman</p>
-            </div>
-            <div class="stat-card yellow">
-                <i class="fas fa-hourglass-half"></i>
-                <h2>15</h2>
-                <p>Menunggu Persetujuan</p>
-            </div>
-            <div class="stat-card green">
-                <i class="fas fa-user-tie"></i>
-                <h2>450</h2>
-                <p>Total Pengguna</p>
-            </div>
+        <div class="stats-grid" style="margin-bottom: 30px;">
+            
+            <a href="peminjaman/peminjaman.html" class="stat-link">
+                <div class="stat-card blue">
+                    <i class="fas fa-calendar-check"></i>
+                    <h2 id="statPeminjaman">-</h2> <p>Total Peminjaman</p>
+                </div>
+            </a>
+
+            <a href="publikasi/publikasi.html" class="stat-link">
+                <div class="stat-card yellow">
+                    <i class="fas fa-book-open"></i> <h2 id="statPublikasi">-</h2> <p>Total Publikasi Dosen</p>
+                </div>
+            </a>
+
+            <a href="konten/konten.html" class="stat-link">
+                <div class="stat-card green">
+                    <i class="fas fa-newspaper"></i> <h2 id="statKonten">-</h2> <p>Total Berita & Konten</p>
+                </div>
+            </a>
         </div>
 
         <div class="data-section">
-            <h2>Daftar Peminjaman Terbaru</h2>
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Peminjam</th>
-                        <th>Tanggal</th>
-                        <th>Status</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>101</td>
-                        <td>Andy Wiratama</td>
-                        <td>2025-11-28</td>
-                        <td><span class="status pending">Pending</span></td>
-                        <td><button class="btn-action approve">Approve</button></td>
-                    </tr>
-                </tbody>
-            </table>
+            
+            <div class="controls-wrapper">
+                <div class="filter-container">
+                    <div style="flex: 1;">
+                        <label style="display:block; margin-bottom:5px; font-weight:600; font-size:12px; color:#666;">PENCARIAN</label>
+                        <input type="text" id="searchNim" class="filter-input" placeholder="Cari NIM, Nama Mahasiswa, atau Ruangan...">
+                    </div>
+                    
+                    <div>
+                        <label style="display:block; margin-bottom:5px; font-weight:600; font-size:12px; color:#666;">FILTER STATUS</label>
+                        <select id="filterStatus" class="filter-select">
+                            <option value="">Semua Status</option>
+                            <option value="diajukan">Diajukan</option>
+                            <option value="disetujui">Disetujui</option>
+                            <option value="ditolak">Ditolak</option>
+                        </select>
+                    </div>
+
+                    <div style="align-self: flex-end;">
+                        <button id="btnRefresh" class="btn-refresh">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-card">
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 50px; text-align: center;">ID</th>
+                                <th style="width: 100px; text-align: center;">Status</th>
+                                <th>Jadwal & Lokasi</th>
+                                <th>Peminjam (Mahasiswa)</th>
+                                <th>Dosen PJ</th>
+                                <th>Detail Keperluan</th>
+                                <th>Info Pengajuan</th>
+                                <th>Admin & Respon</th>
+                            </tr>
+                        </thead>
+                        <tbody id="riwayatTableBody">
+                            <tr>
+                                <td colspan="8" style="text-align: center; padding: 30px; color: #888;">
+                                    <i class="fas fa-spinner fa-spin fa-2x"></i><br><br>Memuat data...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div style="margin-top: 10px; text-align: right; font-size: 0.85rem; color: #888;">
+                Menampilkan semua data dari Materialized View
+            </div>
         </div>
     </div>
 
-    <div id="logoutModal" class="modal-overlay">
-        <div class="modal-content">
-            <h2>Konfirmasi Logout</h2>
-            <p>Apakah Anda yakin ingin keluar dari sesi administrator?</p>
-            <div class="modal-actions">
-                <button id="cancelLogout" class="btn-modal-cancel">Batal</button>
-                <button id="confirmLogout" class="btn-modal-confirm">Ya, Logout</button>
+    <div id="logoutModal" class="modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; justify-content:center; align-items:center;">
+        <div class="modal-content" style="background:white; padding:25px; border-radius:12px; text-align:center; width: 350px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+            <h2 style="margin-bottom: 10px; color: #333;">Konfirmasi</h2>
+            <p style="color: #666; margin-bottom: 25px;">Yakin ingin keluar dari sistem?</p>
+            <div class="modal-actions" style="display: flex; justify-content: center; gap: 10px;">
+                <button id="cancelLogout" style="padding:10px 20px; border:1px solid #ddd; background: #fff; border-radius:6px; cursor:pointer;">Batal</button>
+                <button id="confirmLogout" style="padding:10px 20px; background:#dc3545; color:white; border:none; border-radius:6px; cursor:pointer;">Logout</button>
             </div>
         </div>
     </div>
 
     <script>
+        const API_BASE_URL = '../../backend/api/booking/';
+        const STATS_API_URL = '../../backend/api/admin/dashboard_stats.php'; // URL API Stats Baru
+
+        const tableBody = document.getElementById('riwayatTableBody');
+        const searchInput = document.getElementById('searchNim');
+        const statusSelect = document.getElementById('filterStatus');
+        const refreshBtn = document.getElementById('btnRefresh');
+
+        // --- 1. FUNGSI LOAD STATISTIK & NAMA ADMIN ---
+        async function loadDashboardStats() {
+            try {
+                const response = await fetch(STATS_API_URL);
+                const result = await response.json();
+
+                if (result.success) {
+                    // Update Nama di Header
+                    document.getElementById('welcomeName').textContent = result.data.name;
+
+                    // Update Angka Statistik
+                    document.getElementById('statPeminjaman').textContent = result.data.peminjaman;
+                    document.getElementById('statPublikasi').textContent = result.data.publikasi;
+                    document.getElementById('statKonten').textContent = result.data.konten;
+                }
+            } catch (error) {
+                console.error("Gagal memuat statistik:", error);
+            }
+        }
+
+        // --- 2. FUNGSI LOAD DATA TABEL ---
+        async function loadHistory(isRefresh = false) {
+            if (isRefresh && refreshBtn) {
+                refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+                refreshBtn.disabled = true;
+            }
+
+            const searchVal = searchInput.value;
+            const statusVal = statusSelect.value;
+
+            if (searchVal.length > 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="8" style="text-align: center; padding: 40px; color: #007bff;">
+                            <i class="fas fa-search fa-spin fa-2x"></i><br><br>
+                            Sedang mencari data "${searchVal}"...
+                        </td>
+                    </tr>`;
+            } else if (isRefresh) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="8" style="text-align: center; padding: 40px; color: #888;">
+                            <i class="fas fa-spinner fa-spin fa-2x"></i><br><br>
+                            Memuat ulang data...
+                        </td>
+                    </tr>`;
+            }
+
+            let url = `${API_BASE_URL}riwayat.php?t=${new Date().getTime()}`;
+            if (searchVal) url += `&search=${encodeURIComponent(searchVal)}`;
+            if (statusVal) url += `&status=${encodeURIComponent(statusVal)}`;
+            if (isRefresh) url += `&refresh=true`;
+
+            try {
+                const response = await fetch(url);
+                const result = await response.json();
+
+                if (result.success) {
+                    renderTable(result.data);
+                } else {
+                    tableBody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: red; padding: 20px;">Gagal: ${result.message}</td></tr>`;
+                }
+                
+                // Refresh Stats juga saat tombol refresh ditekan
+                if(isRefresh) loadDashboardStats();
+
+            } catch (error) {
+                console.error("Fetch error:", error);
+                tableBody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: red; padding: 20px;">Koneksi ke server gagal.</td></tr>`;
+            } finally {
+                if (isRefresh && refreshBtn) {
+                    refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh';
+                    refreshBtn.disabled = false;
+                }
+            }
+        }
+
+        // --- 3. FUNGSI RENDER TABLE ---
+        function renderTable(data) {
+            tableBody.innerHTML = '';
+
+            if (!data || data.length === 0) {
+                const searchVal = searchInput.value;
+                let pesan = "Belum ada data peminjaman.";
+                if (searchVal) pesan = `Data dengan kata kunci <strong>"${searchVal}"</strong> tidak ditemukan.`;
+
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="8" style="text-align: center; padding: 50px; background-color: #fff;">
+                            <i class="fas fa-folder-open" style="font-size: 3rem; color: #e0e0e0; margin-bottom: 15px;"></i>
+                            <h3 style="font-size: 1.1rem; color: #555; margin: 0;">Data Tidak Ditemukan</h3>
+                            <p style="color: #999; font-size: 0.9rem; margin-top: 5px;">${pesan}</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            data.forEach(item => {
+                let badgeClass = '';
+                if (item.status === 'diajukan') badgeClass = 'status-diajukan';
+                else if (item.status === 'disetujui') badgeClass = 'status-disetujui';
+                else if (item.status === 'ditolak') badgeClass = 'status-ditolak';
+
+                const jamMulai = item.start_time ? item.start_time.substring(0, 5) : '-';
+                const jamSelesai = item.end_time ? item.end_time.substring(0, 5) : '-';
+                const tglCreated = item.created_at ? item.created_at.split(' ')[0] : '-';
+                const jamCreated = item.created_at ? item.created_at.split(' ')[1].substring(0, 5) : ''; 
+
+                const row = `
+                    <tr>
+                        <td style="text-align: center;"><span class="col-id">#${item.booking_id}</span></td>
+                        <td style="text-align: center;"><span class="status-badge ${badgeClass}">${item.status}</span></td>
+                        <td>
+                            <span class="info-primary"><i class="far fa-calendar-alt td-icon"></i> ${item.tanggal}</span>
+                            <span class="info-secondary"><i class="far fa-clock td-icon"></i> ${jamMulai} - ${jamSelesai}</span>
+                            <span class="info-secondary" style="color: #007bff; margin-top:4px;"><i class="fas fa-map-marker-alt td-icon"></i> ${item.nama_sarana}</span>
+                        </td>
+                        <td>
+                            <span class="info-primary">${item.mahasiswa_nama || '-'}</span>
+                            <span class="info-secondary">NIM: ${item.mahasiswa_nim || '-'}</span>
+                        </td>
+                        <td>
+                            <span class="info-primary">${item.dosen_nama || '-'}</span>
+                            <span class="info-secondary">NIDN: ${item.dosen_nidn || '-'}</span>
+                        </td>
+                        <td class="cell-wrap">
+                            <span class="info-primary" style="font-weight: 500;">${item.keperluan}</span>
+                            <span class="info-tertiary">Studi: ${item.sks} SKS</span>
+                        </td>
+                        <td>
+                            <span class="info-primary">${tglCreated} <small>${jamCreated}</small></span>
+                            <span class="info-secondary">Akun: ${item.requester_display_name || 'System'}</span>
+                        </td>
+                        <td class="cell-wrap">
+                            ${item.handled_by ? `<span class="info-primary" style="font-size:0.85rem"><i class="fas fa-user-check td-icon"></i> ${item.handled_by}</span>` : '<span style="color:#ddd;">-</span>'}
+                            ${item.admin_response ? `<div style="background:#f8f9fa; padding:5px; border-radius:4px; margin-top:5px; font-size:0.8rem; border-left: 3px solid #ccc; color:#555;">"${item.admin_response}"</div>` : ''}
+                        </td>
+                    </tr>
+                `;
+                tableBody.insertAdjacentHTML('beforeend', row);
+            });
+        }
+
+        // --- EVENT LISTENERS ---
+        if (refreshBtn) refreshBtn.addEventListener('click', () => loadHistory(true));
+        if (statusSelect) statusSelect.addEventListener('change', () => loadHistory(false));
+        
+        let debounceTimer;
+        if (searchInput) {
+            searchInput.addEventListener('keyup', () => {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => { loadHistory(false); }, 500);
+            });
+        }
+
+        // INIT: Jalankan Load History DAN Load Stats
+        document.addEventListener('DOMContentLoaded', () => {
+            loadHistory(false);
+            loadDashboardStats(); // Panggil fungsi stats baru
+        });
+
+        // --- LOGOUT LOGIC ---
         const logoutTrigger = document.getElementById('logoutTrigger');
         const logoutModal = document.getElementById('logoutModal');
         const cancelLogoutBtn = document.getElementById('cancelLogout');
         const confirmLogoutBtn = document.getElementById('confirmLogout');
 
-        logoutTrigger.addEventListener('click', (e) => {
-            e.preventDefault();
-            logoutModal.style.display = 'flex';
-        });
-
-        cancelLogoutBtn.addEventListener('click', () => {
-            logoutModal.style.display = 'none';
-        });
-
-        // ... (Skrip yang sudah ada di admin.html)
-
-        confirmLogoutBtn.addEventListener('click', async () => {
-            // Path ke PHP: dari frontend/ ke backend/api/auth/logout.php
-            const url = '../../backend/api/auth/logout.php';
-
+        if(logoutTrigger) logoutTrigger.addEventListener('click', (e) => { e.preventDefault(); logoutModal.style.display = 'flex'; });
+        if(cancelLogoutBtn) cancelLogoutBtn.addEventListener('click', () => { logoutModal.style.display = 'none'; });
+        if(confirmLogoutBtn) confirmLogoutBtn.addEventListener('click', async () => {
             try {
-                const response = await fetch(url, {
-                    method: 'POST',
-                });
-                const result = await response.json();
-
-                if (result.success) {
-                    // Logout berhasil di server
-                    logoutModal.style.display = 'none';
-                    window.location.href = '../public/index.html'; // Redirect ke halaman utama
-                } else {
-                    // Jika ada masalah logout di server, tetap redirect agar user tidak terjebak
-                    window.location.href = '../public/index.html';
-                }
-
-            } catch (error) {
-                // Jika terjadi error jaringan/server, tetap redirect
-                console.error('Logout Error:', error);
+                await fetch('../../backend/api/auth/logout.php', { method: 'POST' });
                 window.location.href = '../public/index.html';
-            }
-        });
-
-        // ... (Skrip yang sudah ada di admin.html)
-
-        window.addEventListener('click', (e) => {
-            if (e.target === logoutModal) {
-                logoutModal.style.display = 'none';
-            }
+            } catch(e) { window.location.href = '../public/index.html'; }
         });
     </script>
 </body>
-
 </html>
