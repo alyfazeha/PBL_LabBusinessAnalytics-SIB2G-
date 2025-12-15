@@ -8,6 +8,8 @@ ini_set('display_errors', 0);
 error_reporting(E_ALL);
 
 try {
+    // FIX PATH: Mundur 2 langkah (Perlu ditambahkan lagi di sini)
+    require_once __DIR__ . "/../../config/database.php"; 
     require_once __DIR__ . "/../../models/Dosen.php";
     require_once __DIR__ . "/../../config/auth.php";
 
@@ -26,6 +28,17 @@ try {
     if (!$currentDosen) {
         throw new Exception('Data Dosen tidak ditemukan.');
     }
+
+    // --- NORMALISASI NIP DI SINI ---
+    $input_nip = trim($_POST['nip'] ?? $currentDosen['nip']);
+    // Jika input NIP kosong, strip (-), atau sama dengan string 'NULL', set ke NULL
+    if ($input_nip === "" || $input_nip === "-" || strtoupper($input_nip) === 'NULL') {
+        $normalized_nip = null;
+    } else {
+        $normalized_nip = $input_nip;
+    }
+    // -----------------------------
+
 
     // --- LOGIKA UPDATE FOTO (YANG DIPERBAIKI) ---
     $final_foto_path = $currentDosen['foto_path'];
@@ -53,29 +66,31 @@ try {
             $dest_path = $uploadFileDir . $newFileName;
 
             if(move_uploaded_file($fileTmpPath, $dest_path)) {
-                $final_foto_path = 'assets/uploads/dosen/' . $newFileName;
+                // PATH BERSIH DISIMPAN DI DB
+                $final_foto_path = 'assets/uploads/dosen/' . $newFileName; 
             } else {
                 throw new Exception("Gagal mengupload file foto.");
             }
         }
     } 
-    elseif (!empty($_POST['foto_path'])) {
+    elseif (isset($_POST['foto_path'])) {
         $final_foto_path = trim($_POST['foto_path']);
     }
 
+    // --- DATA FINAL UNTUK UPDATE ---
     $data = [
-        'nama'          => trim($_POST['nama'] ?? $currentDosen['nama']),
-        'jabatan'       => trim($_POST['jabatan'] ?? $currentDosen['jabatan']),
-        'email'         => trim($_POST['email'] ?? $currentDosen['email']),
-        'foto_path'     => $final_foto_path,
+        'nama'             => trim($_POST['nama'] ?? $currentDosen['nama']),
+        'jabatan'          => trim($_POST['jabatan'] ?? $currentDosen['jabatan']),
+        'email'            => trim($_POST['email'] ?? $currentDosen['email']),
+        'foto_path'        => $final_foto_path,
         'researchgate_url' => trim($_POST['researchgate_url'] ?? $currentDosen['researchgate_url']),
-        'scholar_url'   => trim($_POST['scholar_url'] ?? $currentDosen['scholar_url']),
-        'sinta_url'     => trim($_POST['sinta_url'] ?? $currentDosen['sinta_url']),
-        'nip'           => trim($_POST['nip'] ?? $currentDosen['nip']),
-        'prodi'         => trim($_POST['prodi'] ?? $currentDosen['prodi']),
-        'pendidikan'    => trim($_POST['pendidikan'] ?? $currentDosen['pendidikan']),
-        'sertifikasi'   => trim($_POST['sertifikasi'] ?? $currentDosen['sertifikasi']),
-        'mata_kuliah'   => trim($_POST['mata_kuliah'] ?? $currentDosen['mata_kuliah']),
+        'scholar_url'      => trim($_POST['scholar_url'] ?? $currentDosen['scholar_url']),
+        'sinta_url'        => trim($_POST['sinta_url'] ?? $currentDosen['sinta_url']),
+        'nip'              => $normalized_nip, // MENGGUNAKAN NIP YANG SUDAH DINORMALISASI
+        'prodi'            => trim($_POST['prodi'] ?? $currentDosen['prodi']),
+        'pendidikan'       => trim($_POST['pendidikan'] ?? $currentDosen['pendidikan']),
+        'sertifikasi'      => trim($_POST['sertifikasi'] ?? $currentDosen['sertifikasi']),
+        'mata_kuliah'      => trim($_POST['mata_kuliah'] ?? $currentDosen['mata_kuliah']),
     ];
 
     $success = $dosenModel->update($nidn, $data);
@@ -88,6 +103,13 @@ try {
 
 } catch (Exception $e) {
     http_response_code(500);
-    echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+    // Tambahkan penanganan untuk duplikasi NIP yang diisi
+    if (strpos($e->getMessage(), 'Duplicate entry') !== false && strpos($e->getMessage(), 'nip') !== false) {
+        $message = 'Gagal: NIP yang Anda masukkan sudah digunakan Dosen lain.';
+    } else {
+        $message = $e->getMessage();
+    }
+
+    echo json_encode(['success' => false, 'message' => $message]);
 }
 ?>

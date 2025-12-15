@@ -4,6 +4,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 header("Content-Type: application/json");
+// Tetap matikan display_errors di production, tapi kita tambahkan untuk debug
 ini_set('display_errors', 0);
 error_reporting(E_ALL);
 
@@ -28,7 +29,6 @@ try {
 
     // --- PERBAIKAN NIP ---
     $nip = trim($_POST['nip'] ?? "");
-    // Jika NIP kosong atau isinya cuma strip (-), ubah jadi NULL agar tidak error Unique
     if ($nip === "" || $nip === "-") {
         $nip = null;
     }
@@ -48,70 +48,67 @@ try {
     }
 
     // ---------------------------------------------------------
-    // 2. LOGIKA UPLOAD FOTO
+    // 2. LOGIKA UPLOAD FOTO (DIRAPIKAN & DIPERKUAT)
     // ---------------------------------------------------------
-    $final_foto_path = $foto_path_input; // Pertahankan path lama jika tidak ada upload baru
+    $final_foto_path = $foto_path_input;
 
-    // Cek apakah ada file baru yang diupload dan tidak ada error
+    // Cek apakah ada file baru yang diupload (field name: 'foto_file')
     if (isset($_FILES['foto_file']) && $_FILES['foto_file']['error'] === UPLOAD_ERR_OK) {
+        
+        $fileUploadInfo = $_FILES['foto_file'];
 
-        // 1. Tentukan direktori upload absolut menggunakan __DIR__
-        // Asumsi: File PHP ini berada 3 level di bawah direktori frontend/assets/uploads/
-        $uploadDir = __DIR__ . '/../../../frontend/assets/uploads/dosen/';
+        // 1. Tentukan direktori upload absolut
+        $uploadDir = __DIR__ . '/../../../frontend/assets/uploads/dosen/'; 
 
-        // 2. Pastikan folder ada
+        // 2. Pastikan folder ada dan dapat ditulis
         if (!is_dir($uploadDir)) {
             if (!mkdir($uploadDir, 0777, true)) {
                 http_response_code(500);
-                exit(json_encode(['status' => 'error', 'message' => "Gagal membuat folder upload di: " . $uploadDir]));
+                exit(json_encode(['status' => 'error', 'message' => "Gagal membuat folder upload di: " . $uploadDir . ". Cek izin folder."]));
             }
         }
 
-        $fileNameWithExt = $_FILES['foto_file']['name'];
+        $fileNameWithExt = $fileUploadInfo['name'];
         $fileExtension = pathinfo($fileNameWithExt, PATHINFO_EXTENSION);
         $fileExtensionLower = strtolower($fileExtension);
-
         $allowedTypes = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
 
         // 3. Cek format file
         if (in_array($fileExtensionLower, $allowedTypes)) {
 
-            // 4. Buat nama file unik (menggunakan NIDN dan timestamp)
-            // Pastikan variabel $nidn sudah tersedia
-            if (empty($nidn)) {
-                // Jika $nidn tidak tersedia, gunakan id unik saja, atau berikan error
-                $newFileName = 'dosen_' . time() . '_' . uniqid() . '.' . $fileExtensionLower;
-            } else {
-                $newFileName = $nidn . '_' . time() . '.' . $fileExtensionLower;
-            }
-
+            // 4. Buat nama file unik
+            $newFileName = (empty($nidn) ? 'dosen_' . time() . '_' . uniqid() : $nidn . '_' . time()) . '.' . $fileExtensionLower;
             $targetFile = $uploadDir . $newFileName;
 
             // 5. Pindahkan file
-            if (move_uploaded_file($_FILES['foto_file']['tmp_name'], $targetFile)) {
+            if (move_uploaded_file($fileUploadInfo['tmp_name'], $targetFile)) {
 
-                // 6. Simpan path yang dapat dibaca frontend ke database
-                // Path ini relatif dari root frontend ke file gambar
-                $final_foto_path = '../../assets/uploads/dosen/' . $newFileName;
+                // 6. Simpan path relatif ke database (PATH BERSIH DARI ROOT FRONTEND)
+                $final_foto_path = 'assets/uploads/dosen/' . $newFileName; 
             } else {
                 // Jika gagal upload, kirim error API
                 http_response_code(500);
-                exit(json_encode(['status' => 'error', 'message' => 'Gagal memindahkan file upload. Cek izin folder.']));
+                exit(json_encode(['status' => 'error', 'message' => 'Gagal memindahkan file upload. Pastikan folder memiliki izin tulis (777).']));
             }
         } else {
             // Jika format tidak didukung, kirim error API
             http_response_code(400);
             exit(json_encode(['status' => 'error', 'message' => 'Format foto tidak didukung.']));
         }
+    } else if (isset($_FILES['foto_file']) && $_FILES['foto_file']['error'] !== UPLOAD_ERR_NO_FILE) {
+        // Menangani error upload selain file tidak ada (misal ukuran terlalu besar)
+        http_response_code(400);
+        exit(json_encode(['status' => 'error', 'message' => 'Error upload file: Kode ' . ($_FILES['foto_file']['error']) ]));
     }
-    // Variabel $final_foto_path sekarang siap digunakan untuk query database.
-
+    
     // 3. Mulai Transaksi Database
     $db = Database::getInstance();
     $db->beginTransaction();
 
     try {
         $user_id_to_use = null;
+        $is_new_user = false;
+        $initial_password_text = "dosen123"; // Password default
 
         // Cek User Existing
         $stmtCheck = $db->prepare("SELECT user_id FROM users WHERE username = :u LIMIT 1");
@@ -121,13 +118,21 @@ try {
         if ($existingUser) {
             $user_id_to_use = $existingUser['user_id'];
         } else {
-            $default_password = password_hash("dosen123", PASSWORD_BCRYPT);
+            // Logika pembuatan user baru dan password default
+            $is_new_user = true;
+            
+            // --- PERUBAHAN DI SINI: GENERATE PASSWORD ACAK ---
+            $initial_password_text = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, 8);
+            // --- END PERUBAHAN ---
+            
+            $default_password_hash = password_hash($initial_password_text, PASSWORD_BCRYPT);
+            
             $sqlUser = "INSERT INTO users (username, password_hash, role, email, display_name, created_at) 
-                        VALUES (:username, :pass, 'dosen', :email, :nama, NOW())";
+                         VALUES (:username, :pass, 'dosen', :email, :nama, NOW())";
             $stmtUser = $db->prepare($sqlUser);
             $stmtUser->execute([
                 ':username' => $nidn,
-                ':pass'     => $default_password,
+                ':pass'     => $default_password_hash,
                 ':email'    => $email,
                 ':nama'     => $nama
             ]);
@@ -143,13 +148,13 @@ try {
 
         // Simpan Data Dosen
         $sqlDosen = "INSERT INTO dosen (
-                        nidn, user_id, nama, jabatan, email, foto_path,
-                        researchgate_url, scholar_url, sinta_url, 
-                        nip, prodi, pendidikan, sertifikasi, mata_kuliah
+                         nidn, user_id, nama, jabatan, email, foto_path,
+                         researchgate_url, scholar_url, sinta_url, 
+                         nip, prodi, pendidikan, sertifikasi, mata_kuliah
                     ) VALUES (
-                        :nidn, :user_id, :nama, :jabatan, :email, :foto_path,
-                        :researchgate_url, :scholar_url, :sinta_url,
-                        :nip, :prodi, :pendidikan, :sertifikasi, :mata_kuliah
+                         :nidn, :user_id, :nama, :jabatan, :email, :foto_path,
+                         :researchgate_url, :scholar_url, :sinta_url,
+                         :nip, :prodi, :pendidikan, :sertifikasi, :mata_kuliah
                     )";
 
         $stmtDosen = $db->prepare($sqlDosen);
@@ -163,7 +168,7 @@ try {
             ':researchgate_url' => $researchgate_url,
             ':scholar_url' => $scholar_url,
             ':sinta_url' => $sinta_url,
-            ':nip' => $nip, // Ini sekarang bisa NULL
+            ':nip' => $nip, 
             ':prodi' => $prodi,
             ':pendidikan' => $pendidikan,
             ':sertifikasi' => $sertifikasi,
@@ -171,17 +176,31 @@ try {
         ]);
 
         $db->commit();
-        echo json_encode(['success' => true, 'message' => 'Berhasil menyimpan data dosen!']);
+        
+        // --- PESAN SUKSES AKHIR ---
+        $success_message = 'Berhasil menyimpan data dosen!';
+        
+        if ($is_new_user) {
+            $success_message .= " AKUN BARU DIBUAT: Username: $nidn, Password Default: $initial_password_text";
+        }
+        
+        echo json_encode(['success' => true, 'message' => $success_message]);
+
     } catch (Exception $ex) {
         $db->rollBack();
-        throw $ex;
+        http_response_code(500); 
+        echo json_encode(['success' => false, 'message' => 'Error Transaksi Database: ' . $ex->getMessage()]);
     }
 } catch (Exception $e) {
-    http_response_code(500);
-    if (strpos($e->getMessage(), 'Duplicate entry') !== false) {
-        // Cek detail error apakah karena email atau NIDN/NIP lain
-        echo json_encode(['success' => false, 'message' => 'Data duplikat terdeteksi (NIDN, Email, atau NIP sudah ada).']);
-    } else {
-        echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+    // Error diluar transaksi (validasi, upload, koneksi)
+    $statusCode = http_response_code();
+    if ($statusCode === 200) { $statusCode = 500; http_response_code(500); }
+    
+    $message = 'Error: ' . $e->getMessage();
+    if (strpos($message, 'Duplicate entry') !== false || strpos($message, 'dosen_nidn_key') !== false) {
+        $message = 'Data duplikat terdeteksi (NIDN, Email, atau NIP sudah ada).';
     }
+    
+    echo json_encode(['success' => false, 'message' => $message]);
 }
+?>
