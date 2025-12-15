@@ -12,58 +12,66 @@
 <body>
     <aside class="dsn-sidebar">
         <div class="dsn-logo-area">
-            <h2><i class="fas fa-chalkboard-teacher"></i> DSN <br> DASHBOARD</h2>
+            <h2><i class="fas fa-chalkboard-teacher"></i> DOSEN <br> DASHBOARD</h2>
         </div>
         <nav>
             <a href="index.html" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
             <a href="profile.html"><i class="fas fa-user-tie"></i> Profil & Akun</a>
             <a href="riwayat_peminjaman.html"><i class="fas fa-book-reader"></i> Riwayat Peminjaman</a>
             <a href="publikasi.html"><i class="fas fa-file-invoice"></i> Kelola Publikasi</a>
+            
+            <hr style="border-top: 1px solid #444; margin: 10px 0;">
+            <a href="../public/index.html"><i class="fas fa-home"></i> Landing Page</a> 
+            
             <a href="#" id="logoutLink"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            
+            <hr style="border-top: 1px solid #444; margin: 10px 0;"> 
         </nav>
     </aside>
 
     <main class="main-content">
         <header class="dashboard-header">
-            <h1>Selamat Datang, Bapak/Ibu [Nama Dosen]!</h1>
-            <p>Kelola publikasi dan pantau peminjaman aset di sini.</p>
+            <h1 id="welcomeMessage">Selamat Datang</h1>
+            <p>Kelola publikasi dan pantau peminjaman bapak/ibu di sini.</p>
         </header>
-
+        
         <div class="status-grid">
             <div class="status-card approved">
                 <div class="status-info">
                     <h3>Total Publikasi</h3>
-                    <p>5</p>
+                    <p id="totalPublications">...</p>
                 </div>
                 <div class="status-icon"><i class="fas fa-scroll"></i></div>
             </div>
+            
+            <div class="status-card info" style="border-left: 5px solid #007bff;"> 
+                <div class="status-info">
+                    <h3>Total Peminjaman</h3>
+                    <p id="totalLoans">...</p>
+                </div>
+                <div class="status-icon"><i class="fas fa-book-reader"></i></div> 
+            </div>
+            
             <div class="status-card pending">
                 <div class="status-info">
-                    <h3>Peminjaman Menunggu</h3>
-                    <p>3</p>
+                    <h3>Publikasi Pending</h3>
+                    <p id="pendingPublications">...</p>
                 </div>
-                <div class="status-icon"><i class="fas fa-clock"></i></div>
-            </div>
-            <div class="status-card rejected">
-                <div class="status-info">
-                    <h3>Publikasi Draft</h3>
-                    <p>1</p>
-                </div>
-                <div class="status-icon"><i class="fas fa-folder"></i></div>
+                <div class="status-icon"><i class="fas fa-hourglass-half"></i></div>
             </div>
         </div>
 
         <div class="content-card">
             <h2><i class="fas fa-file-alt"></i> Publikasi Terbaru Anda</h2>
-            <div class="pub-item">
-                <div class="pub-info">
-                    <h3>Judul Jurnal: Implementasi AI dalam Kurikulum</h3>
-                    <p>Jenis: Jurnal | Tanggal: 10 Jan 2025 | Status: <span class="badge published">Published</span></p>
-                </div>
-                <div class="pub-actions">
-                    <a href="edit_publikasi.html" class="btn-edit"><i class="fas fa-edit"></i> Edit</a>
+            <div id="latestPublicationsList">
+                <div class="pub-item">
+                    <div class="pub-info">
+                        <h3>Memuat data...</h3>
+                        <p>...</p>
+                    </div>
                 </div>
             </div>
+            
             <div style="text-align: center; margin-top: 20px;">
                 <a href="publikasi.html"
                     style="color: var(--primary-blue); text-decoration: none; font-weight: 600;">Lihat Semua Publikasi
@@ -73,12 +81,70 @@
     </main>
 
     <script>
-        // Logika Logout
+        // --- API Endpoints ---
+        const API_DASHBOARD = '../../backend/api/dosen/get_dashboard_summary.php';
+        const API_LOGOUT = '../../backend/api/auth/logout.php';
+
+        async function loadDashboardData() {
+            try {
+                const response = await fetch(API_DASHBOARD);
+                const text = await response.text(); 
+                const result = JSON.parse(text);
+
+                if (result.status === 'success') {
+                    const data = result.data;
+                    
+                    const namaDosen = data.nama || 'Dosen';
+                    document.getElementById('welcomeMessage').textContent = `Selamat Datang, Bapak/Ibu ${namaDosen}!`;
+
+                    // Mengisi Status Kartu
+                    document.getElementById('totalPublications').textContent = data.total_publikasi || 0;
+                    document.getElementById('totalLoans').textContent = data.total_peminjaman || 0; 
+                    document.getElementById('pendingPublications').textContent = data.publikasi_pending || 0;
+                    
+                    const listContainer = document.getElementById('latestPublicationsList');
+                    listContainer.innerHTML = ''; 
+
+                    if (data.latest_publications && data.latest_publications.length > 0) {
+                        data.latest_publications.forEach(pub => {
+                            const pubItem = document.createElement('div');
+                            pubItem.className = 'pub-item';
+                            
+                            let statusClass = pub.status.toLowerCase().replace(' ', '');
+                            
+                            pubItem.innerHTML = `
+                                <div class="pub-info">
+                                    <h3>Judul: ${pub.judul}</h3>
+                                    <p>Jenis: ${pub.jenis} | Tanggal: ${pub.tanggal} | Status: <span class="badge ${statusClass}">${pub.status}</span></p>
+                                </div>
+                                <div class="pub-actions">
+                                    <a href="edit_publikasi.html?id=${pub.id}" class="btn-edit"><i class="fas fa-edit"></i> Edit</a>
+                                </div>
+                            `;
+                            listContainer.appendChild(pubItem);
+                        });
+                    } else {
+                        listContainer.innerHTML = '<p style="text-align: center;">Belum ada publikasi yang diajukan.</p>';
+                    }
+
+                } else {
+                    alert(result.message || 'Sesi Anda telah berakhir. Silakan login kembali.');
+                    window.location.href = '../public/login.html';
+                }
+
+            } catch (error) {
+                console.error('Error memuat data dashboard:', error);
+                document.getElementById('welcomeMessage').textContent = 'Selamat Datang (Gagal Memuat Data)!';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadDashboardData);
+
+        // Logika Logout (tetap sama)
         document.getElementById('logoutLink').addEventListener('click', function (e) {
             e.preventDefault();
             if (confirm('Apakah Anda yakin ingin keluar dari sistem?')) {
-                const logoutUrl = '../../backend/api/auth/logout.php';
-                fetch(logoutUrl, { method: 'POST' })
+                fetch(API_LOGOUT, { method: 'POST' })
                     .then(response => response.json())
                     .then(data => {
                         alert(data.message);

@@ -1,5 +1,3 @@
-</html>
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -379,18 +377,18 @@
         <div class="col-lg-12">
           <div class="main-buttons d-flex flex-wrap gap-2">
 
-            <div id="filterTahun" class="filter-dropdown">
-              <button class="filter-btn dropdown-toggle" type="button" data-bs-toggle="dropdown">Tahun</button>
+            <div id="filterTahun" class="filter-dropdown dropdown">
+              <button class="filter-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Tahun</button>
               <ul id="listTahun" class="dropdown-menu"></ul>
             </div>
 
-            <div id="filterFokus" class="filter-dropdown">
-              <button class="filter-btn dropdown-toggle" type="button" data-bs-toggle="dropdown">Fokus Riset</button>
+            <div id="filterFokus" class="filter-dropdown dropdown">
+              <button class="filter-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Fokus Riset</button>
               <ul id="listFokus" class="dropdown-menu"></ul>
             </div>
 
-            <div id="filterKategori" class="filter-dropdown">
-              <button class="filter-btn dropdown-toggle" type="button" data-bs-toggle="dropdown">Kategori</button>
+            <div id="filterKategori" class="filter-dropdown dropdown">
+              <button class="filter-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Kategori</button>
               <ul id="listKategori" class="dropdown-menu"></ul>
             </div>
 
@@ -648,15 +646,14 @@
   <script src="../assets/js/imagesloaded.js"></script>
   <script src="../assets/js/popup.js"></script>
   <script src="../assets/js/custom.js"></script>
-  <script src="../vendor/jquery/jquery.min.js"></script>
-  <script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-
   <script>
-    // ==========================================================
+   // ==========================================================
     // 1. KONFIGURASI & VARIABEL GLOBAL
     // ==========================================================
     const PUB_API_URL = '../../backend/api/publikasi/list_public.php';
     const DOSEN_API_URL = '../../backend/api/dosen/list_public.php';
+    const KAT_API_URL = '../../backend/api/publikasi/kategori_list.php';
+    const FOCUS_API_URL = '../../backend/api/research/list.php';
     const DEFAULT_FOTO = '../assets/images/dosen.jpg';
 
     let allPubData = [];
@@ -677,13 +674,13 @@
 
     async function initPublikasi() {
       const container = document.getElementById('publicationsContainer');
-      // Asumsi Anda punya elemen untuk loading, jika tidak, abaikan variabel ini
       const loading = document.getElementById('pubLoadingMessage');
 
       if (!container) return;
       if (loading) loading.style.display = 'block';
 
       try {
+        // STEP 1: Ambil semua data publikasi
         const response = await fetch(PUB_API_URL);
         const res = await response.json();
 
@@ -694,80 +691,99 @@
 
           if (loading) loading.style.display = 'none';
 
-          renderFilterMenus();
-          renderPublikasi(1); // Tampilkan halaman pertama
+          // STEP 2: Ambil data filter dan render menu (fungsi baru)
+          await fetchFilterDataAndRender();
+          
+          // STEP 3: Tampilkan hasil publikasi (semua)
+          renderPublikasi(1); 
+          
         } else {
           throw new Error(res.message || 'Data publikasi kosong atau tidak valid.');
         }
       } catch (err) {
         console.error("[Publikasi Error]:", err);
-        // Ganti pesan loading dengan pesan error
         if (loading) loading.innerHTML = `<p class="text-danger text-center">Gagal memuat data publikasi. (${err.message})</p>`;
-        // Kosongkan container jika ada error
         container.innerHTML = `<div class="col-12 text-center py-4"><p>Gagal memuat data publikasi.</p></div>`;
       }
     }
 
-    // --- Filter Handlers ---
+    // --- Filter Handlers (Fungsi BARU untuk Mengambil Data Filter dari API terpisah) ---
+    async function fetchFilterDataAndRender() {
+        const listTahunEl = document.getElementById('listTahun');
+        const listFokusEl = document.getElementById('listFokus');
+        const listKategoriEl = document.getElementById('listKategori');
 
-    function renderFilterMenus() {
-      // Ambil data unik untuk filter
-      const years = [...new Set(allPubData.map(d => String(d.tahun)))].filter(y => y !== "null" && y !== "" && y !== "0").sort((a, b) => b - a);
-      const focus = [...new Set(allPubData.map(d => d.nama_fokus))].filter(Boolean).sort();
-      const cats = [...new Set(allPubData.map(d => d.nama_kategori))].filter(Boolean).sort();
+        // 1. Ambil Tahun (dari data publikasi yang sudah dimuat)
+        const years = [...new Set(allPubData.map(d => String(d.tahun)))].filter(y => y !== "null" && y !== "" && y !== "0").sort((a, b) => b - a);
+        fillDropdownFromList('listTahun', 'filterTahun', years, 'Tahun');
+        
+        try {
+            // 2. Ambil Fokus Riset (dari API terpisah)
+            const resFokus = await fetch(FOCUS_API_URL);
+            const dataFokus = await resFokus.json();
+            if (dataFokus.status === 'success') {
+                const fokusList = dataFokus.data.map(item => item.nama_fokus);
+                fillDropdownFromList('listFokus', 'filterFokus', fokusList, 'Fokus Riset');
+            }
 
-      fillDropdown('listTahun', 'filterTahun', years, 'Tahun');
-      fillDropdown('listFokus', 'filterFokus', focus, 'Fokus Riset');
-      fillDropdown('listKategori', 'filterKategori', cats, 'Kategori');
+            // 3. Ambil Kategori (dari API terpisah)
+            const resKat = await fetch(KAT_API_URL);
+            const dataKat = await resKat.json();
+            if (dataKat.status === 'success') {
+                const katList = dataKat.data.map(item => item.nama_kategori);
+                fillDropdownFromList('listKategori', 'filterKategori', katList, 'Kategori');
+            }
+        } catch(error) {
+             console.error("Error fetching filter options:", error);
+        }
     }
 
-    function fillDropdown(listId, containerId, items, label) {
-      const listEl = document.getElementById(listId);
-      const containerEl = document.getElementById(containerId);
-      if (!listEl || !containerEl) return;
+    // Fungsi Pengisi Dropdown yang dimodifikasi untuk menerima list data
+    function fillDropdownFromList(listId, containerId, items, label) {
+        const listEl = document.getElementById(listId);
+        const containerEl = document.getElementById(containerId);
+        if (!listEl || !containerEl) return;
 
-      const btnEl = containerEl.querySelector('.filter-btn');
-      // Set label asli (jika belum ada)
-      if (!btnEl.dataset.originalLabel) {
-        btnEl.dataset.originalLabel = label;
-      }
+        const btnEl = containerEl.querySelector('.filter-btn');
+        if (!btnEl.dataset.originalLabel) {
+            btnEl.dataset.originalLabel = label;
+        }
 
-      const key = containerId.replace('filter', '').toLowerCase(); // 'tahun', 'fokus', 'kategori'
+        const key = containerId.replace('filter', '').toLowerCase(); 
 
-      // Buat opsi "Semua" aktif secara default
-      let html = `<li><a class="dropdown-item active" href="#" data-value="all" data-filter-key="${key}">Semua ${label}</a></li>`;
-      items.forEach(val => {
-        html += `<li><a class="dropdown-item" href="#" data-value="${val}" data-filter-key="${key}">${val}</a></li>`;
-      });
-      listEl.innerHTML = html;
+        let html = `<li><a class="dropdown-item active" href="#" data-value="all" data-filter-key="${key}">Semua ${label}</a></li>`;
+        items.forEach(val => {
+            html += `<li><a class="dropdown-item" href="#" data-value="${val}" data-filter-key="${key}">${val}</a></li>`;
+        });
+        listEl.innerHTML = html;
     }
 
     function applyFilters() {
-      filteredPubData = allPubData.filter(item => {
-        // Normalisasi data dari API menjadi string lowercase untuk perbandingan yang aman
-        const itemYear = String(item.tahun || "").trim();
-        const itemFocus = (item.nama_fokus || "").trim().toLowerCase();
-        const itemCat = (item.nama_kategori || "").trim().toLowerCase();
+        filteredPubData = allPubData.filter(item => {
+            // Normalisasi data untuk perbandingan (mengambil data dari allPubData)
+            const itemYear = String(item.tahun || "").trim();
+            const itemFocus = (item.nama_fokus || "").trim().toLowerCase(); 
+            const itemCat = (item.nama_kategori || "").trim().toLowerCase();
 
-        // Normalisasi nilai filter
-        const filterYear = activeFilters.tahun;
-        const filterFocus = activeFilters.fokus.trim().toLowerCase();
-        const filterCat = activeFilters.kategori.trim().toLowerCase();
+            const filterYear = activeFilters.tahun;
+            const filterFocus = activeFilters.fokus.trim().toLowerCase();
+            const filterCat = activeFilters.kategori.trim().toLowerCase();
 
-        // Logika filter: Jika 'all', selalu true. Jika ada nilai, harus sama.
-        const matchYear = filterYear === 'all' || itemYear === filterYear;
-        const matchFocus = filterFocus === 'all' || itemFocus === filterFocus;
-        const matchCat = filterCat === 'all' || itemCat === filterCat;
+            // Logika filter: Jika 'all', selalu true. Jika ada nilai, harus sama.
+            const matchYear = filterYear === 'all' || itemYear === filterYear;
+            const matchFocus = filterFocus === 'all' || itemFocus === filterFocus;
+            const matchCat = filterCat === 'all' || itemCat === filterCat;
 
-        return matchYear && matchFocus && matchCat;
-      });
+            return matchYear && matchFocus && matchCat;
+        });
 
-      renderPublikasi(1); // Selalu reset ke halaman 1
+        renderPublikasi(1); // Setelah filter, panggil renderPublikasi untuk menampilkan hasil di halaman 1
     }
 
     // --- Render Functions (Pagination & Cards) ---
 
     function renderPublikasi(page) {
+      // ... (Fungsi ini tetap sama)
       currentPage = page;
       const container = document.getElementById('publicationsContainer');
       if (!container) return;
@@ -802,6 +818,7 @@
     }
 
     function renderPubPagination() {
+      // ... (Fungsi ini tetap sama)
       const paginContainer = document.getElementById('paginationContainer');
       if (!paginContainer) return;
 
@@ -812,7 +829,6 @@
         return;
       }
 
-      // Tampilan pagination
       paginContainer.innerHTML = `
             <button class="nav-btn pub-nav-btn" data-action="prev" ${currentPage === 1 ? 'disabled' : ''}>
                 <i class="fa fa-angle-left"></i> Previous
@@ -831,7 +847,6 @@
     // -----------------------------------------------------------------------------------
 
     document.addEventListener('click', function (e) {
-      // Mencari elemen <a> terdekat dengan class .dropdown-item (untuk filter)
       const item = e.target.closest('.dropdown-item');
 
       // --- 1. Logic Filtering ---
@@ -842,20 +857,17 @@
         const containerEl = item.closest('.filter-dropdown');
         const btnEl = containerEl.querySelector('.filter-btn');
 
-        const filterKey = item.dataset.filterKey; // 'tahun', 'fokus', 'kategori'
+        const filterKey = item.dataset.filterKey;
         const filterValue = item.dataset.value;
 
         if (!filterKey) return;
 
-        // Visual toggle: hapus 'active' dari semua, tambahkan ke yang diklik
         listEl.querySelectorAll('.dropdown-item').forEach(i => i.classList.remove('active'));
         item.classList.add('active');
 
-        // Set button text
         const originalLabel = btnEl.dataset.originalLabel || btnEl.innerText;
         btnEl.innerText = filterValue === 'all' ? originalLabel : filterValue;
 
-        // Update Filter State
         activeFilters[filterKey] = filterValue;
 
         applyFilters(); // Jalankan Filter
@@ -882,14 +894,35 @@
 
         renderPublikasi(newPage);
         const pubSection = document.getElementById('publications');
-        // Gulir ke atas halaman publikasi setelah pindah halaman
         if (pubSection) pubSection.scrollIntoView({ behavior: 'smooth' });
       }
     });
 
     // ==========================================================
-    // 3. BAGIAN DOSEN (Tidak Diubah)
+    // 3. BAGIAN DOSEN (Perbaikan Path yang Aman)
     // ==========================================================
+    
+    function getDosenFotoPath(dosen) {
+        let foto = DEFAULT_FOTO;
+        if (dosen.foto_path && dosen.foto_path !== 'null') {
+            if (dosen.foto_path.startsWith('http')) {
+                foto = dosen.foto_path;
+            } else {
+                // Logika Perbaikan Path Lokal
+                let pathLokal = dosen.foto_path;
+                
+                // Bersihkan path dari 2 tingkat '..' yang tidak perlu (asumsi path Admin)
+                // dan hanya sisakan 1 tingkat '..' (path Public)
+                pathLokal = pathLokal.replace('../', '');
+                pathLokal = pathLokal.replace('../', '');
+                
+                // Re-prepend path relatif dari public folder
+                foto = '../' + pathLokal;
+            }
+        }
+        return foto;
+    }
+    
     async function fetchDosen() {
       const container = document.getElementById('dosen-list-flex');
       const loadingDosen = document.getElementById('loading-message'); // Asumsi ID ini ada
@@ -905,32 +938,7 @@
           if (loadingDosen) loadingDosen.style.display = 'none';
 
           container.innerHTML = res.data.map(d => {
-            // SCRIPT BARU (Menangani Link Eksternal ATAU File Lokal untuk list)
-            // index.html - di dalam fetchDosen()
-            // index.html - di dalam res.data.map(d => { ...
-
-            let foto = DEFAULT_FOTO;
-
-            if (d.foto_path && d.foto_path !== 'null') {
-              // 1. Cek Link Eksternal (Dr. Rakhmat)
-              if (d.foto_path.startsWith('http')) {
-                foto = d.foto_path;
-              } else {
-                // 2. Jika Path Lokal (berdasarkan path yang benar di dosen.html)
-
-                let pathLokal = d.foto_path;
-
-                // Hapus 2 level "../" yang berlebihan di depan path.
-                // Ini diasumsikan sebagai "offset" antara lokasi admin dan public.
-
-                // Cari dan ganti 2 tingkat ../ pertama dengan string kosong
-                pathLokal = pathLokal.replace('../', '');
-                pathLokal = pathLokal.replace('../', '');
-
-                // Tambahkan path yang benar dari folder public/ (yaitu 1 tingkat ../)
-                foto = '../' + pathLokal;
-              }
-            }
+            const foto = getDosenFotoPath(d); // Menggunakan fungsi yang aman
 
             return `
                         <div class="member-card">
@@ -943,9 +951,12 @@
                             </div>
                         </div>`;
           }).join('');
+        } else {
+             if (loadingDosen) loadingDosen.textContent = 'Gagal memuat data dosen.';
         }
       } catch (error) {
         console.error('Error Dosen:', error);
+        if (loadingDosen) loadingDosen.textContent = 'Terjadi kesalahan jaringan saat memuat data dosen.';
       }
     };
 
