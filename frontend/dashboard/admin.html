@@ -146,7 +146,7 @@
                 <div class="filter-container">
                     <div style="flex: 1;">
                         <label style="display:block; margin-bottom:5px; font-weight:600; font-size:12px; color:#666;">PENCARIAN</label>
-                        <input type="text" id="searchNim" class="filter-input" placeholder="Cari NIM, Nama Mahasiswa, atau Ruangan...">
+                        <input type="text" id="searchNim" class="filter-input" placeholder="Cari NIM Mahasiswa...">
                     </div>
                     
                     <div>
@@ -194,7 +194,7 @@
             </div>
             
             <div style="margin-top: 10px; text-align: right; font-size: 0.85rem; color: #888;">
-                Menampilkan semua data dari Materialized View
+                Menampilkan semua data dari Materialized View vw_peminjaman_history
             </div>
         </div>
     </div>
@@ -303,7 +303,7 @@
             if (!data || data.length === 0) {
                 const searchVal = searchInput.value;
                 let pesan = "Belum ada data peminjaman.";
-                if (searchVal) pesan = `Data dengan kata kunci <strong>"${searchVal}"</strong> tidak ditemukan.`;
+                if (searchVal) pesan = `Data dengan NIM <strong>"${searchVal}"</strong> tidak ditemukan.`;
 
                 tableBody.innerHTML = `
                     <tr>
