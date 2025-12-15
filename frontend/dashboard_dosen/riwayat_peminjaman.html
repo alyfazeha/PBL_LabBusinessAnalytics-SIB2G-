@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -45,11 +46,9 @@
         <div class="content-card">
             <h2><i class="fas fa-history"></i> Riwayat Peminjaman Aset Mahasiswa</h2>
 
-            <div style="margin-bottom: 20px; display: flex; gap: 15px;">
-            <input type="text" id="searchInput" placeholder="Cari berdasarkan Nama/NIM..."
-                style="flex-grow: 1; padding: 10px; border-radius: 6px; border: 1px solid #ddd;">
-                    <button id="searchButton" class="btn-submit" style="width: 150px; margin: 0; padding: 10px;"><i class="fas fa-search"></i>
-                    Cari</button>
+            <div style="margin-bottom: 20px;">
+                <input type="text" id="searchInput" placeholder="Cari berdasarkan Nama/NIM..."
+                    style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ddd;">
             </div>
 
             <div style="overflow-x: auto;">
@@ -73,6 +72,7 @@
 
     <script>
     const tableBody = document.getElementById('peminjamanTableBody');
+    const searchInput = document.getElementById('searchInput'); // Ambil elemen input
 
     function getStatusClass(status) {
         const lowerStatus = status ? status.toLowerCase() : '';
@@ -122,65 +122,60 @@
     }
 
     // FUNGSI UTAMA: Menerima parameter pencarian
-async function loadPeminjaman(searchQuery = null) {
-    // Tentukan apakah ini adalah permintaan load awal (tanpa ada klik tombol Cari)
-    const isInitialLoad = searchQuery === null;
+    async function loadPeminjaman(searchQuery = null) {
+        const isInitialLoad = searchQuery === null;
 
-    // Jika ini adalah load awal, kita set query menjadi string kosong ('') untuk menghindari
-    // masalah parameter null, dan menambahkan cachebuster.
-    if (isInitialLoad) {
-        searchQuery = '';
-    }
-
-    tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center;">Memuat data peminjaman...</td></tr>`;
-
-    let apiUrl = '../../backend/api/booking/list_dosen.php';
-    const params = new URLSearchParams();
-
-    // 1. Tambahkan Query Pencarian (hanya jika ada teks yang dicari)
-    if (searchQuery.trim() !== '') {
-        params.append('search', searchQuery.trim());
-    } 
-
-    // 2. Tambahkan Cache Buster pada permintaan awal
-    if (isInitialLoad) {
-        params.append('cache_buster', new Date().getTime());
-    }
-
-    if (params.toString()) {
-        apiUrl += `?${params.toString()}`;
-    }
-
-    try {
-        const response = await fetch(apiUrl); 
-        const result = await response.json();
-
-        if (result.status === 'success') {
-            renderPeminjaman(result.data);
-        } else {
-            // Tampilkan pesan error dari server PHP 
-            tableBody.innerHTML = `<tr><td colspan="6" style="color: red; text-align: center;">Gagal memuat data: ${result.message}</td></tr>`;
+        if (isInitialLoad) {
+            searchQuery = '';
         }
 
-    } catch (error) {
-        console.error('Error loading peminjaman:', error);
-        tableBody.innerHTML = `<tr><td colspan="6" style="color: red; text-align: center;">Terjadi kesalahan koneksi jaringan.</td></tr>`;
+        tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center;">Memuat data peminjaman...</td></tr>`;
+
+        let apiUrl = '../../backend/api/booking/list_dosen.php';
+        const params = new URLSearchParams();
+
+        // 1. Tambahkan Query Pencarian (hanya jika ada teks yang dicari)
+        if (searchQuery.trim() !== '') {
+            params.append('search', searchQuery.trim());
+        } 
+
+        // 2. Tambahkan Cache Buster pada permintaan awal
+        if (isInitialLoad) {
+            params.append('cache_buster', new Date().getTime());
+        }
+
+        if (params.toString()) {
+            apiUrl += `?${params.toString()}`;
+        }
+
+        try {
+            const response = await fetch(apiUrl); 
+            const result = await response.json();
+
+            if (result.status === 'success') {
+                renderPeminjaman(result.data);
+            } else {
+                tableBody.innerHTML = `<tr><td colspan="6" style="color: red; text-align: center;">Gagal memuat data: ${result.message}</td></tr>`;
+            }
+
+        } catch (error) {
+            console.error('Error loading peminjaman:', error);
+            tableBody.innerHTML = `<tr><td colspan="6" style="color: red; text-align: center;">Terjadi kesalahan koneksi jaringan.</td></tr>`;
+        }
     }
-}
 
-// Panggil fungsi saat halaman dimuat
-document.addEventListener('DOMContentLoaded', () => {
-    // Panggil tanpa argumen, sehingga searchQuery = null
-    loadPeminjaman(); 
-});
+    // Panggil fungsi saat halaman dimuat
+    document.addEventListener('DOMContentLoaded', () => {
+        loadPeminjaman(); 
+    });
 
-// Event Listener untuk Tombol Cari tetap sama, memanggil loadPeminjaman(query)
-document.getElementById('searchButton').addEventListener('click', function(e) {
-    e.preventDefault();
-    const searchInput = document.getElementById('searchInput');
-    const query = searchInput.value.trim();
-    loadPeminjaman(query);
-});
+    // Event Listener BARU untuk Auto-Search saat tombol dilepas
+    searchInput.addEventListener('keyup', function(e) {
+        // Debouncing opsional: Anda bisa menambahkan jeda 300ms di sini 
+        // agar tidak terlalu banyak request saat mengetik cepat.
+        const query = searchInput.value.trim();
+        loadPeminjaman(query);
+    });
 
     // Logika Logout
     document.getElementById('logoutLink').addEventListener('click', function (e) {
@@ -192,7 +187,7 @@ document.getElementById('searchButton').addEventListener('click', function(e) {
                 .catch(() => window.location.href = '../public/index.html');
         }
     });
-</script>
+    </script>
 </body>
 
 </html>
