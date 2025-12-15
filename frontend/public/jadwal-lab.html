@@ -4,168 +4,383 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jadwal Lab Business Analytics</title>
+    <title>Jadwal Lab | Business Analytics</title>
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" crossorigin="anonymous">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="../assets/css/cssadmin.css">
 
     <style>
+        /* --- 1. RESET & LAYOUT DASAR --- */
         body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            background-color: var(--light-bg);
-            padding: 0;
-            box-sizing: border-box;
-            width: 100%;
             margin: 0;
+            padding: 0;
+            background-color: #f4f6f9; /* Abu-abu muda */
+            font-family: 'Poppins', sans-serif;
+            color: #333;
+            /* Pastikan body berperilaku normal (block), bukan flex */
+            display: block; 
+            min-height: 100vh;
         }
 
-        /* Container utama di bawah header */
-        .container.schedule-page {
+        /* --- 2. HEADER BIRU (FULL WIDTH) --- */
+        .header-blue {
             width: 100%;
-            max-width: 1200px;
-            padding: 0 20px 50px 20px;
-            margin-top: 30px;
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            /* Pastikan tidak ada margin yang bikin geser */
+            margin-bottom: 0; 
         }
 
-        /* Card untuk menampung tabel */
-        .schedule-card {
+        .header-blue h1 {
+            margin: 0 0 10px 0;
+            font-size: 2rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .header-blue p {
+            margin: 0;
+            font-size: 1rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        /* --- 3. CONTAINER UTAMA (DI TENGAH) --- */
+        .main-container {
+            width: 100%;
+            max-width: 1000px; /* Lebar maksimal agar enak dibaca */
+            margin: 30px auto; /* Atas-Bawah 30px, Kiri-Kanan Auto (Center) */
+            padding: 0 20px;
+            box-sizing: border-box;
+        }
+
+        /* --- 4. KOMPONEN CARD JADWAL --- */
+        
+        /* Navigasi (Tombol Next/Prev) */
+        .week-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border: 1px solid #ddd;
+            margin-bottom: 20px; /* Jarak antara nav dan tabel */
+        }
+
+        .btn-nav {
             background-color: #fff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-            margin-bottom: 25px;
-            /* Jarak antar hari */
-            overflow-x: auto;
-            /* Agar tabel responsif */
+            color: #007bff;
+            border: 1px solid #007bff;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex; 
+            align-items: center; 
+            gap: 8px;
+            transition: 0.3s;
+        }
+        
+        .btn-nav:hover {
+            background-color: #007bff;
+            color: white;
         }
 
-        .schedule-card h3 {
-            color: var(--primary-blue);
-            margin-top: 0;
-            border-bottom: 2px solid #eee;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-            font-size: 1.5em;
+        .period-label {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #444;
         }
 
-        /* Table Styling (Re-use dari status/riwayat) */
-        .schedule-table {
+        /* Wrapper Tabel (Card Putih) */
+        .schedule-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border: 1px solid #eee;
+            overflow: hidden; /* Supaya sudut tabel tumpul ikut radius card */
+        }
+
+        /* Tabel Styling */
+        .main-table {
             width: 100%;
             border-collapse: collapse;
         }
 
-        .schedule-table th,
-        .schedule-table td {
-            padding: 16px;
+        .main-table thead {
+            background-color: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .main-table th {
+            padding: 16px 20px;
             text-align: left;
-            border-bottom: 1px solid #e0e0e0;
-        }
-
-        .schedule-table th {
-            background-color: #f1f1f1;
-            /* Header tabel netral */
-            color: var(--dark-grey);
-            font-weight: 600;
+            font-size: 0.85rem;
             text-transform: uppercase;
-            font-size: 0.9em;
+            font-weight: 700;
+            color: #666;
+            letter-spacing: 0.5px;
         }
 
-        .schedule-table tr:last-child td {
+        .main-table td {
+            padding: 16px 20px;
+            border-bottom: 1px solid #f1f1f1;
+            vertical-align: middle;
+            font-size: 0.95rem;
+            color: #333;
+        }
+
+        .main-table tbody tr:last-child td {
             border-bottom: none;
         }
 
-        .schedule-table .available {
-            color: #4CAF50;
-            /* Hijau untuk Ketersediaan */
+        /* Style Kolom Tanggal */
+        .date-col {
             font-weight: 600;
+            color: #2c3e50;
+            width: 35%;
         }
 
-        .schedule-table .booked {
-            color: #E91E63;
-            /* Merah/Pink untuk Terpakai */
-            font-weight: 600;
+        /* Baris Hari Ini (Highlight) */
+        .today-row td {
+            background-color: #f0f8ff; /* Biru muda sekali */
         }
+
+        /* --- 5. BADGES & UTILITIES --- */
+        .badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            display: inline-block;
+        }
+        .badge-approved { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; } /* Hijau */
+        .badge-pending  { background: #fff3cd; color: #856404; border: 1px solid #ffeeba; } /* Kuning */
+        .badge-free     { background: #e2e6ea; color: #383d41; border: 1px solid #d6d8db; } /* Abu/Biru */
+        .badge-expired  { background: #f8f9fa; color: #aaa; border: 1px solid #ddd; } /* Abu Pucat */
+
+        /* Teks Coret untuk yang expired */
+        .text-expired {
+            color: #bbb;
+            text-decoration: line-through;
+            font-style: italic;
+        }
+
+        .loading-state { text-align: center; padding: 50px; color: #999; }
+        
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 30px;
+            margin-bottom: 40px;
+            text-decoration: none;
+            color: #666;
+            font-weight: 500;
+            transition: 0.3s;
+        }
+        .back-link:hover { color: #007bff; }
+
     </style>
 </head>
 
 <body>
-    <div class="header-status-blue">
-        <h1><i class="fas fa-calendar-alt"></i> Jadwal Pemanfaatan Lab Business Analytics</h1>
-        <p>Lihat ketersediaan Lab Business Analytics untuk merencanakan pengajuan peminjaman Anda.</p>
-    </div>
 
-    <div class="container schedule-page">
+    <header class="header-blue">
+        <h1><i class="fas fa-calendar-alt"></i> Jadwal Lab Business Analytics</h1>
+        <p>Cek ketersediaan laboratorium sebelum anda melakukan peminjaman!</p>
+    </header>
+
+    <div class="main-container">
+        
+        <nav class="week-nav">
+            <button class="btn-nav" id="prevWeek"><i class="fas fa-arrow-left"></i> Sebelumnya</button>
+            <span class="period-label" id="periodDisplay">Memuat...</span>
+            <button class="btn-nav" id="nextWeek">Selanjutnya <i class="fas fa-arrow-right"></i></button>
+        </nav>
 
         <div class="schedule-card">
-            <h3>Senin, 02 Desember 2025</h3>
-            <table class="schedule-table">
+            
+            <div id="loadingArea" class="loading-state" style="display: none;">
+                <i class="fas fa-spinner fa-spin fa-2x"></i><br><br>Sedang memuat jadwal...
+            </div>
+            
+            <table class="main-table" id="scheduleTable">
                 <thead>
                     <tr>
-                        <th>Waktu</th>
+                        <th>Hari, Tanggal</th>
+                        <th>Jam Operasional</th>
                         <th>Status</th>
-                        <th>Keperluan/Mata Kuliah</th>
-                        <th>Peminjam</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr>
-                        <td>08:00 - 10:00</td>
-                        <td><span class="booked">Terpakai</span></td>
-                        <td>Perkuliahan: Data Mining</td>
-                        <td>Dr. Erna Cahyani</td>
-                    </tr>
-                    <tr>
-                        <td>10:00 - 12:00</td>
-                        <td><span class="available">Tersedia</span></td>
-                        <td>-</td>
-                        <td>-</td>
-                    </tr>
-                    <tr>
-                        <td>13:00 - 15:00</td>
-                        <td><span class="booked">Terpakai</span></td>
-                        <td>Riset Mahasiswa (Bimbingan)</td>
-                        <td>Sdr. Rian Hidayat</td>
-                    </tr>
-                </tbody>
+                <tbody id="tableBody">
+                    </tbody>
             </table>
         </div>
 
-        <div class="schedule-card">
-            <h3>Selasa, 03 Desember 2025</h3>
-            <table class="schedule-table">
-                <thead>
-                    <tr>
-                        <th>Waktu</th>
-                        <th>Status</th>
-                        <th>Keperluan/Mata Kuliah</th>
-                        <th>Peminjam</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>08:00 - 12:00</td>
-                        <td><span class="available">Tersedia</span></td>
-                        <td>-</td>
-                        <td>-</td>
-                    </tr>
-                    <tr>
-                        <td>14:00 - 16:00</td>
-                        <td><span class="booked">Terpakai</span></td>
-                        <td>Rapat Koordinator Lab</td>
-                        <td>Admin Lab</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+        <a href="index.html" class="back-link">
+            <i class="fas fa-home"></i> Kembali ke Landing Page
+        </a>
 
     </div>
-    <a href="index.html" class="back-link-home">
-        <i class="fas fa-home" style="margin-right: 8px;"></i> Kembali ke Halaman Utama
-    </a>
 
+<script>
+        const API_URL = '../../backend/api/admin/schedule.php'; 
+        
+        let currentMonday = getMonday(new Date()); 
+
+        function getMonday(d) {
+            d = new Date(d);
+            var day = d.getDay(),
+                diff = d.getDate() - day + (day == 0 ? -6 : 1); 
+            return new Date(d.setDate(diff));
+        }
+
+        // --- PERBAIKAN UTAMA DI SINI ---
+        // Menggunakan Local Time (WIB), bukan UTC
+        function formatDateLocal(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function formatDateIndo(date) {
+            const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+            return date.toLocaleDateString('id-ID', options);
+        }
+
+        async function loadSchedule() {
+            const tableBody = document.getElementById('tableBody');
+            const display = document.getElementById('periodDisplay');
+            const loadingArea = document.getElementById('loadingArea');
+            const tableEl = document.getElementById('scheduleTable');
+
+            // Reset UI
+            tableBody.innerHTML = '';
+            tableEl.style.display = 'none';
+            loadingArea.style.display = 'block';
+
+            const startDate = new Date(currentMonday);
+            const endDate = new Date(currentMonday);
+            endDate.setDate(startDate.getDate() + 6);
+
+            display.textContent = `${startDate.toLocaleDateString('id-ID', {day:'numeric', month:'short'})} - ${endDate.toLocaleDateString('id-ID', {day:'numeric', month:'short', year:'numeric'})}`;
+
+            try {
+                // Gunakan formatDateLocal
+                const url = `${API_URL}?start_date=${formatDateLocal(startDate)}&end_date=${formatDateLocal(endDate)}`;
+                
+                // Debugging: Cek di Console Browser (Tekan F12) untuk melihat data asli dari server
+                console.log("Fetching URL:", url);
+
+                const response = await fetch(url);
+                const result = await response.json();
+
+                console.log("Data dari Server:", result); // Cek apakah data tanggal 27 ada di sini
+
+                if(result.success) {
+                    renderSingleTable(result.data, startDate);
+                } else {
+                    tableBody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:red; padding:20px;">Gagal: ${result.message}</td></tr>`;
+                }
+
+            } catch (error) {
+                console.error(error);
+                tableBody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:red; padding:20px;">Koneksi Error</td></tr>`;
+            } finally {
+                loadingArea.style.display = 'none';
+                tableEl.style.display = 'table';
+            }
+        }
+
+        function renderSingleTable(data, startDate) {
+            const tableBody = document.getElementById('tableBody');
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            for (let i = 0; i < 7; i++) {
+                let loopDate = new Date(startDate);
+                loopDate.setDate(startDate.getDate() + i);
+                loopDate.setHours(0, 0, 0, 0);
+
+                // Gunakan formatDateLocal agar kuncinya cocok dengan database (YYYY-MM-DD)
+                let dateStrISO = formatDateLocal(loopDate);
+                let dateStrIndo = formatDateIndo(loopDate);
+                
+                // Ambil data menggunakan kunci tanggal lokal
+                let events = data[dateStrISO] || [];
+                
+                let isPast = loopDate < today;
+                let isToday = loopDate.getTime() === today.getTime();
+                let rowClass = isToday ? 'today-row' : '';
+
+                if (isPast) {
+                    // Logic Expired
+                    const row = `
+                        <tr class="${rowClass}">
+                            <td class="date-col text-expired">${dateStrIndo}</td>
+                            <td class="text-expired">07:00 - 17:00</td>
+                            <td><span class="badge badge-expired">Sudah Lewat</span></td>
+                        </tr>
+                    `;
+                    tableBody.insertAdjacentHTML('beforeend', row);
+
+                } else {
+                    if (events.length > 0) {
+                        events.forEach((ev, index) => {
+                            let displayDate = (index === 0) ? dateStrIndo : '';
+                            
+                            let badgeHtml = '';
+                            // Pastikan status di-lowercase biar cocok (case insensitive)
+                            let status = ev.status.toLowerCase();
+
+                            if (status === 'disetujui' || status === 'approved') {
+                                badgeHtml = '<span class="badge badge-approved">Terisi</span>';
+                            } else {
+                                badgeHtml = '<span class="badge badge-pending">Menunggu Verifikasi</span>';
+                            }
+
+                            const row = `
+                                <tr class="${rowClass}">
+                                    <td class="date-col">${displayDate}</td> 
+                                    <td><strong>${ev.waktu}</strong></td>
+                                    <td>${badgeHtml}</td>
+                                </tr>
+                            `;
+                            tableBody.insertAdjacentHTML('beforeend', row);
+                        });
+                    } else {
+                        const row = `
+                            <tr class="${rowClass}">
+                                <td class="date-col">${dateStrIndo}</td>
+                                <td>07:00 - 17:00</td>
+                                <td><span class="badge badge-free">Tersedia</span></td>
+                            </tr>
+                        `;
+                        tableBody.insertAdjacentHTML('beforeend', row);
+                    }
+                }
+            }
+        }
+
+        document.getElementById('prevWeek').addEventListener('click', () => {
+            currentMonday.setDate(currentMonday.getDate() - 7);
+            loadSchedule();
+        });
+
+        document.getElementById('nextWeek').addEventListener('click', () => {
+            currentMonday.setDate(currentMonday.getDate() + 7);
+            loadSchedule();
+        });
+
+        document.addEventListener('DOMContentLoaded', loadSchedule);
+    </script>
 </body>
-
 </html>
