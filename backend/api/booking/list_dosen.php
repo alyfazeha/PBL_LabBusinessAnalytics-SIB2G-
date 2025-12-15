@@ -1,6 +1,5 @@
 <?php
 // backend/api/booking/list_dosen.php
-
 ini_set('display_errors', 0);
 error_reporting(E_ALL); 
 
