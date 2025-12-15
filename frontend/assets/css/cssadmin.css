@@ -184,6 +184,143 @@ header h1 {
     border-bottom: 1px solid #ddd;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     border-radius: 12px;
+    margin-bottom: 0px;
+    flex-wrap: wrap;
+    /* Penting untuk responsivitas */
+}
+
+/* Container baru untuk tombol aksi di kanan */
+.header-actions-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    /* Jarak antara tombol Filter dan tombol Tambah */
+}
+
+/* Styling untuk Tombol Filter (Trigger Pop-up) */
+
+/*
+  Jika Anda menggunakan kelas .btn-secondary, tambahkan aturan ini.
+  Jika Anda hanya menggunakan ID #btnToggleFilter, gunakan itu.
+*/
+#btnToggleFilter {
+    /* Pastikan memiliki padding vertikal yang sesuai */
+    padding: 8px 15px;
+
+    /* Atur tinggi minimum agar seragam dengan Tombol Tambah Peminjaman */
+    height: 43px;
+
+    /* Gunakan display flex untuk meratakan ikon dan teks */
+    display: flex;
+    align-items: center;
+    gap: 5px;
+
+    /* Tambahkan gaya visual (Jika belum ada) */
+    background-color: #ffffff;
+    /* Latar belakang putih */
+    color: var(--primary-blue);
+    /* Teks biru utama */
+    border: 1px solid var(--primary-blue);
+    /* Border biru */
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.2s, color 0.2s;
+    font-family: var(--font);
+    font-weight: 600;
+    font-size: 1em;
+
+}
+
+#btnToggleFilter:hover {
+    background-color: var(--primary-blue);
+    color: #ffffff;
+}
+
+/* Jika Anda menggunakan kelas 'active' saat filter terbuka */
+#btnToggleFilter.active {
+    background-color: var(--primary-blue);
+    color: #ffffff;
+}
+
+/* TAMBAHKAN GAYA INI: Header warna di atas Form Card */
+.filter-section-header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 8px;
+    /* Tinggi bar biru */
+    background-color: var(--light-blue);
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    margin-top: -5px;
+}
+
+/* Sembunyikan Filter Section secara default */
+#dateFilterSection {
+    display: none;
+    /* KUNCI: Sembunyikan elemen */
+
+    /* Styling agar muncul di bawah header */
+    position: absolute;
+    /* Penting agar tidak menggeser elemen di bawahnya */
+    right: 20px;
+    /* Sejajarkan ke kanan, sesuaikan dengan padding body */
+    top: 100px;
+    /* Sesuaikan jarak dari atas, tergantung tinggi header Anda */
+    z-index: 1000;
+
+    /* Perubahan Estetika: */
+    background: #ffffff;
+    /* Pastikan putih bersih */
+    padding: 18px 20px;
+    /* Padding sedikit ditingkatkan */
+    border-radius: 10px;
+    /* Radius lebih tegas */
+    /* Shadow yang lebih halus dan 'pop' */
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    border: 1px solid #f0f0f0;
+    /* Border sangat tipis */
+    gap: 15px;
+    /* Jarak antar elemen filter */
+    margin-right: 20px;
+}
+
+/* Pastikan filter-section yang sudah disembunyikan tetap menggunakan flexbox saat muncul */
+.filter-section.show {
+    display: flex !important;
+    /* Akan diatur oleh JavaScript saat tombol diklik */
+}
+
+/* Modifikasi tombol Reset/Terapkan agar sejajar */
+#btnResetFilter {
+    height: 38px;
+    /* Pastikan tinggi sama */
+    margin-top: 15px;
+    /* Kompensasi untuk label di filter-group */
+}
+
+/* TAMBAHAN untuk mengelola grup di kanan */
+.header-right-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    /* Jarak antara Filter Section dan Tombol Tambah */
+}
+
+/*
+ * TAMBAHAN: Aturan ini memastikan ikon dan judul di dalamnya sejajar.
+ * Anda bisa menempatkan ini di bawah aturan .main-content header yang sudah ada.
+ */
+.header-title {
+    display: flex;
+    /* KUNCI: Membuat elemen anak (ikon dan h2) sejajar horizontal */
+    align-items: center;
+    /* Meratakan elemen anak secara vertikal di tengah */
+    gap: 10px;
+    /* Memberi jarak 10px antara ikon dan judul */
 }
 
 .header-title h2 {
@@ -691,7 +828,7 @@ header h1 {
 }
 
 .btn-add:hover {
-    background-color: var(--light-blue);
+    background-color: #3a7bd5;
 }
 
 /* 2. Tombol Detail (Warna Primer - Biru) */
@@ -1981,4 +2118,170 @@ header h1 {
     font-size: 0.85em;
     min-width: 35px;
     /* Lebar minimum untuk ikon */
+}
+
+/* --- CSS TAMBAHAN UNTUK DATE FILTER --- */
+.filter-section {
+    background: #fff;
+    padding: 10px 15px;
+    /* Sedikit dikecilkan paddingnya agar lebih ringkas */
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    /* Shadow yang lebih halus */
+    border: 1px solid #eee;
+    display: flex;
+    align-items: center;
+    /* KUNCI: Pastikan input dan label sejajar tengah */
+    gap: 10px;
+    /* Jarak antar grup filter lebih ringkas */
+    flex-wrap: wrap;
+
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    /* Jarak antara label dan input */
+}
+
+.filter-group label {
+    font-size: 11px;
+    /* Ukuran label lebih kecil */
+    font-weight: 500;
+    color: #666;
+    margin-bottom: 0;
+}
+
+/* Modifikasi styling input tanggal */
+.input-date {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    /* Radius lebih tegas */
+    font-size: 14px;
+    transition: all 0.2s;
+    font-family: var(--font);
+    color: var(--dark-grey);
+}
+
+.input-date:focus {
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.15);
+    /* Ring fokus yang halus */
+    outline: none;
+}
+
+/* Modifikasi Styling untuk Tombol Reset */
+.btn-reset {
+    padding: 8px 15px;
+    /* Padding lebih besar */
+    background-color: var(--primary-blue);
+    /* Gunakan warna utama (Biru) */
+    color: #ffffff;
+    /* Teks putih */
+    border: none;
+    /* Hilangkan border */
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: background-color 0.2s;
+
+    /* Penyesuaian Layout */
+    height: 40px;
+    margin-top: 15px;
+    /* Untuk mengimbangi label di filter-group */
+    font-family: var(--font);
+}
+
+.btn-reset:hover {
+    background-color: #3b7ad6;
+    /* Biru yang sedikit lebih gelap saat hover */
+}
+
+/* Pesan jika filter tidak menemukan data */
+.no-result-row {
+    background-color: #f9f9f9;
+    color: #888;
+    font-style: italic;
+}
+
+/* ================== NOTIFIKASI TOAST (SUDUT KANAN ATAS) ================== */
+#toastNotificationContainer {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1050;
+    /* Pastikan di atas semua elemen lain, termasuk modal */
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 350px;
+}
+
+.toast-notification {
+    background-color: #ffffff;
+    color: #333;
+    padding: 15px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    opacity: 0;
+    transform: translateX(100%);
+    transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+}
+
+.toast-notification.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.toast-notification.hide {
+    opacity: 0;
+    transform: translateX(100%);
+}
+
+.toast-icon {
+    font-size: 1.5em;
+    line-height: 1;
+}
+
+.toast-text {
+    flex-grow: 1;
+    font-size: 0.95em;
+    font-weight: 500;
+}
+
+/* Modifier Colors */
+.toast-success {
+    border-left: 5px solid #4CAF50;
+    /* Hijau */
+}
+
+.toast-success .toast-icon {
+    color: #4CAF50;
+}
+
+.toast-error {
+    border-left: 5px solid #f44336;
+    /* Merah */
+}
+
+.toast-error .toast-icon {
+    color: #f44336;
+}
+
+.toast-info {
+    border-left: 5px solid #2196F3;
+    /* Biru Info */
+}
+
+.toast-info .toast-icon {
+    color: #2196F3;
 }
