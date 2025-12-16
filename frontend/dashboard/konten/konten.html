@@ -9,7 +9,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../../assets/css/cssadmin.css">
     <link rel="stylesheet" href="../../assets/css/cssmahasiswa.css">
-
+    <style>
+        /* Tetap pertahankan styling tebal judul di sini (kolom ke-3) */
+        .data-table tr td:nth-child(3) {
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+    </style>
 </head>
 
 <body>
@@ -162,7 +168,7 @@
             showToast(message, type);
         }
 
-        // --- 2. FUNGSI BARU: FORMAT TANGGAL DAN WAKTU (2 BARIS) ---
+        // --- 2. FUNGSI BARU: FORMAT TANGGAL DAN WAKTU (2 BARIS DENGAN IKON) ---
         function formatDateTime(dateTimeString) {
             if (!dateTimeString) return 'N/A';
 
@@ -191,9 +197,16 @@
             const formattedDate = date.toLocaleDateString('id-ID', dateOptions);
             const formattedTime = date.toLocaleTimeString('id-ID', timeOptions) + ' WIB';
 
+            // Menggunakan styling ikon dan kontainer yang serupa dengan Peminjaman
             return `
-                <div style="font-weight: 600; color: #333; line-height: 1.2;">${formattedDate}</div>
-                <div style="font-size: 11px; color: #777; margin-top: 2px;">${formattedTime}</div>
+                <div style="display: flex; align-items: center; margin-bottom: 4px;">
+                    <i class="fas fa-calendar-alt" style="color: #4A90E2; font-size: 14px; margin-right: 8px;"></i>
+                    <span style="font-weight: 600; color: #333;">${formattedDate}</span>
+                </div>
+                <div style="display: flex; align-items: center;">
+                    <i class="far fa-clock" style="color: #777; font-size: 14px; margin-right: 8px;"></i>
+                    <span style="font-size: 13px; color: #777;">${formattedTime}</span>
+                </div>
             `;
         }
         // --- AKHIR FUNGSI FORMAT TANGGAL ---
@@ -309,10 +322,8 @@
             `;
 
                 row.innerHTML = `
-                <td>${id}</td>
-                <td class="table-img-cell">${imgDisplay}</td> 
-                <td>${konten.title}</td>
-                <td>
+                <td>#${id}</td> <td class="table-img-cell">${imgDisplay}</td> 
+                <td>${konten.title}</td> <td>
                     <span class="category-badge">${konten.category_name || '-'}</span>
                 </td>
                 <td>${formatDateTime(konten.created_at)}</td>
