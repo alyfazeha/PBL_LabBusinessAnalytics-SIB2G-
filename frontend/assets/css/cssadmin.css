@@ -853,6 +853,20 @@ header h1 {
     border-radius: 6px;
 }
 
+.focus-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+    background-color: #f7e6d8;
+    /* Warna latar yang berbeda untuk fokus (misal: oranye muda) */
+    color: #cc8400;
+    /* Warna teks oranye */
+    text-align: center;
+}
+
 /* ================== GAYA AKSI TABEL KHUSUS (Detail = Split) ================== */
 
 /* Container utama di Aksi Tabel (Tegak Lurus) */
@@ -2116,6 +2130,8 @@ header h1 {
     font-size: 0.85em;
     display: inline-block;
     text-transform: uppercase;
+    text-align: center;
+    white-space: nowrap
 }
 
 
@@ -2135,6 +2151,40 @@ header h1 {
     background-color: #f44336;
     color: #ffebee;
     border: 1px solid #ffcdd2;
+}
+
+.status-disetujui {
+    background-color: #e8f5e9;
+    color: #4caf50;
+    border: 1px solid #c8e6c9;
+}
+
+/* Status Diajukan (Pending/Awal) */
+.status-diajukan {
+    background-color: #fff8e1;
+    color: #ff9800;
+    border: 1px solid #ffecb3;
+}
+
+/* Status Ditolak (Rejected) */
+.status-ditolak {
+    background-color: #ffebee;
+    color: #f44336;
+    border: 1px solid #ffcdd2;
+}
+
+.category-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    /* Bentuk pil */
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+    background-color: #e2f2ff;
+    /* Warna biru muda untuk kategori */
+    color: #0056b3;
+    text-align: center;
 }
 
 /* PUBLISHED (Biasanya Hijau/Sukses) */
@@ -2378,6 +2428,21 @@ header h1 {
     color: #666;
     margin-bottom: 0;
 }
+
+.filter-select {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    min-width: 150px;
+    transition: border-color 0.2s;
+}
+
+.filter-select:focus {
+    border-color: var(--primary-blue, #4A90E2);
+    /* Biru saat fokus */
+    outline: none;
+}
+
 
 /* Modifikasi styling input tanggal */
 .input-date {
@@ -2642,32 +2707,3 @@ header h1 {
     display: block;
     min-height: 1.2em;
 }
-
-/* ================== STYLING BADGE KATEGORI (FIXED: MATCHING STATUS) ================== */
-
-.category-badge {
-    display: inline-block;
-
-    /* Ukuran dan Bentuk SAMA dengan Status Badge */
-    padding: 6px 12px;
-    /* Sama dengan Status Badge */
-    border-radius: 20px;
-    /* Sama dengan Status Badge (Bentuk Pil) */
-    font-size: 11px;
-    /* Sama dengan Status Badge */
-    font-weight: 600;
-    /* Sama dengan Status Badge */
-    text-transform: uppercase;
-    /* Sama dengan Status Badge */
-    white-space: nowrap;
-
-    /* Warna Netral Kategori (Biru Muda) */
-    background-color: #e3f2fd;
-    /* Light Blue BG */
-    color: #1e88e5;
-    /* Darker Blue Text */
-    border: 1px solid #90caf9;
-    /* Soft Blue Border */
-}
-
-/* ================== AKHIR STYLING BADGE KATEGORI ================== */
