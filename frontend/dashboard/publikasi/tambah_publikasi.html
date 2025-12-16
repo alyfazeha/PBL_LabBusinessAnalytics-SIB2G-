@@ -13,6 +13,8 @@
 
 <body>
 
+    <div id="toastNotificationContainer"></div>
+
     <div class="sidebar">
         <div class="logo-area">
             <h3>Lab Admin</h3>
@@ -30,78 +32,138 @@
 
     <div class="main-content">
         <header>
-            <a href="publikasi.html" class="back-link"><i class="fas fa-arrow-left"></i> Kembali</a>
-            <h1>Tambah Publikasi</h1>
+            <div class="header-title">
+                <a href="publikasi.html" class="back-icon-in-header"><i class="fas fa-arrow-left"></i></a>
+                <h2>Tambah Publikasi</h2>
+            </div>
+            <div></div>
         </header>
 
-        <div class="data-section">
-            <div id="message" class="message-area" style="display: none;"></div>
+        <main>
+            <div class="form-card">
+                <div class="form-card-header"></div>
 
-            <form id="publikasiForm" class="data-form">
+                <form id="publikasiForm" class="data-form">
 
-                <div class="form-group">
-                    <label for="judul">Judul Publikasi <span class="required">*</span></label>
-                    <input type="text" id="judul" name="judul" required placeholder="Masukkan judul jurnal/penelitian...">
-                </div>
+                    <div class="form-grid-2">
+                        <div class="column-left">
 
-                <div class="form-group">
-                    <label for="tahun">Tahun Publikasi <span class="required">*</span></label>
-                    <input type="number" id="tahun" name="tahun" required placeholder="Contoh: 2024" min="1900" max="2100">
-                </div>
+                            <div class="form-group">
+                                <label for="judul">Judul Publikasi <span class="required">*</span></label>
+                                <input type="text" id="judul" name="judul" required
+                                    placeholder="Masukkan judul jurnal/penelitian...">
+                            </div>
 
-                <div class="form-group">
-                    <label for="kategori_id">Kategori Publikasi <span class="required">*</span></label>
-                    <select id="kategori_id" name="kategori_id" required>
-                        <option value="">-- Sedang memuat... --</option>
-                    </select>
-                </div>
+                            <div class="form-group">
+                                <label for="tahun">Tahun Publikasi <span class="required">*</span></label>
+                                <input type="number" id="tahun" name="tahun" required placeholder="Contoh: 2024"
+                                    min="1900" max="2100">
+                            </div>
 
-                <div class="form-group">
-                    <label for="focus_id">Topik / Fokus Riset <span class="required">*</span></label>
-                    <select id="focus_id" name="focus_id" required>
-                        <option value="">-- Pilih Topik Riset --</option>
-                    </select>
-                    <small>Pilih topik yang sesuai dengan judul publikasi ini.</small>
-                </div>
+                            <div class="form-group">
+                                <label for="kategori_id">Kategori Publikasi <span class="required">*</span></label>
+                                <select id="kategori_id" name="kategori_id" required>
+                                    <option value="">-- Sedang memuat... --</option>
+                                </select>
+                            </div>
 
-                <div class="form-group">
-                    <label for="dosen_nidn">Pilih Dosen Penulis <span class="required">*</span></label>
-                    <select id="dosen_nidn" name="dosen_nidn" required>
-                        <option value="">-- Sedang memuat dosen... --</option>
-                    </select>
-                    <small>Format: Nama Dosen (NIDN)</small>
-                </div>
+                            <div class="form-group">
+                                <label for="focus_id">Topik / Fokus Riset <span class="required">*</span></label>
+                                <select id="focus_id" name="focus_id" required>
+                                    <option value="">-- Pilih Topik Riset --</option>
+                                </select>
+                                <small class="form-text">Pilih topik yang sesuai dengan judul publikasi ini.</small>
+                            </div>
 
-                <div class="form-group">
-                    <label for="external_link">Link Eksternal (Jurnal/Drive/PDF)</label>
-                    <input type="url" id="external_link" name="external_link" placeholder="https://...">
-                </div>
+                        </div>
+                        <div class="column-right">
 
-                <div class="form-actions">
-                    <button type="submit" class="btn btn-primary" id="submitBtn"><i class="fas fa-save"></i> Simpan Publikasi</button>
-                    <button type="reset" class="btn btn-secondary"><i class="fas fa-redo"></i> Reset</button>
-                </div>
-            </form>
+                            <div class="form-group">
+                                <label for="dosen_nidn">Pilih Dosen Penulis <span class="required">*</span></label>
+                                <select id="dosen_nidn" name="dosen_nidn" required>
+                                    <option value="">-- Sedang memuat dosen... --</option>
+                                </select>
+                                <small class="form-text">Format: Nama Dosen (NIDN)</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="external_link">Link Eksternal (Jurnal/Drive/PDF)</label>
+                                <input type="url" id="external_link" name="external_link" placeholder="https://...">
+                            </div>
+
+                            <div class="form-actions align-bottom">
+                                <button type="submit" class="btn btn-ijo" id="submitBtn"><i class="fas fa-save"></i>
+                                    Simpan Publikasi</button>
+                                <a href="publikasi.html" class="btn btn-secondary"><i class="fas fa-times"></i>
+                                    Batal</a>
+                            </div>
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+    <div id="logoutModal" class="modal logout-modal">
+        <div class="modal-content" style="text-align: left !important;">
+            <span class="close-btn" onclick="logoutModal.style.display='none';">&times;</span>
+            <h4><i class="fas fa-sign-out-alt"></i> Konfirmasi Logout</h4>
+            <p>Anda yakin ingin mengakhiri sesi dan keluar dari Panel Admin?</p>
+            <div class="modal-buttons">
+                <button id="cancelLogoutBtn" class="btn btn-secondary">Batal</button>
+                <button id="confirmLogoutBtn" class="btn btn-danger">Ya, Logout</button>
+            </div>
         </div>
     </div>
 
-    <div id="logoutModal" class="modal">
-        <div class="modal-content">
-            <h2>Konfirmasi Logout</h2>
-            <p>Apakah Anda yakin ingin keluar?</p>
-            <button id="confirmLogoutBtn" class="btn btn-danger">Logout</button>
-            <button id="cancelLogoutBtn" class="btn btn-secondary">Batal</button>
-        </div>
-    </div>
 
     <script>
-        function displayMessage(type, message) {
-            const messageArea = document.getElementById('message');
-            messageArea.textContent = message;
-            messageArea.className = 'message-area ' + type;
-            messageArea.style.display = 'block';
-            setTimeout(() => { messageArea.style.display = 'none'; }, 5000);
+        // ===================================
+        // 1. FUNGSI TOAST NOTIFICATION (BARU)
+        // ===================================
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastNotificationContainer');
+            if (!container) return;
+
+            const toast = document.createElement('div');
+            let iconClass = 'fas fa-info-circle';
+            let typeClass = 'toast-info';
+
+            if (type === 'success') {
+                iconClass = 'fas fa-check-circle';
+                typeClass = 'toast-success';
+            } else if (type === 'error') {
+                iconClass = 'fas fa-times-circle';
+                typeClass = 'toast-error';
+            }
+
+            toast.classList.add('toast-notification', typeClass);
+            toast.innerHTML = `
+                <i class="toast-icon ${iconClass}"></i>
+                <span class="toast-text">${message}</span>
+            `;
+
+            container.appendChild(toast);
+
+            setTimeout(() => { toast.classList.add('show'); }, 10);
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+                toast.classList.add('hide');
+                setTimeout(() => { toast.remove(); }, 300);
+            }, 4000);
         }
+
+        function displayMessage(type, message) {
+            // Mengubah mapping tipe pesan lama ke toast
+            if (type.includes('error')) type = 'error';
+            if (type.includes('success')) type = 'success';
+            showToast(message, type);
+        }
+
+        // ===================================
+        // 2. FUNGSI FETCH DROPDOWN
+        // ===================================
 
         async function fetchKategori() {
             try {
@@ -110,9 +172,18 @@
                 const select = document.getElementById('kategori_id');
                 select.innerHTML = '<option value="">-- Pilih Kategori --</option>';
                 if (result.status === 'success' && result.data) {
-                    result.data.forEach(item => { select.innerHTML += `<option value="${item.id}">${item.nama_kategori}</option>`; });
+                    result.data.forEach(item => {
+                        // Menggunakan id atau kategori_id jika ada
+                        select.innerHTML += `<option value="${item.id || item.kategori_id}">${item.nama_kategori}</option>`;
+                    });
+                } else {
+                    select.innerHTML = '<option value="" disabled>Gagal memuat kategori</option>';
+                    displayMessage('error', result.message || 'Gagal memuat daftar kategori.');
                 }
-            } catch (error) { console.error('Kategori Error:', error); }
+            } catch (error) {
+                console.error('Kategori Error:', error);
+                document.getElementById('kategori_id').innerHTML = '<option value="" disabled>Gagal koneksi</option>';
+            }
         }
 
         async function fetchFocus() {
@@ -122,9 +193,18 @@
                 const select = document.getElementById('focus_id');
                 select.innerHTML = '<option value="">-- Pilih Topik Riset --</option>';
                 if (result.status === 'success' && result.data) {
-                    result.data.forEach(item => { select.innerHTML += `<option value="${item.focus_id}">${item.nama_fokus}</option>`; });
+                    result.data.forEach(item => {
+                        // Menggunakan focus_id atau fokus_id jika ada
+                        select.innerHTML += `<option value="${item.focus_id || item.fokus_id}">${item.nama_fokus}</option>`;
+                    });
+                } else {
+                    select.innerHTML = '<option value="" disabled>Gagal memuat fokus riset</option>';
+                    displayMessage('error', result.message || 'Gagal memuat daftar fokus riset.');
                 }
-            } catch (error) { console.error('Focus Error:', error); }
+            } catch (error) {
+                console.error('Focus Error:', error);
+                document.getElementById('focus_id').innerHTML = '<option value="" disabled>Gagal koneksi</option>';
+            }
         }
 
         async function fetchDosen() {
@@ -132,7 +212,7 @@
                 const response = await fetch('../../../backend/api/dosen/list.php');
                 const result = await response.json();
                 const select = document.getElementById('dosen_nidn');
-                select.innerHTML = '<option value="">-- Pilih Dosen --</option>';
+                select.innerHTML = '<option value="">-- Pilih Dosen Penulis --</option>';
                 let dataDosen = Array.isArray(result) ? result : (result.status === 'success' ? result.data : []);
                 if (dataDosen.length > 0) {
                     const seen = new Set();
@@ -142,46 +222,106 @@
                             select.innerHTML += `<option value="${dosen.nidn}">${dosen.nama} (${dosen.nidn})</option>`;
                         }
                     });
+                } else {
+                    select.innerHTML = '<option value="" disabled>Gagal memuat dosen</option>';
+                    displayMessage('error', result.message || 'Gagal memuat daftar dosen.');
                 }
-            } catch (error) { console.error('Dosen Error:', error); }
+            } catch (error) {
+                console.error('Dosen Error:', error);
+                document.getElementById('dosen_nidn').innerHTML = '<option value="" disabled>Gagal koneksi</option>';
+            }
         }
+
+        // ===================================
+        // 3. FUNGSI SUBMIT FORM
+        // ===================================
 
         const publikasiForm = document.getElementById('publikasiForm');
         publikasiForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const submitBtn = document.getElementById('submitBtn');
-            const messageArea = document.getElementById('message');
+            const originalText = submitBtn.innerHTML;
+
+            // UI Feedback
             submitBtn.disabled = true;
-            submitBtn.innerHTML = 'Menyimpan...';
-            messageArea.style.display = 'none';
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
 
             const formData = new FormData(publikasiForm);
 
             try {
-                const response = await fetch('../../../backend/api/publikasi/create.php', { method: 'POST', body: formData });
+                const response = await fetch('../../../backend/api/publikasi/create.php', {
+                    method: 'POST',
+                    body: formData
+                });
                 const text = await response.text();
                 let result;
-                try { result = JSON.parse(text); } catch (err) { throw new Error("Server Error"); }
+                try {
+                    result = JSON.parse(text);
+                } catch (err) {
+                    throw new Error("Respon server tidak valid atau terjadi kesalahan server.");
+                }
 
                 if (response.ok && (result.status === 'success' || result.id)) {
                     displayMessage('success', result.message || 'Publikasi berhasil disimpan!');
+
+                    // Reset form dan set dropdown kembali ke default
                     publikasiForm.reset();
                     document.getElementById('dosen_nidn').value = "";
                     document.getElementById('focus_id').value = "";
-                } else { throw new Error(result.message || 'Gagal menyimpan data.'); }
-            } catch (error) { displayMessage('error', error.message || 'Kesalahan jaringan.'); }
-            finally { submitBtn.disabled = false; submitBtn.innerHTML = '<i class="fas fa-save"></i> Simpan Publikasi'; }
+                    document.getElementById('kategori_id').value = ""; // Pastikan kategori juga direset
+
+                    // Arahkan kembali setelah sukses
+                    setTimeout(() => { window.location.href = 'publikasi.html'; }, 1500);
+
+                } else {
+                    // Tangani error dari API
+                    throw new Error(result.message || 'Gagal menyimpan data.');
+                }
+            } catch (error) {
+                console.error('Submission Error:', error);
+                displayMessage('error', error.message || 'Kesalahan jaringan atau server.');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
         });
 
-        document.addEventListener('DOMContentLoaded', () => { fetchKategori(); fetchFocus(); fetchDosen(); });
+        // ===================================
+        // 4. LOGIKA LOGOUT & INITIAL LOAD (DISESUAIKAN DENGAN style.display)
+        // ===================================
+        document.addEventListener('DOMContentLoaded', () => {
+            // Panggil semua fungsi fetch saat halaman dimuat
+            fetchKategori();
+            fetchFocus();
+            fetchDosen();
+        });
 
         const logoutModal = document.getElementById('logoutModal');
-        document.getElementById('logoutTrigger').onclick = (e) => { e.preventDefault(); logoutModal.classList.add('show'); };
-        document.getElementById('cancelLogoutBtn').onclick = () => logoutModal.classList.remove('show');
-        document.getElementById('confirmLogoutBtn').onclick = async () => {
-            try { await fetch('../../../backend/api/auth/logout.php', { method: 'POST' }); } catch (e) { }
+        const logoutTrigger = document.getElementById('logoutTrigger');
+        const cancelLogoutBtn = document.getElementById('cancelLogoutBtn');
+        const confirmLogoutBtn = document.getElementById('confirmLogoutBtn');
+
+        if (logoutTrigger) logoutTrigger.onclick = (e) => {
+            e.preventDefault();
+            logoutModal.style.display = 'flex';
+        };
+
+        if (cancelLogoutBtn) cancelLogoutBtn.onclick = () => logoutModal.style.display = 'none';
+
+        if (confirmLogoutBtn) confirmLogoutBtn.onclick = async () => {
+            try {
+                await fetch('../../../backend/api/auth/logout.php', {
+                    method: 'POST'
+                });
+            } catch (e) { }
             window.location.href = '../../public/index.html';
+        };
+
+        // Menutup modal jika klik di luar area modal
+        window.onclick = (e) => {
+            if (e.target === logoutModal) logoutModal.style.display = 'none';
         };
     </script>
 </body>
+
 </html>
