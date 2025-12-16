@@ -8,7 +8,7 @@ class Database
     private $port = "5432";
     private $db_name = "pbl";
     private $username = "postgres";
-    private $password = "12345678";
+    private $password = "lovie180906";
 
     private $conn;
 
