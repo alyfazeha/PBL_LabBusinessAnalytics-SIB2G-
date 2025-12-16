@@ -683,6 +683,10 @@ header h1 {
     text-align: left;
 }
 
+.data-table th:nth-child(1) {
+    text-align: center;
+}
+
 /* 2. Styling Sel Data (TD) */
 .data-table td {
     /* Font umum */
@@ -706,18 +710,28 @@ header h1 {
 /* 6. Styling Font Judul di Tabel (Agar Menonjol) */
 .data-table tr td:nth-child(3) {
     /* Kolom Judul (ke-3) */
-    font-weight: 600;
+    font-weight: 500;
     /* Sedikit lebih tebal */
     color: #1a1a1a;
     /* Warna paling gelap untuk Judul/Nama utama */
 }
 
 /* 7. Styling Kolom ID (Agar Terlihat Kecil) */
+/* ================== STYLING KHUSUS KOLOM ID (PERTAMA) ================== */
+
 .data-table tr td:nth-child(1) {
-    /* Kolom ID (ke-1) */
     font-size: 13px;
-    color: #999;
-    width: 30px;
+    /* Ukuran font lebih kecil dari data biasa */
+
+    /* Warna Biru, Ambil dari variabel utama */
+    color: var(--primary-blue, #4A90E2);
+
+    font-weight: 600;
+    /* Sedikit tebal agar menonjol */
+    width: 40px;
+    /* Lebar kolom yang kompak */
+    text-align: center;
+    /* ID di tengah */
 }
 
 /* 4. Styling Baris (TR) */

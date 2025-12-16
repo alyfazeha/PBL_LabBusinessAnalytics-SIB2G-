@@ -9,7 +9,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../../assets/css/cssadmin.css">
 
-
+    <style>
+        .data-table th:nth-child(5),
+        .data-table td:nth-child(5) {
+            width: 180px;
+            /* Lebar yang cukup besar untuk format 2 baris ikon-dan-teks */
+            min-width: 180px;
+        }
+    </style>
 </head>
 
 <body>
@@ -33,14 +40,14 @@
 
     <div class="main-content">
         <header>
-            
+
             <div class="header-title">
-                
+
                 <h2>Kelola Peminjaman</h2>
             </div>
 
             <div class="header-actions-group">
-                
+
                 <button id="btnToggleFilter" class="btn btn-secondary">
                     <i class="fas fa-filter"></i> Filter
                 </button>
@@ -78,8 +85,7 @@
                             <th>Mahasiswa</th>
                             <th>Dosen PJ</th>
                             <th>Sarana</th>
-                            <th>Tanggal</th>
-                            <th>Waktu</th>
+                            <th>Tanggal & Waktu</th>
                             <th>Keperluan</th>
                             <th>Status</th>
                             <th>Aksi</th>
@@ -87,7 +93,7 @@
                     </thead>
                     <tbody id="peminjamanTableBody">
                         <tr>
-                            <td colspan="9">Memuat data...</td>
+                            <td colspan="8">Memuat data...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -173,23 +179,52 @@
             }, 4000);
         }
 
-        // Nonaktifkan fungsi showStatusMessage lama karena kita pakai Toast
-        // function showStatusMessage(message, type = 'error') { ... } 
+        // --- FUNGSI BARU: FORMAT TANGGAL DAN WAKTU (2 BARIS) ---
+        function formatPeminjamanDateTime(dateString, startTime, endTime) {
+            if (!dateString) return 'N/A';
+
+            // Format Tanggal (Contoh: 2025-12-31)
+            const date = new Date(dateString.replace(/-/g, "/"));
+
+            // Format Waktu (Hanya ambil HH:MM)
+            const formattedTime = `${startTime.substring(0, 5)} - ${endTime.substring(0, 5)}`;
+
+            // Opsi pemformatan Tanggal (Contoh: 31 Desember 2025)
+            const dateOptions = {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+            };
+
+            const formattedDate = date.toLocaleDateString('id-ID', dateOptions);
+
+            // Gabungkan dengan styling HTML untuk 2 baris
+            return `
+                <div style="display: flex; align-items: center; margin-bottom: 4px;">
+                    <i class="fas fa-calendar-alt" style="color: #4A90E2; font-size: 14px; margin-right: 8px;"></i>
+                    <span style="font-weight: 600; color: #333;">${formattedDate}</span>
+                </div>
+                <div style="display: flex; align-items: center;">
+                    <i class="far fa-clock" style="color: #777; font-size: 14px; margin-right: 8px;"></i>
+                    <span style="font-size: 13px; color: #777;">${formattedTime}</span>
+                </div>
+            `;
+        }
+        // --- AKHIR FUNGSI FORMAT TANGGAL ---
+
 
         // --- 2. FUNGSI FETCH DATA LAMA (fetchPeminjaman) ---
         async function fetchPeminjaman() {
             const tableBody = document.getElementById('peminjamanTableBody');
-            tableBody.innerHTML = '<tr><td colspan="9" class="loading-state">Memuat data...</td></tr>';
+            tableBody.innerHTML = '<tr><td colspan="8" class="loading-state">Memuat data...</td></tr>'; // COLSpan JADI 8
 
             try {
-                // URL LAMA: Tidak ada paginasi, memuat semua data
                 const response = await fetch(BASE_API_URL + 'list.php');
                 const result = await response.json();
 
                 if (!response.ok || result.error) {
-                    // Mengganti showStatusMessage dengan Toast
                     showToast(result.error || `Gagal memuat data.`, 'error');
-                    tableBody.innerHTML = '<tr><td colspan="9" style="color: red;">Error: Data gagal dimuat.</td></tr>';
+                    tableBody.innerHTML = '<tr><td colspan="8" style="color: red;">Error: Data gagal dimuat.</td></tr>';
                     return;
                 }
 
@@ -198,7 +233,7 @@
                     tableBody.innerHTML = '';
 
                     if (data.length === 0) {
-                        tableBody.innerHTML = '<tr><td colspan="9" class="loading-state">Tidak ada data peminjaman.</td></tr>';
+                        tableBody.innerHTML = '<tr><td colspan="8" class="loading-state">Tidak ada data peminjaman.</td></tr>';
                         return;
                     }
 
@@ -209,12 +244,19 @@
                         const namaMahasiswa = item.nama_mahasiswa ? item.nama_mahasiswa : '-';
                         const namaDosen = item.nama_dosen ? item.nama_dosen : '-';
 
-                        row.insertCell().textContent = item.booking_id;
+                        // ID diberi prefix # untuk kesamaan dengan tabel konten
+                        row.insertCell().innerHTML = `<span style="font-weight: 600; color: #4A90E2;">#${item.booking_id}</span>`;
                         row.insertCell().textContent = namaMahasiswa;
                         row.insertCell().textContent = namaDosen;
                         row.insertCell().textContent = item.nama_sarana;
-                        row.insertCell().textContent = item.tanggal;
-                        row.insertCell().textContent = `${item.start_time.substring(0, 5)} - ${item.end_time.substring(0, 5)}`;
+
+                        // MENGGUNAKAN FUNGSI FORMAT BARU (Kolom ke-5)
+                        const dateTimeCell = row.insertCell();
+                        dateTimeCell.innerHTML = formatPeminjamanDateTime(item.tanggal, item.start_time, item.end_time);
+                        // Cell ini akan digunakan untuk filter, kita sisipkan atribut tanggal mentah
+                        dateTimeCell.setAttribute('data-date', item.tanggal);
+
+
                         row.insertCell().textContent = item.keperluan;
 
                         const statusCell = row.insertCell();
@@ -241,16 +283,16 @@
                     filterByDateRange();
 
                 } else {
-                    tableBody.innerHTML = '<tr><td colspan="9" style="color: red;">Format data salah.</td></tr>';
+                    tableBody.innerHTML = '<tr><td colspan="8" style="color: red;">Format data salah.</td></tr>';
                 }
 
             } catch (error) {
                 console.error(error);
-                tableBody.innerHTML = '<tr><td colspan="9" style="color: red;">Gagal terhubung ke API.</td></tr>';
+                tableBody.innerHTML = '<tr><td colspan="8" style="color: red;">Gagal terhubung ke API.</td></tr>';
             }
         }
 
-        // --- 3. FILTER RANGE TANGGAL (SAMA) ---
+        // --- 3. FILTER RANGE TANGGAL (Diperbaiki: Menggunakan atribut data-date) ---
         function filterByDateRange() {
             const startDateVal = document.getElementById('startDate').value;
             const endDateVal = document.getElementById('endDate').value;
@@ -263,15 +305,22 @@
             let visibleCount = 0;
 
             rows.forEach(row => {
-                const dateCell = row.cells[4].textContent.trim();
+                // Ambil data tanggal mentah dari atribut data-date di kolom Tanggal & Waktu (Kolom ke-5)
+                const dateCell = row.cells[4].getAttribute('data-date');
                 let show = true;
 
-                if (startDateVal && dateCell < startDateVal) {
+                if (dateCell) {
+                    if (startDateVal && dateCell < startDateVal) {
+                        show = false;
+                    }
+                    if (endDateVal && dateCell > endDateVal) {
+                        show = false;
+                    }
+                } else {
+                    // Jika data-date tidak ada, sembunyikan untuk amannya
                     show = false;
                 }
-                if (endDateVal && dateCell > endDateVal) {
-                    show = false;
-                }
+
 
                 if (show) {
                     row.style.display = '';
@@ -282,7 +331,7 @@
             });
 
             if (visibleCount === 0 && rows.length > 0) {
-                const noRow = `<tr id="noDataRow" class="no-result-row"><td colspan="9" style="text-align:center; padding: 20px;">
+                const noRow = `<tr id="noDataRow" class="no-result-row"><td colspan="8" style="text-align:center; padding: 20px;">
                 <i class="fas fa-calendar-times" style="font-size: 24px; margin-bottom: 10px; display:block;"></i>
                 Tidak ada peminjaman di rentang tanggal tersebut.
             </td></tr>`;
