@@ -20,9 +20,8 @@
             border: 1px solid #eee;
             margin-bottom: 20px;
             
-            /* Flexbox untuk layout kiri-kanan */
             display: flex;
-            justify-content: space-between; /* Kiri (Search+Filter) vs Kanan (Tombol) */
+            justify-content: space-between; 
             align-items: center;
             flex-wrap: wrap;
             gap: 15px;
@@ -31,13 +30,12 @@
         .left-controls {
             display: flex;
             align-items: center;
-            gap: 10px; /* Jarak antara Search dan Filter */
+            gap: 10px; 
             flex-wrap: wrap;
         }
 
-        /* Input Search Rapih & Tidak Kepanjangan */
         #searchInput {
-            width: 300px; /* Lebar fix agar tidak mendorong elemen lain */
+            width: 300px; 
             padding: 10px 15px;
             border: 1px solid #ddd;
             border-radius: 5px;
@@ -50,12 +48,11 @@
             box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
         }
 
-        /* Filter Dropdown Sejajar */
         .filter-select {
             padding: 0 15px;
             border: 1px solid #ddd;
             border-radius: 5px;
-            height: 42px; /* Samakan tinggi dengan input search (padding+border) */
+            height: 42px; 
             color: #555;
             cursor: pointer;
             background-color: #f9f9f9;
@@ -66,7 +63,6 @@
             background-color: #fff;
         }
 
-        /* Tombol Tambah */
         .btn-add {
             background-color: #007bff;
             color: white;
@@ -78,7 +74,7 @@
             align-items: center;
             gap: 8px;
             transition: 0.3s;
-            height: 42px; /* Samakan tinggi */
+            height: 42px; 
             box-sizing: border-box;
         }
         .btn-add:hover {
@@ -86,7 +82,7 @@
             transform: translateY(-1px);
         }
 
-        /* Style pesan Data Tidak Ditemukan */
+        /* --- STYLE PESAN KOSONG --- */
         .empty-state {
             text-align: center;
             padding: 50px 20px;
@@ -106,6 +102,25 @@
         .empty-state p {
             font-size: 0.9rem;
             color: #999;
+        }
+
+        /* --- STYLE KOLOM PASSWORD --- */
+        .pass-box {
+            font-family: 'Courier New', monospace;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            padding: 4px 8px;
+            border-radius: 4px;
+            color: #d63384; /* Warna pink kemerahan agar menonjol */
+            font-weight: 700;
+            font-size: 0.9rem;
+            display: inline-block;
+            letter-spacing: 0.5px;
+        }
+        .pass-empty {
+            color: #ccc;
+            font-size: 0.8rem;
+            font-style: italic;
         }
     </style>
 </head>
@@ -136,7 +151,6 @@
             <div id="message" class="message-area" style="display: none;"></div>
 
             <div class="controls-area">
-                
                 <div class="left-controls">
                     <input type="text" id="searchInput" placeholder="Cari NIM, Nama, atau Prodi...">
                     
@@ -163,7 +177,7 @@
                             <th>Nama Mahasiswa</th>
                             <th>Prodi</th>
                             <th>Tingkat</th>
-                            <th>Email</th>
+                            <th>Password Awal</th> <th>Email</th>
                             <th>No. HP</th>
                             <th>Aksi</th>
                         </tr>
@@ -191,7 +205,7 @@
             messageArea.textContent = message;
             messageArea.className = `message-area ${type}`;
             messageArea.style.display = 'block';
-            setTimeout(() => { messageArea.style.display = 'none'; }, 3000);
+            setTimeout(() => { messageArea.style.display = 'none'; }, 5000); // 5 Detik agar sempat baca
         }
 
         // --- FETCH DATA ---
@@ -201,7 +215,7 @@
             const timestamp = new Date().getTime(); 
             const url = `../../../backend/api/mahasiswa/list.php?t=${timestamp}`;
             
-            mahasiswaTableBody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 20px;"><i class="fas fa-spinner fa-spin"></i> Memuat data...</td></tr>';
+            mahasiswaTableBody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 20px;"><i class="fas fa-spinner fa-spin"></i> Memuat data...</td></tr>';
 
             try {
                 const response = await fetch(url, {
@@ -216,7 +230,7 @@
                 }
             } catch (error) {
                 console.error('Fetch Error:', error);
-                mahasiswaTableBody.innerHTML = `<tr><td colspan="7" style="color: red; text-align: center;">${error.message}</td></tr>`;
+                mahasiswaTableBody.innerHTML = `<tr><td colspan="8" style="color: red; text-align: center;">${error.message}</td></tr>`;
             }
         }
 
@@ -224,13 +238,18 @@
             mahasiswaTableBody.innerHTML = '';
             
             mahasiswaList.forEach(mhs => {
+                // Tampilkan Password jika ada, jika null beri tanda strip
+                const passDisplay = mhs.initial_password 
+                    ? `<span class="pass-box">${mhs.initial_password}</span>` 
+                    : `<span class="pass-empty">-</span>`;
+
                 const row = `
                     <tr class="data-row">
                         <td>${mhs.nim}</td>
                         <td>${mhs.nama}</td>
                         <td>${mhs.prodi}</td>
                         <td>${mhs.tingkat}</td>
-                        <td>${mhs.email || '-'}</td>
+                        <td>${passDisplay}</td> <td>${mhs.email || '-'}</td>
                         <td>${mhs.no_hp || '-'}</td>
                         <td>
                             <button onclick="editMahasiswa('${mhs.nim}')" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i> Edit</button>
@@ -287,7 +306,7 @@
 
                 const noDataHTML = `
                     <tr id="noDataRow">
-                        <td colspan="7">
+                        <td colspan="8">
                             <div class="empty-state">
                                 <i class="fas fa-folder-open"></i>
                                 <h3>Data Tidak Ditemukan</h3>
