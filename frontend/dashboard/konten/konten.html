@@ -96,7 +96,7 @@
     </div>
 
     <div id="logoutModal" class="modal logout-modal">
-        <div class="modal-content">
+        <div class="modal-content" style="text-align: left !important;">
             <span class="close-btn" onclick="logoutModal.style.display='none';">&times;</span>
 
             <h4><i class="fas fa-sign-out-alt"></i> Konfirmasi Logout</h4>
@@ -283,6 +283,7 @@
             kontenList.forEach(konten => {
                 const row = kontenTableBody.insertRow();
                 const isPub = konten.is_published === true || konten.is_published === 't' || konten.is_published === '1';
+                // Status DRAFT atau PUBLISHED
                 const statusText = isPub ? 'PUBLISHED' : 'DRAFT';
                 const statusClass = statusText;
 
@@ -378,12 +379,13 @@
         }
 
 
-        // --- 9. Fungsi Toggle Publish ---
+        // --- 9. Fungsi Toggle Publish (PERBAIKAN NOTIFIKASI) ---
         async function togglePublish(id, currentStatus) {
             const newStatus = !currentStatus;
             const url = '../../../backend/api/contents/publish.php';
             const formData = new FormData();
             formData.append('content_id', id);
+            // newStatus: true (1) = PUBLISH, false (0) = DRAFT
             formData.append('status', newStatus ? '1' : '0');
 
             try {
@@ -391,7 +393,20 @@
                 const result = await response.json();
 
                 if (result.status === true || result.status === 'success') {
-                    displayMessage('success', result.message);
+
+                    // --- LOGIKA OVERRIDE PESAN SUKSES ---
+                    let customMessage = '';
+                    if (newStatus === false) {
+                        // Jika status baru adalah DRAFT
+                        customMessage = 'Konten berhasil dimasukkan draft';
+                    } else {
+                        // Jika status baru adalah PUBLISH
+                        customMessage = 'Konten berhasil diterbitkan';
+                    }
+
+                    displayMessage('success', customMessage);
+                    // --- AKHIR LOGIKA OVERRIDE ---
+
                     fetchKonten();
                 } else {
                     displayMessage('error', result.message);

@@ -2157,6 +2157,7 @@ header h1 {
     background-color: #e8f5e9;
     color: #4caf50;
     border: 1px solid #c8e6c9;
+    width: 100%;
 }
 
 /* Status Diajukan (Pending/Awal) */
@@ -2164,6 +2165,7 @@ header h1 {
     background-color: #fff8e1;
     color: #ff9800;
     border: 1px solid #ffecb3;
+    width: 100%;
 }
 
 /* Status Ditolak (Rejected) */
@@ -2171,6 +2173,7 @@ header h1 {
     background-color: #ffebee;
     color: #f44336;
     border: 1px solid #ffcdd2;
+    width: 100%;
 }
 
 .category-badge {
@@ -2706,4 +2709,50 @@ header h1 {
     color: var(--dark-grey);
     display: block;
     min-height: 1.2em;
+}
+
+
+
+/* ================== PUBLIKASI ACTION BUTTONS (CUSTOM LAYOUT 3x2) ================== */
+
+/* Memastikan kolom aksi cukup lebar dan rata tengah (Kolom ke-8) */
+
+
+/* Container utama untuk 2 baris aksi (vertikal) */
+.publikasi-action-list {
+    display: flex;
+    flex-direction: column;
+    /* Tumpuk baris ke bawah */
+    gap: 4px;
+    /* Jarak antara baris atas dan bawah */
+    width: 100%;
+    max-width: 200px;
+    /* Batasi lebar agar tidak terlalu lebar di layar besar */
+    margin: 0 auto;
+    /* Tengah di kolom */
+}
+
+/* Baris tombol aksi (horizontal) */
+.publikasi-action-row {
+    display: flex;
+    gap: 3px;
+    /* Jarak antar tombol */
+    width: 100%;
+}
+
+/* Membuat semua tombol di dalam baris mengisi ruang yang sama */
+.publikasi-action-row .btn-sm {
+    flex-grow: 1;
+    /* Membuat total lebar baris sama (3 tombol / 2 tombol) */
+    padding: 8px 10px;
+    /* Pastikan tombol tetap compact */
+    font-size: 11px;
+    line-height: 1;
+    text-align: center;
+}
+
+/* Tambahkan style untuk link yang disabled */
+.publikasi-action-row .btn-sm[disabled] {
+    cursor: not-allowed;
+    opacity: 0.6;
 }

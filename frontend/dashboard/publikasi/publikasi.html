@@ -15,6 +15,14 @@
             font-weight: 600;
             color: #1a1a1a;
         }
+
+        /* Kolom Status (ke-7) */
+        .data-table th:nth-child(7),
+        .data-table td:nth-child(7) {
+            padding-right: 30px;
+            /* Nilai padding yang lebih besar */
+            text-align: center;
+        }
     </style>
 </head>
 
@@ -46,11 +54,13 @@
                 <button id="btnToggleFilter" class="btn btn-secondary">
                     <i class="fas fa-filter"></i> Filter
                 </button>
-                <a href="tambah_publikasi.html" class="btn btn-primary btn-add"><i class="fas fa-plus"></i> Tambah
+                <a href="tambah_publikasi.html" class="btn btn-primary btn-add" style="margin-left: -2px;"><i
+                        class="fas fa-plus"></i> Tambah
                     Publikasi</a>
             </div>
 
             <div class="filter-section" id="dateFilterSection">
+                <div class="filter-section-header"></div>
                 <div class="filter-group">
                     <label for="filterFocus"><i class="fas fa-lightbulb"></i> Fokus Riset:</label>
                     <select id="filterFocus" class="filter-select">
@@ -101,24 +111,70 @@
         </main>
     </div>
 
-    <div id="logoutModal" class="modal">
+    <div id="deletePublikasiModal" class="modal delete-modal-custom">
         <div class="modal-content">
-            <h2>Konfirmasi Logout</h2>
-            <p>Yakin ingin keluar?</p>
-            <button id="confirmLogoutBtn" class="btn btn-danger">Logout</button>
-            <button id="cancelLogoutBtn" class="btn btn-secondary">Batal</button>
+            <span class="close-btn" onclick="closeDeleteModal()">&times;</span>
+            <h4><i class="fas fa-trash-alt modal-icon-danger"></i> Konfirmasi Penghapusan</h4>
+            <p>Anda yakin ingin menghapus konten berjudul: <strong id="publikasiJudulHapus"></strong>?</p>
+            <p class="modal-warning-text">Aksi ini tidak dapat dibatalkan.</p>
+            <div class="modal-buttons">
+                <button id="cancelDeletePublikasiBtn" class="btn btn-secondary">Batal</button>
+                <button id="confirmDeletePublikasiBtn" class="btn btn-danger">Ya, Hapus</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="logoutModal" class="modal logout-modal">
+        <div class="modal-content" style="text-align: left !important;">
+            <span class="close-btn" onclick="logoutModal.style.display='none';">&times;</span>
+
+            <h4><i class="fas fa-sign-out-alt"></i> Konfirmasi Logout</h4>
+
+            <p>Anda yakin ingin mengakhiri sesi dan keluar dari Panel Admin?</p>
+
+            <div class="modal-buttons">
+                <button id="cancelLogoutBtn" class="btn btn-secondary">Batal</button>
+                <button id="confirmLogoutBtn" class="btn btn-danger">Ya, Logout</button>
+            </div>
+
         </div>
     </div>
 
     <script>
+        // Variabel global untuk menyimpan ID yang akan dihapus
+        let deleteIdToDelete = null;
+
+        // Variabel Modal Hapus (Sesuai dengan ID di HTML)
+        const deletePublikasiModal = document.getElementById('deletePublikasiModal');
+        const confirmDeletePublikasiBtn = document.getElementById('confirmDeletePublikasiBtn');
+        const cancelDeletePublikasiBtn = document.getElementById('cancelDeletePublikasiBtn');
+        const publikasiJudulHapus = document.getElementById('publikasiJudulHapus');
+
+        // Variabel Modal Logout (sudah ada)
+        const logoutModal = document.getElementById('logoutModal');
+
         // FUNGSI TOAST NOTIFICATION
         function showToast(type, text) {
             const container = document.getElementById('toastNotificationContainer');
             if (!container) return;
 
+            const typeClass = `toast-${type}`;
             const toast = document.createElement('div');
-            toast.className = `toast-notification ${type}`;
-            toast.innerHTML = `<div class="message-content">${text}</div>`;
+            toast.className = `toast-notification ${typeClass}`;
+
+            let iconClass = '';
+            if (type === 'success') {
+                iconClass = 'fas fa-check-circle';
+            } else if (type === 'error') {
+                iconClass = 'fas fa-times-circle';
+            } else if (type === 'info') {
+                iconClass = 'fas fa-info-circle';
+            }
+
+            toast.innerHTML = `
+        ${iconClass ? `<span class="toast-icon"><i class="${iconClass}"></i></span>` : ''}
+        <span class="toast-text">${text}</span>
+    `;
 
             container.appendChild(toast);
 
@@ -131,13 +187,13 @@
                 toast.addEventListener('transitionend', () => {
                     toast.remove();
                 });
-            }, 5000); // Durasi 5 detik
+            }, 5000);
         }
 
-        // FUNGSI DISPLAY MESSAGE (DIADAPTASI KE TOAST)
         function displayMessage(type, message) {
             showToast(type, message);
         }
+
 
         const tableBody = document.getElementById('publikasiTableBody');
         let allPublikasiData = [];
@@ -246,48 +302,50 @@
                 // Fokus Riset tampil sebagai teks biasa
                 const namaFokus = item.nama_fokus || '-';
 
-                const btnLink = item.external_link ? `<a href="${item.external_link}" target="_blank" class="btn btn-sm btn-info" title="Lihat Link"><i class="fas fa-link"></i></a>` : '';
+                // Tombol Link Publikasi
+                const btnLink = item.external_link
+                    ? `<a href="${item.external_link}" target="_blank" class="btn btn-sm btn-primary" title="Lihat Link"><i class="fas fa-link"></i></a>`
+                    : `<button class="btn btn-sm btn-primary" title="Tidak ada Link" disabled><i class="fas fa-link"></i></button>`;
                 const tahunPub = item.tahun || '-';
 
-                // PERUBAHAN: Kolom Dosen
+                // Kolom Dosen
                 const dosenNidn = item.dosen_nidn || '-';
                 const namaDosen = item.nama_dosen || 'Unknown';
 
                 const dosenHtml = `
-                    <p style="margin: 0; font-weight: 600; color: #1a1a1a;">
-                        <i class="fas fa-user-tie" style="margin-right: 5px; color: #4A90E2;"></i>${namaDosen}
-                    </p>
-                    <p style="margin: 0; font-size: 11px; color:#666; margin-top: 2px;">
-                        <span style="font-weight: 500;">NIDN:</span> ${dosenNidn}
-                    </p>
-                `;
+                <p style="margin: 0; font-weight: 600; color: #1a1a1a;">
+                    <i class="fas fa-user-tie" style="margin-right: 5px; color: #4A90E2;"></i>${namaDosen}
+                </p>
+                <p style="margin: 0; font-size: 11px; color:#666; margin-top: 2px;">
+                    <span style="font-weight: 500;">NIDN:</span> ${dosenNidn}
+                </p>
+            `;
 
 
                 row.innerHTML = `
-                    <td>#${id}</td>
-                    <td>${item.judul}</td>
-                    <td>${tahunPub}</td> 
-                    <td>${namaKategori}</td>
-                    <td>${namaFokus}</td>
-                    <td>${dosenHtml}</td> <td>${statusBadge}</td>
-                    <td>
-                        <div class="action-buttons-list action-buttons-vertical">
-                            <div class="action-buttons-split">
-                                <button onclick="verifyPublikasi(${id}, 'published')" class="btn btn-sm btn-success" title="Approve"><i class="fas fa-check"></i></button>
-                                <button onclick="verifyPublikasi(${id}, 'rejected')" class="btn btn-sm btn-secondary" title="Reject"><i class="fas fa-times"></i></button>
-                            </div>
-
-                            <div class="action-buttons-split">
-                                ${btnLink}
-                                <a href="edit_publikasi.html?id=${id}" class="btn btn-sm btn-warning" title="Edit">
-                                    <i class="fas fa-pencil-alt"></i>
-                                </a>
-
-                                <button onclick="deletePublikasi(${id}, '${item.judul.replace(/'/g, "\\'")}')" class="btn btn-danger btn-sm" title="Hapus"><i class="fas fa-trash-alt"></i></button>
-                            </div>
+                <td>#${id}</td>
+                <td>${item.judul}</td>
+                <td>${tahunPub}</td> 
+                <td>${namaKategori}</td>
+                <td>${namaFokus}</td>
+                <td>${dosenHtml}</td>
+                <td>${statusBadge}</td>
+                <td>
+                    <div class="publikasi-action-list">
+                        <div class="publikasi-action-row">
+                            ${btnLink}
+                            <button onclick="verifyPublikasi(${id}, 'published')" class="btn btn-sm btn-ijo" title="Approve"><i class="fas fa-check"></i></button>
+                            <button onclick="verifyPublikasi(${id}, 'rejected')" class="btn btn-sm btn-secondary" title="Reject"><i class="fas fa-times"></i></button>
                         </div>
-                    </td>
-                `;
+                        <div class="publikasi-action-row">
+                            <a href="edit_publikasi.html?id=${id}" class="btn btn-sm btn-warning" title="Edit">
+                                <i class="fas fa-pencil-alt"></i>
+                            </a>
+                            <button onclick="deletePublikasi(${id}, '${item.judul.replace(/'/g, "\\'")}')" class="btn btn-danger btn-sm" title="Hapus"><i class="fas fa-trash-alt"></i></button>
+                        </div>
+                    </div>
+                </td>
+            `;
             });
         }
 
@@ -319,10 +377,8 @@
         });
 
 
+        // Fungsi Verifikasi (Publish/Reject)
         async function verifyPublikasi(id, status) {
-            const actionName = status === 'published' ? 'Publish' : 'Reject';
-            if (!confirm(`Ubah status publikasi #${id} menjadi ${actionName}?`)) return;
-
             const formData = new FormData();
             formData.append('publikasi_id', id);
             formData.append('status', status);
@@ -333,25 +389,76 @@
                 if (result.status === 'success') {
                     displayMessage('success', result.message);
                     fetchPublikasi();
-                } else { displayMessage('error', result.message); }
-            } catch (error) { displayMessage('error', 'Gagal update status.'); }
+                } else {
+                    displayMessage('error', result.message);
+                }
+            } catch (error) {
+                displayMessage('error', 'Gagal update status. Periksa koneksi API.');
+            }
         }
 
-        async function deletePublikasi(id, judul) {
-            if (!confirm(`Hapus publikasi: "${judul}"?`)) return;
+        // --- LOGIKA MODAL HAPUS KUSTOM (FIX SQL ERROR) ---
+
+        // 1. Fungsi untuk menutup Modal Hapus dan mereset ID
+        function closeDeleteModal() {
+            // Menggunakan classList.remove('show') untuk menghilangkan modal
+            deletePublikasiModal.classList.remove('show');
+            deleteIdToDelete = null;
+        }
+
+        // 2. Fungsi yang dipanggil dari tombol di tabel (Hanya menampilkan modal)
+        function deletePublikasi(id, judul) {
+            // **FIX** Pastikan ID diubah ke integer. Jika null/undefined/string non-numeric, hasilnya NaN.
+            const parsedId = parseInt(id);
+
+            // Safety check: ID harus angka valid dan lebih besar dari 0
+            if (isNaN(parsedId) || parsedId <= 0) {
+                displayMessage('error', 'ID publikasi tidak valid. Tidak dapat menghapus.');
+                return;
+            }
+
+            deleteIdToDelete = parsedId; // Simpan sebagai integer yang terverifikasi
+            publikasiJudulHapus.textContent = judul;
+            // MENAMPILKAN MODAL KUSTOM DENGAN classList.add('show')
+            deletePublikasiModal.classList.add('show');
+        }
+
+        // 3. Fungsi yang dipanggil dari tombol "Ya, Hapus" di dalam modal (melakukan API call)
+        async function executeDeletePublikasi() {
+            // **FIX** Validasi ganda sebelum mengirim data ke API.
+            const idToSend = parseInt(deleteIdToDelete);
+
+            // Safety check final: Pastikan ID yang akan dikirim valid
+            if (isNaN(idToSend) || idToSend <= 0) {
+                closeDeleteModal();
+                displayMessage('error', 'ID penghapusan tidak valid atau hilang. Hapus dibatalkan.');
+                return;
+            }
+
+            closeDeleteModal(); // Tutup modal sebelum API call
+
             const formData = new FormData();
-            formData.append('publikasi_id', id);
+            // Mengirim ID yang sudah dipastikan integer valid
+            formData.append('publikasi_id', idToSend);
+
             try {
                 const response = await fetch('../../../backend/api/publikasi/delete.php', { method: 'POST', body: formData });
                 const result = await response.json();
                 if (result.status === 'success') {
                     displayMessage('success', result.message);
                     fetchPublikasi();
-                } else { displayMessage('error', result.message); }
-            } catch (error) { displayMessage('error', 'Gagal menghapus data.'); }
+                } else {
+                    const errorMsg = result.message || 'Gagal menghapus data. Cek API.';
+                    displayMessage('error', errorMsg);
+                }
+            } catch (error) {
+                console.error('Delete Error:', error);
+                displayMessage('error', 'Gagal menghapus data. Periksa koneksi atau response server.');
+            }
         }
 
-        // --- LOGIKA TOGGLE FILTER ---
+
+        // --- LOGIKA TOGGLE FILTER & INICIALISASI ---
         document.addEventListener('DOMContentLoaded', () => {
             fetchFilters();
             fetchPublikasi();
@@ -378,16 +485,28 @@
                     }
                 });
             }
-        });
 
-        // --- LOGIKA LOGOUT ---\
-        const logoutModal = document.getElementById('logoutModal');
-        document.getElementById('logoutTrigger').onclick = (e) => { e.preventDefault(); logoutModal.classList.add('show'); };
-        document.getElementById('cancelLogoutBtn').onclick = () => logoutModal.classList.remove('show');
-        document.getElementById('confirmLogoutBtn').onclick = async () => {
-            try { await fetch('../../../backend/api/auth/logout.php', { method: 'POST' }); } catch (e) { }
-            window.location.href = '../../public/index.html';
-        };
+            // --- Event Listener untuk Modal Hapus (MENGGUNAKAN ID YANG BENAR) ---
+            if (cancelDeletePublikasiBtn) cancelDeletePublikasiBtn.onclick = closeDeleteModal;
+            if (confirmDeletePublikasiBtn) confirmDeletePublikasiBtn.onclick = executeDeletePublikasi;
+
+
+            // --- LOGIKA LOGOUT ---
+            document.getElementById('logoutTrigger').onclick = (e) => { e.preventDefault(); logoutModal.classList.add('show'); };
+            document.getElementById('cancelLogoutBtn').onclick = () => logoutModal.classList.remove('show');
+            document.getElementById('confirmLogoutBtn').onclick = async () => {
+                try { await fetch('../../../backend/api/auth/logout.php', { method: 'POST' }); } catch (e) { }
+                window.location.href = '../../public/index.html';
+            };
+
+            // Menutup modal jika klik di luar area modal
+            window.onclick = (e) => {
+                if (e.target === logoutModal) logoutModal.classList.remove('show');
+                // Menutup modal hapus saat klik di luar
+                if (e.target === deletePublikasiModal) closeDeleteModal();
+            };
+
+        });
     </script>
 </body>
 

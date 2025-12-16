@@ -9,9 +9,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../../assets/css/cssadmin.css">
     <link rel="stylesheet" href="../../assets/css/cssmahasiswa.css">
+    <style>
+
+    </style>
 </head>
 
 <body>
+    <div id="toastNotificationContainer"></div>
 
     <div class="sidebar">
         <div class="logo-area">
@@ -30,78 +34,130 @@
 
     <div class="main-content">
         <header>
-            <a href="publikasi.html" class="back-link"><i class="fas fa-arrow-left"></i> Kembali</a>
-            <h1>Edit Publikasi</h1>
+            <div class="header-title">
+                <a href="publikasi.html" class="back-icon-in-header"><i class="fas fa-arrow-left"></i></a>
+                <h2>Edit Publikasi</h2>
+            </div>
+            <div></div>
         </header>
 
-        <div class="data-section">
-            <div id="message" class="message-area" style="display: none;"></div>
+        <main>
 
-            <form id="publikasiForm" class="data-form">
-                <input type="hidden" id="publikasi_id" name="publikasi_id">
+            <div class="form-card">
+                <div class="form-card-header"></div>
+                <form id="publikasiForm" class="data-form">
+                    <input type="hidden" id="publikasi_id" name="publikasi_id">
 
-                <div class="form-group">
-                    <label for="judul">Judul Publikasi <span class="required">*</span></label>
-                    <input type="text" id="judul" name="judul" required>
-                </div>
 
-                <div class="form-group">
-                    <label for="tahun">Tahun Publikasi <span class="required">*</span></label>
-                    <input type="number" id="tahun" name="tahun" required placeholder="YYYY" min="1900" max="2100">
-                </div>
+                    <div class="form-grid-2">
+                        <div class="column-left">
 
-                <div class="form-group">
-                    <label for="kategori_id">Kategori Publikasi <span class="required">*</span></label>
-                    <select id="kategori_id" name="kategori_id" required>
-                        <option value="">-- Sedang memuat... --</option>
-                    </select>
-                </div>
+                            <div class="form-group">
+                                <label for="judul">Judul Publikasi <span class="required">*</span></label>
+                                <input type="text" id="judul" name="judul" required
+                                    placeholder="Masukkan judul jurnal/penelitian...">
+                            </div>
 
-                <div class="form-group">
-                    <label for="focus_id">Topik / Fokus Riset <span class="required">*</span></label>
-                    <select id="focus_id" name="focus_id" required>
-                        <option value="">-- Sedang memuat... --</option>
-                    </select>
-                    <small>Ubah topik jika diperlukan.</small>
-                </div>
+                            <div class="form-group">
+                                <label for="tahun">Tahun Publikasi <span class="required">*</span></label>
+                                <input type="number" id="tahun" name="tahun" required placeholder="YYYY" min="1900"
+                                    max="2100">
+                            </div>
 
-                <div class="form-group">
-                    <label for="dosen_nidn">Dosen Penulis <span class="required">*</span></label>
-                    <select id="dosen_nidn" name="dosen_nidn" required>
-                        <option value="">-- Sedang memuat... --</option>
-                    </select>
-                </div>
+                            <div class="form-group">
+                                <label for="kategori_id">Kategori Publikasi <span class="required">*</span></label>
+                                <select id="kategori_id" name="kategori_id" required>
+                                    <option value="">-- Sedang memuat... --</option>
+                                </select>
+                            </div>
 
-                <div class="form-group">
-                    <label for="external_link">Link Eksternal</label>
-                    <input type="url" id="external_link" name="external_link">
-                </div>
+                            <div class="form-group">
+                                <label for="focus_id">Topik / Fokus Riset <span class="required">*</span></label>
+                                <select id="focus_id" name="focus_id" required>
+                                    <option value="">-- Sedang memuat... --</option>
+                                </select>
+                                <small>Ubah topik jika diperlukan.</small>
+                            </div>
 
-                <div class="form-actions">
-                    <button type="submit" class="btn btn-primary" id="submitBtn"><i class="fas fa-save"></i> Simpan
-                        Perubahan</button>
-                    <a href="publikasi.html" class="btn btn-secondary">Batal</a>
-                </div>
-            </form>
-        </div>
+                        </div>
+                        <div class="column-right">
+
+                            <div class="form-group">
+                                <label for="dosen_nidn">Dosen Penulis <span class="required">*</span></label>
+                                <select id="dosen_nidn" name="dosen_nidn" required>
+                                    <option value="">-- Sedang memuat... --</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="external_link">Link Eksternal</label>
+                                <input type="url" id="external_link" name="external_link"
+                                    placeholder="Contoh: https://link-jurnal.com/artikel-ini">
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-ijo" id="submitBtn"><i class="fas fa-save"></i>
+                                    Simpan Perubahan</button>
+                                <a href="publikasi.html" class="btn btn-secondary"><i class="fas fa-times"></i>
+                                    Batal</a>
+                            </div>
+
+                        </div>
+                    </div>
+                </form>
+            </div>
     </div>
+    </main>
 
-    <div id="logoutModal" class="modal">
-        <div class="modal-content">
-            <h2>Konfirmasi Logout</h2>
-            <p>Yakin ingin keluar?</p>
-            <button id="confirmLogoutBtn" class="btn btn-danger">Logout</button>
-            <button id="cancelLogoutBtn" class="btn btn-secondary">Batal</button>
+    <div id="logoutModal" class="modal logout-modal">
+        <div class="modal-content" style="text-align: left !important;">
+            <h4><i class=" fas fa-sign-out-alt"></i> Konfirmasi Logout</h4>
+            <p>Anda yakin ingin mengakhiri sesi dan keluar dari Panel Admin?</p>
+            <div class="modal-buttons">
+                <button id="cancelLogoutBtn" class="btn btn-secondary">Batal</button>
+                <button id="confirmLogoutBtn" class="btn btn-danger">Ya, Logout</button>
+            </div>
         </div>
     </div>
 
     <script>
+        // --- 1. FUNGSI TOAST NOTIFICATION (PERBAIKAN FUNGSI AGAR TIDAK CRASH) ---
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastNotificationContainer');
+            if (!container) return; // Penting: Hindari crash jika container tidak ada
+
+            const toast = document.createElement('div');
+            let iconClass = 'fas fa-info-circle';
+            let typeClass = 'toast-info';
+
+            if (type === 'success') {
+                iconClass = 'fas fa-check-circle';
+                typeClass = 'toast-success';
+            } else if (type === 'error') {
+                iconClass = 'fas fa-times-circle';
+                typeClass = 'toast-error';
+            }
+
+            toast.classList.add('toast-notification', typeClass);
+            toast.innerHTML = `
+                <i class="toast-icon ${iconClass}"></i>
+                <span class="toast-text">${message}</span>
+            `;
+
+            container.appendChild(toast);
+
+            setTimeout(() => { toast.classList.add('show'); }, 10);
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+                toast.classList.add('hide');
+                setTimeout(() => { toast.remove(); }, 300);
+            }, 4000);
+        }
+
+        // Ganti fungsi lama displayMessage yang crash dengan versi Toast
         function displayMessage(type, message) {
-            const messageArea = document.getElementById('message');
-            messageArea.textContent = message;
-            messageArea.className = 'message-area ' + type;
-            messageArea.style.display = 'block';
-            setTimeout(() => { messageArea.style.display = 'none'; }, 5000);
+            showToast(message, type);
         }
 
         const urlParams = new URLSearchParams(window.location.search);
@@ -140,20 +196,22 @@
 
                 const seen = new Set();
                 dataDosen.forEach(d => {
-                    if (!seen.has(d.nidn)) {
+                    if (d.nidn && d.nama && !seen.has(d.nidn)) {
                         seen.add(d.nidn);
                         selDos.innerHTML += `<option value="${d.nidn}">${d.nama} (${d.nidn})</option>`;
                     }
                 });
 
-            } catch (e) { console.error('Error load dropdowns:', e); }
+            } catch (e) {
+                console.error('Error load dropdowns:', e);
+                displayMessage('error', 'Gagal memuat data pendukung.');
+            }
         }
 
         // --- FETCH DATA DETAIL (ISI FORM) ---
         async function fetchDetail() {
             if (!id) { displayMessage('error', 'ID tidak ditemukan'); return; }
 
-            // Tunggu dropdown selesai dimuat dulu agar bisa diset value-nya
             await loadDropdowns();
 
             try {
@@ -164,30 +222,37 @@
                     const data = result.data;
                     document.getElementById('publikasi_id').value = data.id || data.publikasi_id;
                     document.getElementById('judul').value = data.judul;
-                    document.getElementById('external_link').value = data.external_link;
-                    
-                    // [BARU] Isi Tahun
+                    document.getElementById('external_link').value = data.external_link || '';
+
                     document.getElementById('tahun').value = data.tahun || '';
 
                     // Set Value Dropdown
-                    document.getElementById('kategori_id').value = data.kategori_id;
-                    document.getElementById('dosen_nidn').value = data.dosen_nidn;
+                    document.getElementById('kategori_id').value = data.kategori_id || '';
+                    document.getElementById('dosen_nidn').value = data.dosen_nidn || '';
 
-                    // Set Value Fokus (Pastikan di DB kolomnya focus_id)
                     if (data.focus_id) {
                         document.getElementById('focus_id').value = data.focus_id;
                     }
+
+                    // Update Header
+                    document.querySelector('header h2').textContent = `Edit Publikasi #${data.id || data.publikasi_id}`;
+
                 } else {
                     displayMessage('error', 'Gagal memuat detail data.');
                 }
-            } catch (error) { displayMessage('error', 'Terjadi kesalahan koneksi.'); }
+            } catch (error) {
+                console.error('Fetch Detail Error:', error);
+                displayMessage('error', 'Terjadi kesalahan koneksi.');
+            }
         }
 
-        // --- SUBMIT UPDATE ---
+        // --- SUBMIT UPDATE (INI ADALAH FUNGSI UTAMA UNTUK MENYIMPAN) ---
         document.getElementById('publikasiForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('submitBtn');
-            btn.disabled = true; btn.innerHTML = 'Menyimpan...';
+            const originalText = btn.innerHTML;
+
+            btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
 
             const formData = new FormData(e.target);
             try {
@@ -196,29 +261,44 @@
 
                 let json;
                 try { json = JSON.parse(text); }
-                catch (e) { throw new Error("Server Error: " + text); }
+                catch (e) {
+                    // Jika respons bukan JSON, mungkin ada error PHP/server.
+                    throw new Error("Server Error: Respons tidak valid: " + text.substring(0, 100) + "...");
+                }
 
                 if (json.status === 'success') {
-                    displayMessage('success', json.message);
+                    displayMessage('success', json.message || 'Perubahan berhasil disimpan!');
                     setTimeout(() => window.location.href = 'publikasi.html', 1500);
                 } else {
-                    displayMessage('error', json.message);
+                    displayMessage('error', json.message || 'Gagal menyimpan perubahan.');
                 }
             } catch (err) {
                 console.error(err);
-                displayMessage('error', err.message || 'Error server');
+                displayMessage('error', err.message || 'Error server atau koneksi jaringan.');
             }
-            finally { btn.disabled = false; btn.innerHTML = '<i class="fas fa-save"></i> Simpan Perubahan'; }
+            finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
         });
 
         document.addEventListener('DOMContentLoaded', fetchDetail);
 
-        // Logout
-        document.getElementById('logoutTrigger').onclick = (e) => { e.preventDefault(); document.getElementById('logoutModal').classList.add('show'); };
-        document.getElementById('cancelLogoutBtn').onclick = () => document.getElementById('logoutModal').classList.remove('show');
-        document.getElementById('confirmLogoutBtn').onclick = async () => {
-            try { await fetch('../../../backend/api/auth/logout.php', { method: 'POST' }); } catch (e) { }
+        // --- LOGIKA LOGOUT ---
+        const logoutModal = document.getElementById('logoutModal');
+        const logoutTrigger = document.getElementById('logoutTrigger');
+        const cancelLogoutBtn = document.getElementById('cancelLogoutBtn');
+        const confirmLogoutBtn = document.getElementById('confirmLogoutBtn');
+
+        if (logoutTrigger) logoutTrigger.onclick = (e) => { e.preventDefault(); logoutModal.style.display = 'flex'; };
+        if (cancelLogoutBtn) cancelLogoutBtn.onclick = () => logoutModal.style.display = 'none';
+        if (confirmLogoutBtn) confirmLogoutBtn.onclick = async () => {
+            await fetch('../../../backend/api/auth/logout.php', { method: 'POST' });
             window.location.href = '../../public/index.html';
+        };
+
+        window.onclick = (e) => {
+            if (e.target === logoutModal) logoutModal.style.display = 'none';
         };
     </script>
 </body>
