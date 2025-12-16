@@ -37,13 +37,84 @@ try {
         $totalKonten = 0; // Default jika tabel belum ada
     }
 
+// --- [FITUR BARU: DATA UNTUK GRAFIK] ---
+
+    // A. DATA TREN MINGGUAN (7 HARI TERAKHIR)
+    $trendLabels = [];
+    $trendDataMap = [];
+    
+    for ($i = 6; $i >= 0; $i--) {
+        $date = date('Y-m-d', strtotime("-$i days")); // YYYY-MM-DD
+        $label = date('d M', strtotime($date));         
+        $trendLabels[] = $label;
+        $trendDataMap[$date] = 0; // Default 0
+    }
+
+    // Query menghitung jumlah per tanggal
+    // Mengambil data mulai dari 6 hari yang lalu
+    $startDate = date('Y-m-d', strtotime("-6 days"));
+    
+    $sqlTrend = "SELECT tanggal, COUNT(*) as total 
+                 FROM bookings 
+                 WHERE tanggal >= :start_date 
+                 GROUP BY tanggal";
+    
+    $stmtTrend = $db->prepare($sqlTrend);
+    $stmtTrend->execute([':start_date' => $startDate]);
+    $rowsTrend = $stmtTrend->fetchAll(PDO::FETCH_ASSOC);
+
+    // Masukkan data DB ke map
+    foreach ($rowsTrend as $row) {
+        $dbDate = $row['tanggal']; // Pastikan format di DB YYYY-MM-DD
+        if (isset($trendDataMap[$dbDate])) {
+            $trendDataMap[$dbDate] = (int)$row['total'];
+        }
+    }
+    // Ubah map menjadi array angka urut (index)
+    $trendValues = array_values($trendDataMap);
+
+
+    // B. DATA STATUS (PIE CHART)
+    $sqlStatus = "SELECT status, COUNT(*) as total FROM bookings GROUP BY status";
+    $stmtStatus = $db->query($sqlStatus);
+    $rowsStatus = $stmtStatus->fetchAll(PDO::FETCH_ASSOC);
+
+    $statusLabels = [];
+    $statusValues = [];
+    $statusColors = [];
+
+    foreach ($rowsStatus as $row) {
+        $st = ucfirst($row['status']); // Diajukan, Didisetujui, dll
+        $statusLabels[] = $st;
+        $statusValues[] = (int)$row['total'];
+
+        // Warna Custom
+        $stLower = strtolower($st);
+        if (strpos($stLower, 'disetujui') !== false) {
+            $statusColors[] = '#28a745'; // Hijau
+        } elseif (strpos($stLower, 'ditolak') !== false) {
+            $statusColors[] = '#dc3545'; // Merah
+        } else {
+            $statusColors[] = '#ffc107'; // Kuning (Diajukan/Pending)
+        }
+    }
+
+    // --- OUTPUT JSON GABUNGAN ---
     echo json_encode([
         'success' => true,
-        'data' => [
-            'name' => $adminName,
-            'peminjaman' => $totalPeminjaman,
-            'publikasi' => $totalPublikasi,
-            'konten' => $totalKonten
+        'admin_name' => $adminName,
+        'total_peminjaman' => $totalPeminjaman,
+        'total_publikasi' => $totalPublikasi,
+        'total_konten' => $totalKonten,
+        // Data Grafik Baru
+        'chart_trend' => [
+            'labels' => $trendLabels,
+            'data'   => $trendValues
+        ],
+        'chart_status' => [
+            'labels' => $statusLabels,
+            'data'   => $statusValues,
+            'colors' => $statusColors
         ]
     ]);
 
