@@ -11,7 +11,117 @@
     <link rel="stylesheet" href="../../assets/css/cssmahasiswa.css">
 
     <style>
-        /* CSS Hapus Cache Visual */
+        /* --- STYLE CONTROLS AREA --- */
+        .controls-area {
+            background: #fff;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border: 1px solid #eee;
+            margin-bottom: 20px;
+            
+            display: flex;
+            justify-content: space-between; 
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .left-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px; 
+            flex-wrap: wrap;
+        }
+
+        #searchInput {
+            width: 300px; 
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        #searchInput:focus {
+            border-color: #007bff;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+        }
+
+        .filter-select {
+            padding: 0 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            height: 42px; 
+            color: #555;
+            cursor: pointer;
+            background-color: #f9f9f9;
+        }
+        .filter-select:focus {
+            border-color: #007bff;
+            outline: none;
+            background-color: #fff;
+        }
+
+        .btn-add {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.3s;
+            height: 42px; 
+            box-sizing: border-box;
+        }
+        .btn-add:hover {
+            background-color: #0056b3;
+            transform: translateY(-1px);
+        }
+
+        /* --- STYLE PESAN KOSONG --- */
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: #888;
+        }
+        .empty-state i {
+            font-size: 3rem;
+            color: #e0e0e0;
+            margin-bottom: 15px;
+        }
+        .empty-state h3 {
+            font-size: 1.1rem;
+            color: #555;
+            margin: 0 0 5px 0;
+            font-weight: 600;
+        }
+        .empty-state p {
+            font-size: 0.9rem;
+            color: #999;
+        }
+
+        /* --- STYLE KOLOM PASSWORD --- */
+        .pass-box {
+            font-family: 'Courier New', monospace;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            padding: 4px 8px;
+            border-radius: 4px;
+            color: #d63384; /* Warna pink kemerahan agar menonjol */
+            font-weight: 700;
+            font-size: 0.9rem;
+            display: inline-block;
+            letter-spacing: 0.5px;
+        }
+        .pass-empty {
+            color: #ccc;
+            font-size: 0.8rem;
+            font-style: italic;
+        }
     </style>
 </head>
 
@@ -41,8 +151,22 @@
             <div id="message" class="message-area" style="display: none;"></div>
 
             <div class="controls-area">
-                <input type="text" id="searchInput" placeholder="Cari Mahasiswa (NIM/Nama/Prodi/Tingkat)">
-                <a href="tambah_mahasiswa.html" class="btn btn-primary"><i class="fas fa-plus"></i> Tambah Data</a>
+                <div class="left-controls">
+                    <input type="text" id="searchInput" placeholder="Cari NIM, Nama, atau Prodi...">
+                    
+                    <select id="filterTingkat" class="filter-select">
+                        <option value="">Semua Tingkat</option>
+                        <option value="1">Tingkat 1</option>
+                        <option value="2">Tingkat 2</option>
+                        <option value="3">Tingkat 3</option>
+                        <option value="4">Tingkat 4</option>
+                        <option value="S2">S2</option>
+                    </select>
+                </div>
+
+                <a href="tambah_mahasiswa.html" class="btn-add">
+                    <i class="fas fa-plus"></i> Tambah Data
+                </a>
             </div>
 
             <div class="data-table-container">
@@ -53,13 +177,13 @@
                             <th>Nama Mahasiswa</th>
                             <th>Prodi</th>
                             <th>Tingkat</th>
-                            <th>Email</th>
+                            <th>Password Awal</th> <th>Email</th>
                             <th>No. HP</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody id="mahasiswaTableBody">
-                    </tbody>
+                        </tbody>
                 </table>
             </div>
         </div>
@@ -70,71 +194,62 @@
             <h2>Konfirmasi Logout</h2>
             <p>Apakah Anda yakin ingin keluar dari Dashboard Admin?</p>
             <button id="cancelLogoutBtn" class="btn btn-secondary">Batal</button>
-            <button id="confirmLogoutBtn" class="btn btn-primary"
-                style="text-align: center; padding-left: 25px;">Logout</button>
+            <button id="confirmLogoutBtn" class="btn btn-primary" style="text-align: center; padding-left: 25px;">Logout</button>
         </div>
     </div>
 
     <script>
-        // Fungsi utilitas untuk menampilkan pesan
+        // --- UTILITAS ---
         function displayMessage(type, message) {
             const messageArea = document.getElementById('message');
             messageArea.textContent = message;
             messageArea.className = `message-area ${type}`;
             messageArea.style.display = 'block';
-            setTimeout(() => {
-                messageArea.style.display = 'none';
-            }, 3000);
+            setTimeout(() => { messageArea.style.display = 'none'; }, 5000); // 5 Detik agar sempat baca
         }
 
-        // --- FUNGSI FETCH MAHASISWA (DENGAN ANTI-CACHE) ---
+        // --- FETCH DATA ---
         const mahasiswaTableBody = document.getElementById('mahasiswaTableBody');
 
         async function fetchMahasiswa() {
-            // PERBAIKAN UTAMA: Tambahkan timestamp (?t=...) agar browser TIDAK menyimpan cache
             const timestamp = new Date().getTime(); 
             const url = `../../../backend/api/mahasiswa/list.php?t=${timestamp}`;
             
-            mahasiswaTableBody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Memuat data...</td></tr>';
+            mahasiswaTableBody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 20px;"><i class="fas fa-spinner fa-spin"></i> Memuat data...</td></tr>';
 
             try {
                 const response = await fetch(url, {
-                    method: 'GET',
-                    headers: {
-                        'Cache-Control': 'no-cache, no-store, must-revalidate',
-                        'Pragma': 'no-cache',
-                        'Expires': '0'
-                    }
+                    headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
                 });
-                
                 const data = await response.json();
 
                 if (response.ok && Array.isArray(data)) {
                     renderMahasiswaTable(data);
                 } else {
-                    throw new Error(data.message || 'Gagal memuat data Mahasiswa.');
+                    throw new Error(data.message || 'Gagal memuat data.');
                 }
             } catch (error) {
                 console.error('Fetch Error:', error);
-                mahasiswaTableBody.innerHTML = `<tr><td colspan="7" style="color: red; text-align: center;">${error.message} Cek koneksi server API.</td></tr>`;
+                mahasiswaTableBody.innerHTML = `<tr><td colspan="8" style="color: red; text-align: center;">${error.message}</td></tr>`;
             }
         }
 
         function renderMahasiswaTable(mahasiswaList) {
             mahasiswaTableBody.innerHTML = '';
-            if (mahasiswaList.length === 0) {
-                mahasiswaTableBody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Tidak ada data Mahasiswa.</td></tr>';
-                return;
-            }
-
+            
             mahasiswaList.forEach(mhs => {
+                // Tampilkan Password jika ada, jika null beri tanda strip
+                const passDisplay = mhs.initial_password 
+                    ? `<span class="pass-box">${mhs.initial_password}</span>` 
+                    : `<span class="pass-empty">-</span>`;
+
                 const row = `
-                    <tr>
+                    <tr class="data-row">
                         <td>${mhs.nim}</td>
                         <td>${mhs.nama}</td>
                         <td>${mhs.prodi}</td>
                         <td>${mhs.tingkat}</td>
-                        <td>${mhs.email || '-'}</td>
+                        <td>${passDisplay}</td> <td>${mhs.email || '-'}</td>
                         <td>${mhs.no_hp || '-'}</td>
                         <td>
                             <button onclick="editMahasiswa('${mhs.nim}')" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i> Edit</button>
@@ -144,84 +259,108 @@
                 `;
                 mahasiswaTableBody.insertAdjacentHTML('beforeend', row);
             });
+
+            filterTable();
         }
 
-        // --- FUNGSI EDIT ---
+        // --- FILTERING LOGIC ---
+        const searchInput = document.getElementById('searchInput');
+        const filterTingkat = document.getElementById('filterTingkat');
+
+        function filterTable() {
+            const searchValue = searchInput.value.toLowerCase();
+            const tingkatValue = filterTingkat.value;
+            
+            const rows = mahasiswaTableBody.getElementsByClassName('data-row');
+            let visibleCount = 0;
+
+            const existingNoData = document.getElementById('noDataRow');
+            if (existingNoData) {
+                existingNoData.remove();
+            }
+
+            for (let i = 0; i < rows.length; i++) {
+                const row = rows[i];
+                const cells = row.getElementsByTagName('td');
+                const textRow = row.textContent.toLowerCase();
+                const tingkatCell = cells[3].textContent.trim();
+
+                const matchesSearch = textRow.indexOf(searchValue) > -1;
+                const matchesTingkat = (tingkatValue === "") || (tingkatCell === tingkatValue);
+
+                if (matchesSearch && matchesTingkat) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            }
+
+            if (visibleCount === 0) {
+                let pesanDetail = "Belum ada data mahasiswa.";
+                if (searchValue) {
+                    pesanDetail = `Data dengan kata kunci <strong>"${searchInput.value}"</strong> tidak ditemukan.`;
+                } else if (tingkatValue) {
+                    pesanDetail = `Tidak ada mahasiswa di <strong>Tingkat ${tingkatValue}</strong>.`;
+                }
+
+                const noDataHTML = `
+                    <tr id="noDataRow">
+                        <td colspan="8">
+                            <div class="empty-state">
+                                <i class="fas fa-folder-open"></i>
+                                <h3>Data Tidak Ditemukan</h3>
+                                <p>${pesanDetail}</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                mahasiswaTableBody.insertAdjacentHTML('beforeend', noDataHTML);
+            }
+        }
+
+        searchInput.addEventListener('keyup', filterTable);
+        filterTingkat.addEventListener('change', filterTable);
+
+        // --- AKSI LAIN ---
         window.editMahasiswa = (nim) => {
-            // Simpan NIM ke LocalStorage
             localStorage.setItem('editMahasiswaNim', nim);
-            // Redirect
             window.location.href = 'edit_mahasiswa.html';
         };
 
-        // --- FUNGSI DELETE ---
         window.deleteMahasiswa = async (nim, nama) => {
-            if (!confirm(`Apakah Anda yakin ingin menghapus Mahasiswa: ${nama} (${nim})? Tindakan ini tidak dapat dibatalkan.`)) {
-                return;
-            }
-
-            const url = '../../../backend/api/mahasiswa/delete.php';
-            const formData = new FormData();
-            formData.append('nim', nim);
+            if (!confirm(`Hapus Mahasiswa: ${nama} (${nim})?`)) return;
 
             try {
-                const response = await fetch(url, {
-                    method: 'POST',
-                    body: formData
-                });
-
+                const formData = new FormData();
+                formData.append('nim', nim);
+                const response = await fetch('../../../backend/api/mahasiswa/delete.php', { method: 'POST', body: formData });
                 const result = await response.json();
 
                 if (result.success) {
-                    displayMessage('success', result.message || `Mahasiswa ${nama} berhasil dihapus.`);
-                    fetchMahasiswa(); // Reload data otomatis
+                    displayMessage('success', result.message);
+                    fetchMahasiswa();
                 } else {
-                    displayMessage('error', result.message || `Gagal menghapus Mahasiswa ${nama}.`);
+                    displayMessage('error', result.message);
                 }
-
             } catch (error) {
-                console.error('Error deleting Mahasiswa:', error);
-                displayMessage('error', 'Terjadi kesalahan jaringan/server saat menghapus.');
+                displayMessage('error', 'Gagal menghapus data.');
             }
         };
 
-        // Event Listener Search (Opsional - agar pencarian jalan)
-        document.getElementById('searchInput').addEventListener('keyup', function() {
-            const value = this.value.toLowerCase();
-            const rows = mahasiswaTableBody.getElementsByTagName('tr');
-            
-            for (let i = 0; i < rows.length; i++) {
-                const text = rows[i].textContent.toLowerCase();
-                rows[i].style.display = text.indexOf(value) > -1 ? '' : 'none';
-            }
-        });
-
-        // Panggil fungsi saat halaman dimuat
         document.addEventListener('DOMContentLoaded', fetchMahasiswa);
 
-        // --- Logic Logout ---
+        // Logout
         const logoutModal = document.getElementById('logoutModal');
         const logoutTrigger = document.getElementById('logoutTrigger');
-        const cancelLogoutBtn = document.getElementById('cancelLogoutBtn');
-        const confirmLogoutBtn = document.getElementById('confirmLogoutBtn');
+        const cancelBtn = document.getElementById('cancelLogoutBtn');
+        const confirmBtn = document.getElementById('confirmLogoutBtn');
 
-        logoutTrigger.addEventListener('click', (e) => {
-            e.preventDefault();
-            logoutModal.classList.add('show');
-        });
-
-        cancelLogoutBtn.addEventListener('click', () => {
-            logoutModal.classList.remove('show');
-        });
-
-        confirmLogoutBtn.addEventListener('click', async () => {
-            const url = '../../../backend/api/auth/logout.php';
-            try {
-                await fetch(url, { method: 'POST' });
-                window.location.href = '../../public/index.html';
-            } catch (error) {
-                window.location.href = '../../public/index.html';
-            }
+        if(logoutTrigger) logoutTrigger.addEventListener('click', (e) => { e.preventDefault(); logoutModal.classList.add('show'); });
+        if(cancelBtn) cancelBtn.addEventListener('click', () => logoutModal.classList.remove('show'));
+        if(confirmBtn) confirmBtn.addEventListener('click', async () => {
+            await fetch('../../../backend/api/auth/logout.php', { method: 'POST' });
+            window.location.href = '../../public/index.html';
         });
     </script>
 </body>

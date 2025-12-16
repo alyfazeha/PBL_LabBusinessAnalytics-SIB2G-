@@ -8,9 +8,27 @@
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../../assets/css/cssadmin.css">
+
+    <style>
+        .data-table th:nth-child(5),
+        .data-table td:nth-child(5) {
+            width: 180px;
+            /* Lebar yang cukup besar untuk format 2 baris ikon-dan-teks */
+            min-width: 180px;
+        }
+
+        .data-table tr td:nth-child(2),
+        .data-table tr td:nth-child(3) {
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+    </style>
 </head>
 
 <body>
+    <div id="toastNotificationContainer">
+    </div>
+
     <div class="sidebar">
         <div class="logo-area">
             <h3>Lab Admin</h3>
@@ -28,33 +46,60 @@
 
     <div class="main-content">
         <header>
+
             <div class="header-title">
+
                 <h2>Kelola Peminjaman</h2>
             </div>
-            <a href="tambah_peminjaman.html" class="btn btn-add"><i class="fas fa-plus"></i> Tambah Peminjaman</a>
+
+            <div class="header-actions-group">
+
+                <button id="btnToggleFilter" class="btn btn-secondary">
+                    <i class="fas fa-filter"></i> Filter
+                </button>
+
+                <a href="tambah_peminjaman.html" class="btn btn-add"><i class="fas fa-plus"></i> Tambah Peminjaman</a>
+
+            </div>
+
+            <div class="filter-section" id="dateFilterSection">
+                <div class="filter-section-header"></div>
+
+                <div class="filter-group">
+                    <label>Dari Tanggal:</label>
+                    <input type="date" id="startDate" class="input-date">
+                </div>
+                <div class="filter-group">
+                    <label>Sampai Tanggal:</label>
+                    <input type="date" id="endDate" class="input-date">
+                </div>
+                <button id="btnResetFilter" class="btn-reset">
+                    <i class="fas fa-sync-alt"></i> Reset
+                </button>
+            </div>
         </header>
 
         <main>
             <div id="statusMessage" class="status-message" style="display:none; padding: 10px; margin-bottom: 20px;">
             </div>
+
             <div class="table-wrapper">
                 <table class="data-table">
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Nama Mahasiswa</th>
-                            <th>Nama Dosen PJ</th>
+                            <th>Mahasiswa</th>
+                            <th>Dosen PJ</th>
                             <th>Sarana</th>
-                            <th>Tanggal</th>
-                            <th>Waktu</th>
-                            <th>Keperluan Meminjam</th>
+                            <th>Tanggal & Waktu</th>
+                            <th>Keperluan</th>
                             <th>Status</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody id="peminjamanTableBody">
                         <tr>
-                            <td colspan="9">Memuat data...</td>
+                            <td colspan="8">Memuat data...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -70,12 +115,10 @@
             </p>
             <textarea id="rejectionReason" rows="4"
                 placeholder="Alasan penolakan wajib diisi (minimal 5 karakter)"></textarea>
-
             <div class="modal-buttons">
                 <button class="btn btn-secondary" onclick="closeRejectModal()">Batal</button>
                 <button class="btn btn-danger" onclick="rejectPeminjaman()">Tolak Permanen</button>
             </div>
-
         </div>
     </div>
 
@@ -84,7 +127,6 @@
             <span class="close-btn" onclick="closeApproveModal()">&times;</span>
             <h4>Setujui Peminjaman</h4>
             <p>Anda yakin ingin menyetujui peminjaman dengan ID: <span id="approveIdDisplay"></span>?</p>
-
             <div class="modal-buttons">
                 <button class="btn btn-secondary" onclick="closeApproveModal()">Batal</button>
                 <button class="btn btn-ijo" onclick="approvePeminjaman()">Ya, Setujui</button>
@@ -95,122 +137,236 @@
     <div id="logoutModal" class="modal logout-modal">
         <div class="modal-content">
             <span class="close-btn" onclick="logoutModal.style.display='none';">&times;</span>
-
             <h4><i class="fas fa-sign-out-alt"></i> Konfirmasi Logout</h4>
-
             <p>Anda yakin ingin mengakhiri sesi dan keluar dari Panel Admin?</p>
-
             <div class="modal-buttons">
                 <button id="cancelLogoutBtn" class="btn btn-secondary">Batal</button>
                 <button id="confirmLogoutBtn" class="btn btn-danger">Ya, Logout</button>
             </div>
-
         </div>
     </div>
 
     <script>
         const BASE_API_URL = '../../../backend/api/booking/';
 
-        // --- FUNGSI UTILITY ---
-        function showStatusMessage(message, type = 'error') {
-            const statusDiv = document.getElementById('statusMessage');
-            statusDiv.textContent = message;
-            // Gunakan class atau style untuk warna
-            statusDiv.style.backgroundColor = type === 'success' ? '#4CAF50' : '#f44336';
-            statusDiv.style.color = 'white';
-            statusDiv.style.padding = '10px';
-            statusDiv.style.marginBottom = '20px';
-            statusDiv.style.borderRadius = '5px';
-            statusDiv.style.display = 'block';
+        // --- 1. FUNGSI NOTIFIKASI TOAST BARU ---
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastNotificationContainer');
+            if (!container) return;
+
+            const toast = document.createElement('div');
+            let iconClass = 'fas fa-info-circle';
+            let typeClass = 'toast-info';
+
+            if (type === 'success') {
+                iconClass = 'fas fa-check-circle';
+                typeClass = 'toast-success';
+            } else if (type === 'error') {
+                iconClass = 'fas fa-times-circle';
+                typeClass = 'toast-error';
+            }
+
+            toast.classList.add('toast-notification', typeClass);
+            toast.innerHTML = `
+            <i class="toast-icon ${iconClass}"></i>
+            <span class="toast-text">${message}</span>
+        `;
+
+            container.appendChild(toast);
+
+            // Tampilkan notifikasi
+            setTimeout(() => { toast.classList.add('show'); }, 10);
+
+            // Sembunyikan dan hapus setelah 4 detik
             setTimeout(() => {
-                statusDiv.style.display = 'none';
-            }, 5000);
+                toast.classList.remove('show');
+                toast.classList.add('hide');
+                setTimeout(() => { toast.remove(); }, 300);
+            }, 4000);
         }
 
-        // --- FUNGSI FETCH DATA PEMINJAMAN ---
+        // --- FUNGSI BARU: FORMAT TANGGAL DAN WAKTU (2 BARIS) ---
+        function formatPeminjamanDateTime(dateString, startTime, endTime) {
+            if (!dateString) return 'N/A';
+
+            // Format Tanggal (Contoh: 2025-12-31)
+            const date = new Date(dateString.replace(/-/g, "/"));
+
+            // Format Waktu (Hanya ambil HH:MM)
+            const formattedTime = `${startTime.substring(0, 5)} - ${endTime.substring(0, 5)}`;
+
+            // Opsi pemformatan Tanggal (Contoh: 31 Desember 2025)
+            const dateOptions = {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+            };
+
+            const formattedDate = date.toLocaleDateString('id-ID', dateOptions);
+
+            // Gabungkan dengan styling HTML untuk 2 baris
+            return `
+                <div style="display: flex; align-items: center; margin-bottom: 4px;">
+                    <i class="fas fa-calendar-alt" style="color: #4A90E2; font-size: 14px; margin-right: 8px;"></i>
+                    <span style="font-weight: 600; color: #333;">${formattedDate}</span>
+                </div>
+                <div style="display: flex; align-items: center;">
+                    <i class="far fa-clock" style="color: #777; font-size: 14px; margin-right: 8px;"></i>
+                    <span style="font-size: 13px; color: #777;">${formattedTime}</span>
+                </div>
+            `;
+        }
+        // --- AKHIR FUNGSI FORMAT TANGGAL ---
+
+
+        // --- 2. FUNGSI FETCH DATA LAMA (fetchPeminjaman) ---
         async function fetchPeminjaman() {
             const tableBody = document.getElementById('peminjamanTableBody');
-            // Colspan 9
-            tableBody.innerHTML = '<tr><td colspan="9" class="loading-state">Memuat data...</td></tr>';
+            tableBody.innerHTML = '<tr><td colspan="8" class="loading-state">Memuat data...</td></tr>'; // COLSpan JADI 8
 
             try {
                 const response = await fetch(BASE_API_URL + 'list.php');
                 const result = await response.json();
 
-                // 1. Cek respon status HTTP dan error dari API
                 if (!response.ok || result.error) {
-                    const errorMessage = result.error || result.message || `Gagal memuat data. Status: ${response.status}.`;
-                    showStatusMessage(errorMessage);
-                    tableBody.innerHTML = '<tr><td colspan="9" style="color: red;">Error: Data gagal dimuat. Cek Console.</td></tr>';
+                    showToast(result.error || `Gagal memuat data.`, 'error');
+                    tableBody.innerHTML = '<tr><td colspan="8" style="color: red;">Error: Data gagal dimuat.</td></tr>';
                     return;
                 }
 
-                // 2. Koreksi pengambilan data dari respons (harus array di key 'data')
                 if (result.status === 'success' && Array.isArray(result.data)) {
-                    const data = result.data; // Ambil array data dari key 'data'
-
+                    const data = result.data;
                     tableBody.innerHTML = '';
 
                     if (data.length === 0) {
-                        tableBody.innerHTML = '<tr><td colspan="9" class="loading-state">Tidak ada data peminjaman.</td></tr>';
+                        tableBody.innerHTML = '<tr><td colspan="8" class="loading-state">Tidak ada data peminjaman.</td></tr>';
                         return;
                     }
 
                     data.forEach(item => {
                         const row = tableBody.insertRow();
+                        row.classList.add('data-row');
 
-                        // Default nama jika data dari backend null/kosong
                         const namaMahasiswa = item.nama_mahasiswa ? item.nama_mahasiswa : '-';
                         const namaDosen = item.nama_dosen ? item.nama_dosen : '-';
 
-                        row.insertCell().textContent = item.booking_id; // 1. ID
-                        // item.peminjam (username) DILOMPATI / DIHAPUS
-                        row.insertCell().textContent = namaMahasiswa; // 2. Nama Mahasiswa
-                        row.insertCell().textContent = namaDosen; // 3. Nama Dosen PJ
-                        row.insertCell().textContent = item.nama_sarana; // 4. Sarana
-                        row.insertCell().textContent = item.tanggal; // 5. Tanggal
-                        row.insertCell().textContent = `${item.start_time.substring(0, 5)} - ${item.end_time.substring(0, 5)}`; // 6. Waktu
-                        row.insertCell().textContent = item.keperluan; // 7. KEPERLUAN BARU
+                        // ID diberi prefix # untuk kesamaan dengan tabel konten
+                        row.insertCell().innerHTML = `<span style="font-weight: 600; color: #4A90E2;">#${item.booking_id}</span>`;
+                        row.insertCell().textContent = namaMahasiswa;
+                        row.insertCell().textContent = namaDosen;
+                        row.insertCell().textContent = item.nama_sarana;
+
+                        // MENGGUNAKAN FUNGSI FORMAT BARU (Kolom ke-5)
+                        const dateTimeCell = row.insertCell();
+                        dateTimeCell.innerHTML = formatPeminjamanDateTime(item.tanggal, item.start_time, item.end_time);
+                        // Cell ini akan digunakan untuk filter, kita sisipkan atribut tanggal mentah
+                        dateTimeCell.setAttribute('data-date', item.tanggal);
 
 
-                        const statusCell = row.insertCell(); // 8. Status
-                        // Pastikan status adalah uppercase untuk mencocokkan class CSS
+                        row.insertCell().textContent = item.keperluan;
+
+                        const statusCell = row.insertCell();
                         const statusText = item.status.toUpperCase();
                         statusCell.innerHTML = `<span class="status ${statusText}">${statusText}</span>`;
 
-                        const actionCell = row.insertCell(); // 9. Aksi
-
-                        // GANTI BLOK INI di fungsi fetchPeminjaman()
-                        // LOGIKA TOMBOL AKSI
+                        const actionCell = row.insertCell();
                         const statusLower = item.status.toLowerCase();
-                        const isPending = statusLower === 'pending' || statusLower === 'diajukan'; // Tambahkan 'diajukan'
+                        const isPending = statusLower === 'pending' || statusLower === 'diajukan';
 
-                        // Tombol Aksi (Struktur Vertikal Khusus)
                         actionCell.innerHTML = `
-                            <div class="action-buttons-list action-buttons-vertical">
-                                <a href="detail_peminjaman.html?id=${item.booking_id}" class="btn btn-detail action-full-width"><i class="fas fa-eye"></i> Detail</a>
-                                ${isPending ? `
-                                <div class="action-buttons-list action-buttons-split">
-                                    <button class="btn btn-ijo" onclick="showApproveModal(${item.booking_id})"><i class="fas fa-check"></i> Setuju</button>
-                                    <button class="btn btn-danger" onclick="showRejectModal(${item.booking_id})"><i class="fas fa-times"></i> Tolak</button>
-                                </div>
-                                ` : ''}
+                        <div class="action-buttons-list action-buttons-vertical">
+                            <a href="detail_peminjaman.html?id=${item.booking_id}" class="btn btn-detail "><i class="fas fa-eye"></i> Detail</a>
+                            ${isPending ? `
+                            <div class="action-buttons-list action-buttons-split">
+                                <button class="btn btn-ijo" onclick="showApproveModal(${item.booking_id})"><i class="fas fa-check"></i> Setuju</button>
+                                <button class="btn btn-danger" onclick="showRejectModal(${item.booking_id})"><i class="fas fa-times"></i> Tolak</button>
                             </div>
-                        `;
+                            ` : ''}
+                        </div>
+                    `;
                     });
+
+                    filterByDateRange();
+
                 } else {
-                    showStatusMessage(result.message || 'Format data dari server tidak valid.');
-                    tableBody.innerHTML = '<tr><td colspan="9" style="color: red;">Error: Data gagal diurai. Cek format backend.</td></tr>';
+                    tableBody.innerHTML = '<tr><td colspan="8" style="color: red;">Format data salah.</td></tr>';
                 }
 
             } catch (error) {
-                console.error('Fetch Error:', error);
-                showStatusMessage(`Terjadi kesalahan jaringan: ${error.message}`);
-                tableBody.innerHTML = '<tr><td colspan="9" style="color: red;">Error Jaringan: Gagal terhubung ke API.</td></tr>';
+                console.error(error);
+                tableBody.innerHTML = '<tr><td colspan="8" style="color: red;">Gagal terhubung ke API.</td></tr>';
             }
         }
 
-        // --- FUNGSI AKSI (APPROVE/REJECT) ---
+        // --- 3. FILTER RANGE TANGGAL (Diperbaiki: Menggunakan atribut data-date) ---
+        function filterByDateRange() {
+            const startDateVal = document.getElementById('startDate').value;
+            const endDateVal = document.getElementById('endDate').value;
+            const rows = document.querySelectorAll('#peminjamanTableBody tr.data-row');
+            const tableBody = document.getElementById('peminjamanTableBody');
+
+            const existingNoData = document.getElementById('noDataRow');
+            if (existingNoData) existingNoData.remove();
+
+            let visibleCount = 0;
+
+            rows.forEach(row => {
+                // Ambil data tanggal mentah dari atribut data-date di kolom Tanggal & Waktu (Kolom ke-5)
+                const dateCell = row.cells[4].getAttribute('data-date');
+                let show = true;
+
+                if (dateCell) {
+                    if (startDateVal && dateCell < startDateVal) {
+                        show = false;
+                    }
+                    if (endDateVal && dateCell > endDateVal) {
+                        show = false;
+                    }
+                } else {
+                    // Jika data-date tidak ada, sembunyikan untuk amannya
+                    show = false;
+                }
+
+
+                if (show) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            if (visibleCount === 0 && rows.length > 0) {
+                const noRow = `<tr id="noDataRow" class="no-result-row"><td colspan="8" style="text-align:center; padding: 20px;">
+                <i class="fas fa-calendar-times" style="font-size: 24px; margin-bottom: 10px; display:block;"></i>
+                Tidak ada peminjaman di rentang tanggal tersebut.
+            </td></tr>`;
+                tableBody.insertAdjacentHTML('beforeend', noRow);
+            }
+        }
+
+        // Event Listener untuk Filter
+        document.getElementById('startDate').addEventListener('change', filterByDateRange);
+        document.getElementById('endDate').addEventListener('change', filterByDateRange);
+
+        // Tombol Reset
+        document.getElementById('btnResetFilter').addEventListener('click', function () {
+            document.getElementById('startDate').value = '';
+            document.getElementById('endDate').value = '';
+            filterByDateRange(); // Reset tampilan tabel
+
+            // Tambahkan Notifikasi Toast
+            showToast('Filter rentang tanggal telah di-reset.', 'info');
+
+            // Logika tampilan filter
+            const btnToggleFilter = document.getElementById('btnToggleFilter');
+            const dateFilterSection = document.getElementById('dateFilterSection');
+            if (dateFilterSection) dateFilterSection.classList.remove('show');
+            if (btnToggleFilter) btnToggleFilter.classList.remove('active');
+        });
+
+
+        // --- 4. FUNGSI MODAL & AKSI (Mengganti showStatusMessage) ---
         let currentBookingId = null;
 
         function showApproveModal(id) {
@@ -218,129 +374,106 @@
             document.getElementById('approveIdDisplay').textContent = id;
             document.getElementById('approveModal').style.display = 'flex';
         }
-
-        function closeApproveModal() {
-            document.getElementById('approveModal').style.display = 'none';
-        }
+        function closeApproveModal() { document.getElementById('approveModal').style.display = 'none'; }
 
         function showRejectModal(id) {
             currentBookingId = id;
             document.getElementById('rejectIdDisplay').textContent = id;
-            document.getElementById('rejectionReason').value = ''; // Reset alasan
+            document.getElementById('rejectionReason').value = '';
             document.getElementById('rejectModal').style.display = 'flex';
         }
-
-        function closeRejectModal() {
-            document.getElementById('rejectModal').style.display = 'none';
-        }
+        function closeRejectModal() { document.getElementById('rejectModal').style.display = 'none'; }
 
         async function approvePeminjaman() {
             if (!currentBookingId) return;
-
             const formData = new FormData();
             formData.append('booking_id', currentBookingId);
-
-            closeApproveModal(); // Tutup modal saat proses dimulai
+            closeApproveModal();
 
             try {
-                const response = await fetch(BASE_API_URL + 'approve.php', {
-                    method: 'POST',
-                    body: formData
-                });
+                const response = await fetch(BASE_API_URL + 'approve.php', { method: 'POST', body: formData });
                 const result = await response.json();
-
                 if (result.success) {
-                    showStatusMessage('Peminjaman berhasil disetujui.', 'success');
-                    fetchPeminjaman(); // Muat ulang data
+                    // Notifikasi Toast
+                    showToast(`Peminjaman ID #${currentBookingId} berhasil disetujui.`, 'success');
+                    fetchPeminjaman(); // Memuat ulang data
                 } else {
-                    showStatusMessage(`Gagal menyetujui: ${result.message}`);
+                    showToast(`Gagal menyetujui: ${result.message}`, 'error');
                 }
-
-            } catch (error) {
-                console.error('Approve Error:', error);
-                showStatusMessage('Error jaringan saat menyetujui peminjaman.');
-            }
+            } catch (error) { showToast('Error jaringan saat menyetujui peminjaman.', 'error'); }
         }
 
         async function rejectPeminjaman() {
             if (!currentBookingId) return;
-
             const reason = document.getElementById('rejectionReason').value.trim();
-            if (reason.length < 5) {
-                alert("Alasan penolakan harus diisi minimal 5 karakter.");
-                return;
-            }
+            if (reason.length < 5) { showToast("Alasan penolakan minimal 5 karakter.", 'error'); return; }
 
             const formData = new FormData();
             formData.append('booking_id', currentBookingId);
             formData.append('reason', reason);
-
-            closeRejectModal(); // Tutup modal saat proses dimulai
+            closeRejectModal();
 
             try {
-                const response = await fetch(BASE_API_URL + 'reject.php', {
-                    method: 'POST',
-                    body: formData
-                });
+                const response = await fetch(BASE_API_URL + 'reject.php', { method: 'POST', body: formData });
                 const result = await response.json();
-
                 if (result.success) {
-                    showStatusMessage('Peminjaman berhasil ditolak.', 'success');
-                    fetchPeminjaman(); // Muat ulang data
+                    // Notifikasi Toast
+                    showToast(`Peminjaman ID #${currentBookingId} berhasil ditolak.`, 'success');
+                    fetchPeminjaman(); // Memuat ulang data
                 } else {
-                    showStatusMessage(`Gagal menolak: ${result.message}`);
+                    showToast(`Gagal menolak: ${result.message}`, 'error');
                 }
-
-            } catch (error) {
-                console.error('Reject Error:', error);
-                showStatusMessage('Error jaringan saat menolak peminjaman.');
-            }
+            } catch (error) { showToast('Error jaringan saat menolak peminjaman.', 'error'); }
         }
 
-        // --- LOGIKA UTAMA & LOGOUT ---
-        document.addEventListener('DOMContentLoaded', fetchPeminjaman);
-
-        // Logika Logout
+        // --- INIT & LOGOUT (SAMA) ---
         const logoutModal = document.getElementById('logoutModal');
         const logoutTrigger = document.getElementById('logoutTrigger');
         const cancelLogoutBtn = document.getElementById('cancelLogoutBtn');
         const confirmLogoutBtn = document.getElementById('confirmLogoutBtn');
 
-        logoutTrigger.addEventListener('click', (e) => {
-            e.preventDefault();
-            logoutModal.style.display = 'flex';
-        });
-
-        cancelLogoutBtn.addEventListener('click', () => {
-            logoutModal.style.display = 'none';
-        });
+        logoutTrigger.addEventListener('click', (e) => { e.preventDefault(); logoutModal.style.display = 'flex'; });
+        cancelLogoutBtn.addEventListener('click', () => { logoutModal.style.display = 'none'; });
 
         confirmLogoutBtn.addEventListener('click', async () => {
-            const url = '../../../backend/api/auth/logout.php';
-
             try {
-                await fetch(url, {
-                    method: 'POST',
-                });
+                await fetch('../../../backend/api/auth/logout.php', { method: 'POST' });
                 window.location.href = '../../public/index.html';
-
-            } catch (error) {
-                console.error('Logout Error:', error);
-                window.location.href = '../../public/index.html';
-            }
+            } catch (error) { window.location.href = '../../public/index.html'; }
         });
 
-        // Tutup modal jika klik di luar area modal
+        document.addEventListener('DOMContentLoaded', function () {
+            fetchPeminjaman(); // Panggil fungsi fetch data lama
+
+            const btnToggleFilter = document.getElementById('btnToggleFilter');
+            const dateFilterSection = document.getElementById('dateFilterSection');
+
+            if (!btnToggleFilter || !dateFilterSection) {
+                console.error("Error: Element filter tidak ditemukan!");
+                return;
+            }
+
+            btnToggleFilter.addEventListener('click', function () {
+                dateFilterSection.classList.toggle('show');
+                this.classList.toggle('active');
+            });
+
+            window.addEventListener('click', function (e) {
+                if (!dateFilterSection.contains(e.target) && !btnToggleFilter.contains(e.target)) {
+                    if (dateFilterSection.classList.contains('show')) {
+                        dateFilterSection.classList.remove('show');
+                        btnToggleFilter.classList.remove('active');
+                    }
+                }
+            });
+        });
+
         window.addEventListener('click', (e) => {
-            if (e.target === logoutModal) {
-                logoutModal.style.display = 'none';
-            }
-            if (e.target === rejectModal) {
-                rejectModal.style.display = 'none';
-            }
-            if (e.target === approveModal) {
-                approveModal.style.display = 'none';
-            }
+            if (e.target === logoutModal) logoutModal.style.display = 'none';
+            const rejectModal = document.getElementById('rejectModal');
+            const approveModal = document.getElementById('approveModal');
+            if (rejectModal && e.target === rejectModal) rejectModal.style.display = 'none';
+            if (approveModal && e.target === approveModal) approveModal.style.display = 'none';
         });
     </script>
 </body>
