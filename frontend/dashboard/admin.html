@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="../assets/css/cssadmin.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
         /* --- STYLE TAMBAHAN --- */
@@ -93,6 +94,32 @@
         .info-tertiary { font-size: 0.75rem; color: #aaa; margin-top: 4px; display: block; font-style: italic;}
         .cell-wrap { white-space: normal; min-width: 200px; max-width: 300px; line-height: 1.5; }
         .td-icon { color: #ccc; margin-right: 5px; width: 15px; text-align: center;}
+
+        /* --- 2. STYLE UNTUK GRAFIK (SISIPAN BARU) --- */
+        .charts-section { margin-bottom: 30px; }
+        .charts-grid { display: flex; gap: 25px; flex-wrap: wrap; }
+        
+        .chart-card {
+            background: #fff; border-radius: 12px; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            border: 1px solid #eee; padding: 25px;
+            flex: 1;
+        }
+        
+        .chart-header {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
+        }
+        .chart-title { font-weight: 600; color: #444; font-size: 1rem; margin: 0; }
+        
+        /* Ukuran Canvas */
+        .canvas-container-trend { position: relative; height: 300px; width: 100%; }
+        .canvas-container-status { position: relative; height: 250px; width: 100%; display: flex; justify-content: center; }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 992px) {
+            .charts-grid { flex-direction: column; }
+            .chart-card { width: 100%; }
+        }
     </style>
 </head>
 
@@ -138,6 +165,36 @@
                     <i class="fas fa-newspaper"></i> <h2 id="statKonten">-</h2> <p>Total Berita & Konten</p>
                 </div>
             </a>
+        </div>
+
+        <div class="charts-section">
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h3 style="margin: 0; color: #333; font-size: 1.5rem;">Laporan Mingguan</h3>
+                <button class="btn-refresh" onclick="loadDashboardStats()">
+                    <i class="fas fa-sync-alt" id="chartRefreshIcon"></i> Refresh Grafik
+                </button>
+            </div>
+
+            <div class="charts-grid">
+                <div class="chart-card" style="flex: 2; min-width: 320px;">
+                    <div class="chart-header">
+                        <h4 class="chart-title">Grafik Peminjaman (7 Hari Terakhir)</h4>
+                    </div>
+                    <div class="canvas-container-trend">
+                        <canvas id="trendChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card" style="flex: 1; min-width: 280px;">
+                    <div class="chart-header">
+                        <h4 class="chart-title">Komposisi Status Peminjaman</h4>
+                    </div>
+                    <div class="canvas-container-status">
+                        <canvas id="statusChart"></canvas>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="data-section">
@@ -219,31 +276,142 @@
         const statusSelect = document.getElementById('filterStatus');
         const refreshBtn = document.getElementById('btnRefresh');
 
+        // Variabel Chart
+        let trendChartInstance = null;
+        let statusChartInstance = null;
+
         // --- 1. FUNGSI LOAD STATISTIK & NAMA ADMIN ---
         async function loadDashboardStats() {
+            // Tambahkan baris ini untuk efek loading icon
+            const icon = document.getElementById('chartRefreshIcon');
+            if(icon) icon.classList.add('fa-spin');
+
             try {
+                // Debugging: Cek apakah Chart.js sudah aktif
+                if (typeof Chart === 'undefined') {
+                    console.error("ERROR: Library Chart.js belum dimuat!");
+                    alert("Gagal memuat Grafik: Library Chart.js tidak ditemukan.");
+                    return;
+                }
+
                 const response = await fetch(STATS_API_URL);
                 const result = await response.json();
 
+                console.log("Data Statistik Diterima:", result);
+
                 if (result.success) {
                     // Update Nama di Header
-                    document.getElementById('welcomeName').textContent = result.data.name;
+                    document.getElementById('welcomeName').textContent = result.admin_name;
 
                     // Update Angka Statistik
-                    document.getElementById('statPeminjaman').textContent = result.data.peminjaman;
-                    document.getElementById('statPublikasi').textContent = result.data.publikasi;
-                    document.getElementById('statKonten').textContent = result.data.konten;
+                    document.getElementById('statPeminjaman').textContent = result.total_peminjaman;
+                    document.getElementById('statPublikasi').textContent = result.total_publikasi;
+                    document.getElementById('statKonten').textContent = result.total_konten;
+
+                    // Update Grafik
+                    if (result.chart_trend && result.chart_status) {
+                        renderTrendChart(result.chart_trend);
+                        renderStatusChart(result.chart_status);
+                    } else {
+                        console.warn("Data grafik kosong atau format salah dari API.");
+                    }
                 }
             } catch (error) {
                 console.error("Gagal memuat statistik:", error);
+            } finally {
+                // BERHENTI MUTER (Wajib di dalam finally)
+                if (icon) {
+                    setTimeout(() => {
+                        icon.classList.remove('fa-spin');
+                    }, 500);
+                }
             }
+        }
+
+        // --- RENDER BAR CHART (TREN) ---
+        function renderTrendChart(data) {
+            const canvas = document.getElementById('trendChart');
+            if (!canvas) { console.error("Canvas #trendChart tidak ditemukan di HTML!"); return; }
+            
+            const ctx = canvas.getContext('2d');
+            if (trendChartInstance) trendChartInstance.destroy();
+
+            trendChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: 'Jumlah Booking',
+                        data: data.data,
+                        backgroundColor: '#3b82f6', // Biru
+                        borderRadius: 5,
+                        barPercentage: 0.6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { 
+                            beginAtZero: true, 
+                            ticks: { stepSize: 1 } 
+                        },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        // --- RENDER DOUGHNUT CHART (STATUS) ---
+        function renderStatusChart(data) {
+            const canvas = document.getElementById('statusChart');
+            if (!canvas) { console.error("Canvas #statusChart tidak ditemukan di HTML!"); return; }
+
+            const ctx = canvas.getContext('2d');
+            if (statusChartInstance) statusChartInstance.destroy();
+
+            // Handle data kosong agar grafik tidak blank/error
+            let chartData = data.data;
+            let chartLabels = data.labels;
+            let chartColors = data.colors;
+            
+            const total = chartData.reduce((a, b) => a + b, 0);
+            if (total === 0) {
+                chartLabels = ['Belum ada data'];
+                chartData = [1]; // Dummy value
+                chartColors = ['#e5e7eb']; // Abu-abu
+            }
+
+            statusChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: chartLabels,
+                    datasets: [{
+                        data: chartData,
+                        backgroundColor: chartColors,
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { usePointStyle: true, padding: 15 } }
+                    }
+                }
+            });
         }
 
         // --- 2. FUNGSI LOAD DATA TABEL ---
         async function loadHistory(isRefresh = false) {
+            const icon = document.getElementById('tableRefreshIcon'); // ID Icon Tabel
+
             if (isRefresh && refreshBtn) {
                 refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
                 refreshBtn.disabled = true;
+                if(icon) icon.classList.add('fa-spin');
             }
 
             const searchVal = searchInput.value;
