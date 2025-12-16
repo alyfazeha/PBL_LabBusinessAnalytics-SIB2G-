@@ -4,9 +4,14 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 header("Content-Type: application/json");
-// Tetap matikan display_errors di production, tapi kita tambahkan untuk debug
 ini_set('display_errors', 0);
 error_reporting(E_ALL);
+
+// --- FUNGSI GENERATE PASSWORD ACAK (DISALIN DARI MAHASISWA) ---
+function generateRandomPassword($length = 8) {
+    $chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    return substr(str_shuffle($chars), 0, $length);
+}
 
 try {
     // FIX PATH: Mundur 2 langkah
@@ -27,12 +32,10 @@ try {
     $scholar_url = trim($_POST['scholar_url'] ?? "");
     $sinta_url = trim($_POST['sinta_url'] ?? "");
 
-    // --- PERBAIKAN NIP ---
     $nip = trim($_POST['nip'] ?? "");
     if ($nip === "" || $nip === "-") {
         $nip = null;
     }
-    // ---------------------
 
     $prodi = trim($_POST['prodi'] ?? "");
     $pendidikan = trim($_POST['pendidikan'] ?? "");
@@ -47,8 +50,11 @@ try {
         throw new Exception("NIDN, Nama, dan Email wajib diisi.");
     }
 
+    // Ambil Link Foto Manual (jika ada)
+    $foto_path_input = trim($_POST['foto_path'] ?? "");
+
     // ---------------------------------------------------------
-    // 2. LOGIKA UPLOAD FOTO (DIRAPIKAN & DIPERKUAT)
+    // 2. LOGIKA UPLOAD FOTO 
     // ---------------------------------------------------------
     $final_foto_path = $foto_path_input;
 
@@ -108,7 +114,9 @@ try {
     try {
         $user_id_to_use = null;
         $is_new_user = false;
-        $initial_password_text = "dosen123"; // Password default
+        
+        // --- BUAT PASSWORD ACAK UNTUK AKUN BARU ---
+        $initial_password_text = generateRandomPassword(8); 
 
         // Cek User Existing
         $stmtCheck = $db->prepare("SELECT user_id FROM users WHERE username = :u LIMIT 1");
@@ -120,11 +128,6 @@ try {
         } else {
             // Logika pembuatan user baru dan password default
             $is_new_user = true;
-            
-            // --- PERUBAHAN DI SINI: GENERATE PASSWORD ACAK ---
-            $initial_password_text = substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, 8);
-            // --- END PERUBAHAN ---
-            
             $default_password_hash = password_hash($initial_password_text, PASSWORD_BCRYPT);
             
             $sqlUser = "INSERT INTO users (username, password_hash, role, email, display_name, created_at) 
@@ -150,11 +153,13 @@ try {
         $sqlDosen = "INSERT INTO dosen (
                          nidn, user_id, nama, jabatan, email, foto_path,
                          researchgate_url, scholar_url, sinta_url, 
-                         nip, prodi, pendidikan, sertifikasi, mata_kuliah
+                         nip, prodi, pendidikan, sertifikasi, mata_kuliah,
+                         initial_password
                     ) VALUES (
                          :nidn, :user_id, :nama, :jabatan, :email, :foto_path,
                          :researchgate_url, :scholar_url, :sinta_url,
-                         :nip, :prodi, :pendidikan, :sertifikasi, :mata_kuliah
+                         :nip, :prodi, :pendidikan, :sertifikasi, :mata_kuliah,
+                         :init_pass
                     )";
 
         $stmtDosen = $db->prepare($sqlDosen);
@@ -172,7 +177,8 @@ try {
             ':prodi' => $prodi,
             ':pendidikan' => $pendidikan,
             ':sertifikasi' => $sertifikasi,
-            ':mata_kuliah' => $mata_kuliah
+            ':mata_kuliah' => $mata_kuliah,
+            ':init_pass' => $initial_password_text
         ]);
 
         $db->commit();
@@ -181,6 +187,7 @@ try {
         $success_message = 'Berhasil menyimpan data dosen!';
         
         if ($is_new_user) {
+            // Memberikan informasi password acak kepada Admin
             $success_message .= " AKUN BARU DIBUAT: Username: $nidn, Password Default: $initial_password_text";
         }
         
@@ -192,7 +199,6 @@ try {
         echo json_encode(['success' => false, 'message' => 'Error Transaksi Database: ' . $ex->getMessage()]);
     }
 } catch (Exception $e) {
-    // Error diluar transaksi (validasi, upload, koneksi)
     $statusCode = http_response_code();
     if ($statusCode === 200) { $statusCode = 500; http_response_code(500); }
     

@@ -17,7 +17,7 @@
 
         .data-table {
             width: 100%;
-            min-width: 950px;
+            min-width: 1050px;
             border-collapse: collapse;
         }
 
@@ -48,40 +48,64 @@
         }
 
         /* Mengatur lebar spesifik untuk kolom */
+        /* Kolom 1: Foto */
         .data-table th:nth-child(1),
         .data-table td:nth-child(1) {
             width: 60px;
             text-align: center;
         }
 
+        /* Kolom 2: NIDN */
         .data-table th:nth-child(2),
         .data-table td:nth-child(2) {
             width: 100px;
             word-break: break-all;
         }
 
+        /* Kolom 3: NIP */
         .data-table th:nth-child(3),
         .data-table td:nth-child(3) {
-            width: 120px;
+            width: 100px;
             word-break: break-all;
         }
 
+        /* Kolom 4: Nama Lengkap */
         .data-table th:nth-child(4),
         .data-table td:nth-child(4) {
             width: 180px;
         }
 
+        /* Kolom 5: Password Awal (Posisi Baru) */
         .data-table th:nth-child(5),
         .data-table td:nth-child(5) {
+            width: 120px; 
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+        
+        /* Kolom 6: Email (Posisi Baru) */
+        .data-table th:nth-child(6),
+        .data-table td:nth-child(6) {
             width: 150px;
             font-size: 0.9em;
             word-break: break-all;
         }
-
-        .data-table th:nth-child(8),
-        .data-table td:nth-child(8) {
+        
+        /* Kolom 9: Aksi (Kolom terakhir) */
+        .data-table th:last-child,
+        .data-table td:last-child {
             width: 140px;
             text-align: center;
+        }
+
+        /* Atur ulang lebar untuk Jabatan dan Prodi yang tersisa */
+        .data-table th:nth-child(7), /* Jabatan */
+        .data-table td:nth-child(7) {
+            width: 100px;
+        }
+        .data-table th:nth-child(8), /* Prodi */
+        .data-table td:nth-child(8) {
+            width: 100px;
         }
 
         .action-buttons {
@@ -164,15 +188,14 @@
                             <th>NIDN</th>
                             <th>NIP</th>
                             <th>Nama Lengkap</th>
-                            <th>Email</th>
-                            <th>Jabatan</th>
+                            <th>Password Awal</th> <th>Email</th> <th>Jabatan</th>
                             <th>Prodi</th>
                             <th style="text-align: center;">Aksi</th>
                         </tr>
                     </thead>
                     <tbody id="dosenTableBody">
                         <tr>
-                            <td colspan="8" style="text-align: center;">Memuat data dosen...</td>
+                            <td colspan="9" style="text-align: center;">Memuat data dosen...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -261,7 +284,7 @@
         // --- FUNGSI RENDER TABEL ---
         function renderDosen(dosenArray) {
             let html = '';
-            const totalCols = 8;
+            const totalCols = 9; // Jumlah kolom tetap 9
             const DEFAULT_IMG_URL = 'https://via.placeholder.com/50?text=No+Img'; 
             const ERROR_IMG_URL = 'https://via.placeholder.com/50?text=Error'; 
             const LOCAL_BASE_PATH = '../../'; // Mundur 2 level dari /admin/dosen/
@@ -288,6 +311,9 @@
 
                 const nipText = dosen.nip ? dosen.nip : '-';
                 const emailText = dosen.email ? dosen.email : '-';
+                // Ambil initial password
+                const passwordText = dosen.initial_password ? dosen.initial_password : '-'; 
+
 
                 html += `
                     <tr>
@@ -302,8 +328,8 @@
                         <td>${dosen.nidn}</td>
                         <td>${nipText}</td>
                         <td>${dosen.nama}</td>
-                        <td>${emailText}</td>
-                        <td>${dosen.jabatan}</td>
+                        
+                        <td>${passwordText}</td> <td>${emailText}</td> <td>${dosen.jabatan}</td>
                         <td>${dosen.prodi}</td>
                         
                         <td class="action-buttons">
@@ -359,7 +385,7 @@
 
         // --- FUNGSI FETCH DATA (READ) ---
         async function fetchDosen() {
-            dosenTableBody.innerHTML = `<tr><td colspan="8" style="text-align: center;">Memuat data...</td></tr>`;
+            dosenTableBody.innerHTML = `<tr><td colspan="9" style="text-align: center;">Memuat data...</td></tr>`;
 
             const url = '../../../backend/api/dosen/list.php';
 
@@ -378,7 +404,7 @@
 
             } catch (error) {
                 console.error('Error fetching Dosen:', error);
-                dosenTableBody.innerHTML = `<tr><td colspan="8" style="color: red; text-align: center;">Gagal memuat data Dosen. Cek koneksi server API.</td></tr>`;
+                dosenTableBody.innerHTML = `<tr><td colspan="9" style="color: red; text-align: center;">Gagal memuat data Dosen. Cek koneksi server API.</td></tr>`;
             }
         }
 
