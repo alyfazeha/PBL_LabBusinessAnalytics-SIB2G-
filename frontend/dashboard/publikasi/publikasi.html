@@ -10,40 +10,16 @@
     <link rel="stylesheet" href="../../assets/css/cssadmin.css">
     <link rel="stylesheet" href="../../assets/css/cssmahasiswa.css">
     <style>
-        .filter-container {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-            align-items: center;
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid #e9ecef;
-            flex-wrap: wrap;
-        }
-
-        .filter-group {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .filter-group label {
-            font-size: 12px;
+        /* 2. Kolom Judul (Kedua) - Dibuat tebal */
+        .data-table tr td:nth-child(2) {
             font-weight: 600;
-            margin-bottom: 5px;
-            color: #666;
-        }
-
-        .filter-select {
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            min-width: 150px;
+            color: #1a1a1a;
         }
     </style>
 </head>
 
 <body>
+    <div id="toastNotificationContainer"></div>
 
     <div class="sidebar">
         <div class="logo-area">
@@ -62,44 +38,53 @@
 
     <div class="main-content">
         <header>
-            <h1>Data Publikasi</h1>
+            <div class="header-title">
+                <h2>Kelola Publikasi</h2>
+            </div>
+
+            <div class="header-actions-group">
+                <button id="btnToggleFilter" class="btn btn-secondary">
+                    <i class="fas fa-filter"></i> Filter
+                </button>
+                <a href="tambah_publikasi.html" class="btn btn-primary btn-add"><i class="fas fa-plus"></i> Tambah
+                    Publikasi</a>
+            </div>
+
+            <div class="filter-section" id="dateFilterSection">
+                <div class="filter-group">
+                    <label for="filterFocus"><i class="fas fa-lightbulb"></i> Fokus Riset:</label>
+                    <select id="filterFocus" class="filter-select">
+                        <option value="">Semua</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filterKategori"><i class="fas fa-tags"></i> Kategori:</label>
+                    <select id="filterKategori" class="filter-select">
+                        <option value="">Semua</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="filterTahun"><i class="fas fa-calendar-alt"></i> Tahun:</label>
+                    <select id="filterTahun" class="filter-select">
+                        <option value="">Semua</option>
+                    </select>
+                </div>
+                <button id="btnResetFilter" class="btn-reset">
+                    <i class="fas fa-sync-alt"></i> Reset
+                </button>
+            </div>
         </header>
 
-        <div class="data-section">
-            <div id="message" class="message-area" style="display: none;"></div>
-
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <a href="tambah_publikasi.html" class="add-button"><i class="fas fa-plus"></i> Tambah Publikasi</a>
-            </div>
-
-            <div class="filter-container">
-                <div class="filter-group">
-                    <label for="filterFocus">Fokus Riset:</label>
-                    <select id="filterFocus" class="filter-select">
-                        <option value="">-- Semua --</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label for="filterKategori">Kategori:</label>
-                    <select id="filterKategori" class="filter-select">
-                        <option value="">-- Semua --</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label for="filterTahun">Tahun:</label>
-                    <select id="filterTahun" class="filter-select">
-                        <option value="">-- Semua --</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="data-table-container">
+        <main>
+            <div class="table-wrapper">
                 <table class="data-table">
                     <thead>
                         <tr>
                             <th>ID</th>
                             <th>Judul Publikasi</th>
-                            <th>Tahun</th> <th>Kategori</th>
+                            <th>Tahun</th>
+                            <th>Kategori</th>
                             <th>Fokus Riset</th>
                             <th>Dosen (NIDN)</th>
                             <th>Status</th>
@@ -113,7 +98,7 @@
                     </tbody>
                 </table>
             </div>
-        </div>
+        </main>
     </div>
 
     <div id="logoutModal" class="modal">
@@ -126,12 +111,32 @@
     </div>
 
     <script>
+        // FUNGSI TOAST NOTIFICATION
+        function showToast(type, text) {
+            const container = document.getElementById('toastNotificationContainer');
+            if (!container) return;
+
+            const toast = document.createElement('div');
+            toast.className = `toast-notification ${type}`;
+            toast.innerHTML = `<div class="message-content">${text}</div>`;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.add('show');
+            }, 10);
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+                toast.addEventListener('transitionend', () => {
+                    toast.remove();
+                });
+            }, 5000); // Durasi 5 detik
+        }
+
+        // FUNGSI DISPLAY MESSAGE (DIADAPTASI KE TOAST)
         function displayMessage(type, message) {
-            const messageArea = document.getElementById('message');
-            messageArea.textContent = message;
-            messageArea.className = 'message-area ' + type;
-            messageArea.style.display = 'block';
-            setTimeout(() => { messageArea.style.display = 'none'; }, 5000);
+            showToast(type, message);
         }
 
         const tableBody = document.getElementById('publikasiTableBody');
@@ -143,51 +148,65 @@
                 const resFocus = await fetch('../../../backend/api/research/list.php');
                 const dataFocus = await resFocus.json();
                 const selectFocus = document.getElementById('filterFocus');
-                if (dataFocus.status === 'success') {
+
+                selectFocus.innerHTML = '<option value="">Semua</option>';
+
+                if (dataFocus.status === 'success' && dataFocus.data) {
                     dataFocus.data.forEach(item => {
                         selectFocus.innerHTML += `<option value="${item.nama_fokus}">${item.nama_fokus}</option>`;
                     });
+                } else if (dataFocus.message) {
+                    console.error('Filter Fokus Error:', dataFocus.message);
                 }
 
                 // Fetch Kategori
                 const resKat = await fetch('../../../backend/api/publikasi/kategori_list.php');
                 const dataKat = await resKat.json();
                 const selectKat = document.getElementById('filterKategori');
-                if (dataKat.status === 'success') {
+
+                selectKat.innerHTML = '<option value="">Semua</option>';
+
+                if (dataKat.status === 'success' && dataKat.data) {
                     dataKat.data.forEach(item => {
                         selectKat.innerHTML += `<option value="${item.nama_kategori}">${item.nama_kategori}</option>`;
                     });
+                } else if (dataKat.message) {
+                    console.error('Filter Kategori Error:', dataKat.message);
                 }
-            } catch (error) { console.error('Filter Error:', error); }
+            } catch (error) { console.error('Filter Koneksi Error:', error); }
         }
 
         async function fetchPublikasi() {
             try {
+                tableBody.innerHTML = '<tr><td colspan="8" style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> Sedang memuat data...</td></tr>';
+
                 const response = await fetch('../../../backend/api/publikasi/list.php');
                 const result = await response.json();
 
-                if (result.status === 'success') {
+                if (result.status === 'success' && result.data) {
                     allPublikasiData = result.data;
-                    populateYearFilter(allPublikasiData); // Isi filter tahun otomatis
+                    populateYearFilter(allPublikasiData);
                     renderTable(allPublikasiData);
+                } else if (result.status === 'error') {
+                    displayMessage('error', 'Gagal memuat data publikasi: ' + result.message);
+                    tableBody.innerHTML = '<tr><td colspan="8" style="text-align:center;">Gagal memuat data: ' + (result.message || 'Error API') + '</td></tr>';
                 } else {
                     tableBody.innerHTML = '<tr><td colspan="8" style="text-align:center;">Tidak ada data.</td></tr>';
                 }
             } catch (error) {
                 console.error('Fetch Error:', error);
+                displayMessage('error', 'Gagal memuat data. Periksa koneksi ke API.');
                 tableBody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:red;">Gagal memuat data API.</td></tr>';
             }
         }
 
-        // [BARU] Fungsi isi dropdown tahun berdasarkan data yang ada
         function populateYearFilter(data) {
             const selectYear = document.getElementById('filterTahun');
-            // Ambil tahun unik, hilangkan null/kosong, urutkan descending
             const years = [...new Set(data.map(item => item.tahun))]
-                          .filter(y => y != null && y != "" && y != 0)
-                          .sort((a, b) => b - a);
-            
-            selectYear.innerHTML = '<option value="">-- Semua --</option>';
+                .filter(y => y != null && y != "" && y != 0)
+                .sort((a, b) => b - a);
+
+            selectYear.innerHTML = '<option value="">Semua</option>';
             years.forEach(y => {
                 selectYear.innerHTML += `<option value="${y}">${y}</option>`;
             });
@@ -205,34 +224,68 @@
                 const row = tableBody.insertRow();
                 const id = item.publikasi_id || item.id;
 
-                let statusBadge = '<span class="status-pending">Pending</span>';
-                if (item.status === 'published') statusBadge = '<span class="status-published" style="background:#d4edda; color:#155724; padding:2px 8px; border-radius:10px;">Published</span>';
-                else if (item.status === 'rejected') statusBadge = '<span class="status-rejected" style="background:#f8d7da; color:#721c24; padding:2px 8px; border-radius:10px;">Rejected</span>';
+                // LOGIKA STATUS
+                let statusBadge = '';
+                let statusText = 'Diajukan';
+                let statusClass = 'status-diajukan';
 
-                const namaFokus = item.nama_fokus ? `<span style="background:#e3f2fd; color:#0d47a1; padding:2px 6px; border-radius:4px; font-size:12px;">${item.nama_fokus}</span>` : '-';
+                if (item.status === 'published') {
+                    statusText = 'Disetujui';
+                    statusClass = 'status-disetujui';
+                } else if (item.status === 'rejected') {
+                    statusText = 'Ditolak';
+                    statusClass = 'status-ditolak';
+                }
+
+                statusBadge = `<span class="status-badge ${statusClass}">${statusText}</span>`;
+
+
+                // Kategori menggunakan category-badge
+                const namaKategori = item.nama_kategori ? `<span class="category-badge">${item.nama_kategori}</span>` : '-';
+
+                // Fokus Riset tampil sebagai teks biasa
+                const namaFokus = item.nama_fokus || '-';
+
                 const btnLink = item.external_link ? `<a href="${item.external_link}" target="_blank" class="btn btn-sm btn-info" title="Lihat Link"><i class="fas fa-link"></i></a>` : '';
-                const tahunPub = item.tahun || '-'; // Tampilkan tahun
+                const tahunPub = item.tahun || '-';
+
+                // PERUBAHAN: Kolom Dosen
+                const dosenNidn = item.dosen_nidn || '-';
+                const namaDosen = item.nama_dosen || 'Unknown';
+
+                const dosenHtml = `
+                    <p style="margin: 0; font-weight: 600; color: #1a1a1a;">
+                        <i class="fas fa-user-tie" style="margin-right: 5px; color: #4A90E2;"></i>${namaDosen}
+                    </p>
+                    <p style="margin: 0; font-size: 11px; color:#666; margin-top: 2px;">
+                        <span style="font-weight: 500;">NIDN:</span> ${dosenNidn}
+                    </p>
+                `;
+
 
                 row.innerHTML = `
-                    <td>${id}</td>
+                    <td>#${id}</td>
                     <td>${item.judul}</td>
-                    <td>${tahunPub}</td> <td>${item.nama_kategori || '-'}</td>
+                    <td>${tahunPub}</td> 
+                    <td>${namaKategori}</td>
                     <td>${namaFokus}</td>
+                    <td>${dosenHtml}</td> <td>${statusBadge}</td>
                     <td>
-                        <strong>${item.nama_dosen || 'Unknown'}</strong><br>
-                        <small style="color:#666;">${item.dosen_nidn || '-'}</small>
-                    </td>
-                    <td>${statusBadge}</td>
-                    <td>
-                        ${btnLink}
-                        <button onclick="verifyPublikasi(${id}, 'published')" class="btn btn-sm btn-success" title="Approve"><i class="fas fa-check"></i></button>
-                        <button onclick="verifyPublikasi(${id}, 'rejected')" class="btn btn-sm btn-secondary" title="Reject"><i class="fas fa-times"></i></button>
-                        
-                        <a href="edit_publikasi.html?id=${id}" class="btn btn-sm btn-warning" title="Edit" style="background-color: #ffc107; border:none; padding: 5px 10px; border-radius: 4px; color:white; text-decoration:none; display:inline-block;">
-                            <i class="fas fa-pencil-alt"></i>
-                        </a>
+                        <div class="action-buttons-list action-buttons-vertical">
+                            <div class="action-buttons-split">
+                                <button onclick="verifyPublikasi(${id}, 'published')" class="btn btn-sm btn-success" title="Approve"><i class="fas fa-check"></i></button>
+                                <button onclick="verifyPublikasi(${id}, 'rejected')" class="btn btn-sm btn-secondary" title="Reject"><i class="fas fa-times"></i></button>
+                            </div>
 
-                        <button onclick="deletePublikasi(${id}, '${item.judul}')" class="btn btn-danger btn-sm" title="Hapus"><i class="fas fa-trash-alt"></i></button>
+                            <div class="action-buttons-split">
+                                ${btnLink}
+                                <a href="edit_publikasi.html?id=${id}" class="btn btn-sm btn-warning" title="Edit">
+                                    <i class="fas fa-pencil-alt"></i>
+                                </a>
+
+                                <button onclick="deletePublikasi(${id}, '${item.judul.replace(/'/g, "\\'")}')" class="btn btn-danger btn-sm" title="Hapus"><i class="fas fa-trash-alt"></i></button>
+                            </div>
+                        </div>
                     </td>
                 `;
             });
@@ -246,20 +299,29 @@
             const filteredData = allPublikasiData.filter(item => {
                 const matchFocus = focusVal === "" || item.nama_fokus === focusVal;
                 const matchKat = katVal === "" || item.nama_kategori === katVal;
-                const matchYear = yearVal === "" || item.tahun == yearVal; // Logic filter tahun
+                const matchYear = yearVal === "" || item.tahun == yearVal;
                 return matchFocus && matchKat && matchYear;
             });
 
             renderTable(filteredData);
         }
 
+        // --- LOGIKA FILTER ACTION ---
         document.getElementById('filterFocus').addEventListener('change', applyFilters);
         document.getElementById('filterKategori').addEventListener('change', applyFilters);
-        document.getElementById('filterTahun').addEventListener('change', applyFilters); // Event listener tahun
+        document.getElementById('filterTahun').addEventListener('change', applyFilters);
+
+        document.getElementById('btnResetFilter').addEventListener('click', () => {
+            document.getElementById('filterFocus').value = "";
+            document.getElementById('filterKategori').value = "";
+            document.getElementById('filterTahun').value = "";
+            applyFilters();
+        });
+
 
         async function verifyPublikasi(id, status) {
             const actionName = status === 'published' ? 'Publish' : 'Reject';
-            if (!confirm(`Ubah status menjadi ${actionName}?`)) return;
+            if (!confirm(`Ubah status publikasi #${id} menjadi ${actionName}?`)) return;
 
             const formData = new FormData();
             formData.append('publikasi_id', id);
@@ -289,11 +351,36 @@
             } catch (error) { displayMessage('error', 'Gagal menghapus data.'); }
         }
 
+        // --- LOGIKA TOGGLE FILTER ---
         document.addEventListener('DOMContentLoaded', () => {
             fetchFilters();
             fetchPublikasi();
+
+            const btnToggleFilter = document.getElementById('btnToggleFilter');
+            const dateFilterSection = document.getElementById('dateFilterSection');
+
+            if (btnToggleFilter && dateFilterSection) {
+                // Toggle visibility on button click
+                btnToggleFilter.addEventListener('click', function () {
+                    dateFilterSection.classList.toggle('show');
+                    this.classList.toggle('active');
+                });
+
+                // Hide when clicking outside
+                window.addEventListener('click', function (e) {
+                    if (e.target.closest('.sidebar') || e.target.closest('#logoutModal')) return;
+
+                    if (!dateFilterSection.contains(e.target) && !btnToggleFilter.contains(e.target)) {
+                        if (dateFilterSection.classList.contains('show')) {
+                            dateFilterSection.classList.remove('show');
+                            btnToggleFilter.classList.remove('active');
+                        }
+                    }
+                });
+            }
         });
 
+        // --- LOGIKA LOGOUT ---\
         const logoutModal = document.getElementById('logoutModal');
         document.getElementById('logoutTrigger').onclick = (e) => { e.preventDefault(); logoutModal.classList.add('show'); };
         document.getElementById('cancelLogoutBtn').onclick = () => logoutModal.classList.remove('show');
@@ -303,4 +390,5 @@
         };
     </script>
 </body>
+
 </html>
