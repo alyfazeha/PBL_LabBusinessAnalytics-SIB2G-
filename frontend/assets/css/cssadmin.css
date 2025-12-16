@@ -187,6 +187,7 @@ header h1 {
     margin-bottom: 0px;
     flex-wrap: wrap;
     /* Penting untuk responsivitas */
+    border-top: 5px solid var(--primary-blue);
 }
 
 /* Container baru untuk tombol aksi di kanan */
@@ -338,50 +339,69 @@ header h1 {
     gap: 15px;
 }
 
-/* Grup untuk Ikon Filter dan Dropdown */
+/* 1. Gaya Dasar Container Filter (Putih, Border Biru, Teks Biru) */
 .filter-icon-group {
-    position: relative;
-    /* Menjadi acuan untuk position absolute */
     display: flex;
     align-items: center;
+    /* Vertikal center */
+    padding: 9px 15px;
+    /* Padding di dalam tombol */
+    border: 1px solid var(--primary-blue);
+    border-radius: 6px;
+    background-color: #ffffff;
+    color: var(--primary-blue);
+    /* Teks dan Icon Biru */
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 600;
+    margin-left: 10px;
+    /* Jarak dari elemen sebelumnya (optional) */
+    font-size: 14px;
+    gap: 3px;
+    margin-left: 10px;
+    height: 25px;
+    margin-right: -17px;
 }
 
-/* Styling Ikon Filter */
+/* 2. Style Icon Filter */
 .filter-icon {
-    /* Ikon diletakkan secara bebas di dalam .filter-icon-group */
-    position: absolute;
-    left: 10px;
-    /* Posisikan 10px dari kiri */
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 2;
-    /* Pastikan ikon di depan teks */
-    font-size: 1.1em;
-    color: #666;
+    font-size: 14px;
+    margin-right: 0px;
+    color: inherit;
+    /* Ikut warna container */
 }
 
 /* Styling Dropdown Select */
+/* 3. Style Dropdown Select (Menghilangkan tampilan native browser) */
 .filter-select {
-    /* Padding kiri (45px) memberi ruang untuk ikon. Padding kanan (40px) memberi ruang untuk panah. */
-    padding: 8px 40px 8px 45px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    height: 45px;
-    min-width: 180px;
-    /* Sedikit dilebarkan agar teks "Tampilkan Semua" muat */
-    font-size: 1em;
-    cursor: pointer;
-    background-color: #fcfcfc;
-    transition: border-color 0.3s, box-shadow 0.3s;
-
-    /* Optional: Memberi panah kustom pada dropdown */
+    /* Hapus tampilan dropdown native */
+    -webkit-appearance: none;
+    -moz-appearance: none;
     appearance: none;
-    /* Kunci untuk menyembunyikan panah bawaan browser */
-    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%20viewBox%3D%220%200%20292.4%20292.4%22%3E%3Cpath%20fill%3D%22%23666%22%20d%3D%22M287%20146.2c0-23.7-19.1-42.8-42.8-42.8H48.2c-23.7%200-42.8%2019.1-42.8%2042.8S24.5%20189%2048.2%20189h196c23.7%200%2042.8-19.1%2042.8-42.8z%22%2F%3E%3C%2Fsvg%3E');
-    background-repeat: no-repeat;
-    background-position: right 10px center;
-    /* Panah di kanan, 10px dari tepi */
-    background-size: 12px auto;
+
+    /* Buat transparan dan tanpa border */
+    background: transparent;
+    border: none;
+    color: inherit;
+    /* Ikut warna container */
+    font-family: inherit;
+    font-size: 14px;
+    padding: 0;
+    /* Sesuaikan padding agar terlihat rapi */
+    outline: none;
+    cursor: pointer;
+    /* Tambahkan icon panah custom jika diperlukan, 
+       tapi untuk gaya tombol seringkali panah bawaan dihapus. */
+    font-weight: 600;
+}
+
+/* 4. Gaya Hover (Background Biru, Teks Putih) */
+.filter-icon-group:hover {
+    background-color: var(--primary-blue);
+    color: #ffffff;
+    /* Teks dan icon menjadi putih */
+    border-color: var(--primary-blue);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .filter-select:hover {
@@ -606,6 +626,37 @@ header h1 {
     font-size: 14px;
 }
 
+/* ================== EFEK HOVER BARIS TABEL ================== */
+
+/* Menambahkan efek hover pada baris data (<tr>) */
+.data-table tbody tr {
+    transition: background-color 0.2s ease;
+    /* Transisi halus */
+}
+
+.data-table tbody tr:hover {
+    /* Menggunakan warna biru muda dari variabel yang sudah ada (light-blue) 
+       atau warna hex yang sangat tipis */
+    background-color: #eaf4ff;
+    /* Biru yang sangat tipis, cocok untuk highlight */
+    cursor: pointer;
+    /* Opsional: Mengubah kursor menjadi pointer */
+}
+
+/* Styling untuk Konsistensi Header Tabel */
+.data-table thead th {
+    background-color: var(--primary-blue);
+    /* Gunakan warna utama biru */
+    color: #ffffff;
+    /* Teks putih */
+    font-weight: 600;
+    text-align: left;
+    padding: 12px 15px;
+    font-size: 14px;
+    /* Ukuran yang ideal */
+    border-bottom: 2px solid #4a90e2;
+}
+
 .data-table th,
 .data-table td {
     padding: 15px 18px;
@@ -617,12 +668,34 @@ header h1 {
 }
 
 .data-table th {
-    background-color: var(--primary-blue);
-    color: white;
-    font-weight: 600;
-    text-transform: uppercase;
     font-size: 13px;
-    letter-spacing: 0.5px;
+    /* Lebih kecil dari data untuk hirarki */
+    font-weight: 600;
+    /* Bold */
+    text-transform: uppercase;
+    color: #666;
+    /* Warna header lebih terang dari data */
+    background-color: #f7f9fc;
+    /* Latar belakang header yang sangat tipis */
+    padding: 15px 15px;
+    border-bottom: 2px solid #eee;
+    /* Garis pemisah yang jelas */
+    text-align: left;
+}
+
+/* 2. Styling Sel Data (TD) */
+.data-table td {
+    /* Font umum */
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    /* Ukuran yang pas untuk data detail */
+    color: #444;
+    /* Warna teks yang lebih gelap dari gray muda */
+    padding: 12px 15px;
+    /* Tambah padding agar data tidak terlalu rapat */
+    vertical-align: middle;
+    /* Hilangkan border bawah pada td jika menggunakan border pada tr */
+    border-bottom: none;
 }
 
 /* Striping baris (membuat baris ganjil/genap berbeda warna) */
@@ -630,9 +703,28 @@ header h1 {
     background-color: #fcfcfc;
 }
 
-.data-table tr:hover {
-    background-color: #eef5ff;
-    /* Highlight biru saat hover */
+/* 6. Styling Font Judul di Tabel (Agar Menonjol) */
+.data-table tr td:nth-child(3) {
+    /* Kolom Judul (ke-3) */
+    font-weight: 600;
+    /* Sedikit lebih tebal */
+    color: #1a1a1a;
+    /* Warna paling gelap untuk Judul/Nama utama */
+}
+
+/* 7. Styling Kolom ID (Agar Terlihat Kecil) */
+.data-table tr td:nth-child(1) {
+    /* Kolom ID (ke-1) */
+    font-size: 13px;
+    color: #999;
+    width: 30px;
+}
+
+/* 4. Styling Baris (TR) */
+.data-table tr {
+    /* Tambahkan garis pemisah tipis di setiap baris */
+    border-bottom: 1px solid #f0f0f0;
+    transition: background-color 0.3s ease;
 }
 
 /* --- Styling Tabel Aksi (Edit dan Hapus Bersebelahan) --- */
@@ -794,19 +886,20 @@ header h1 {
 
 /* Gaya dasar untuk semua tombol */
 .btn {
-    padding: 10px 18px;
+    padding: 8px 10px;
     border: none;
     border-radius: 8px;
     /* Sudut lebih modern */
     cursor: pointer;
     font-weight: 600;
-    font-size: 0.95em;
+    font-size: 12px;
     text-align: center;
     text-decoration: none;
     /* Penting untuk tombol link (a.btn) */
     transition: background-color 0.2s, box-shadow 0.2s;
-    display: inline-flex;
+    display: flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
     /* Jarak antara ikon dan teks */
 }
@@ -831,11 +924,17 @@ header h1 {
     background-color: #3a7bd5;
 }
 
-/* 2. Tombol Detail (Warna Primer - Biru) */
+/* Tombol Detail (BIRU - Untuk konsistensi peminjaman.html) */
 .btn-detail {
     background-color: var(--primary-blue);
-    color: white;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    /* BIRU */
+    color: #ffffff;
+    border: 1px solid var(--primary-blue);
+    font-weight: 600;
+    /* Kuat */
+    font-size: 12px;
+    padding: 8px 10px;
+    align-items: center;
 }
 
 .btn-detail:hover {
@@ -861,6 +960,10 @@ header h1 {
     /* Merah */
     color: white;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-weight: 600;
+    /* Kuat */
+    font-size: 12px;
+    padding: 8px 10px;
 }
 
 .btn-danger:hover {
@@ -1919,25 +2022,33 @@ header h1 {
 
 
 
-/* Input, Textarea, File Input: Memberi tinggi yang seragam jika memungkinkan */
+/* ================== PENYESUAIAN FORM UMUM (BERDASARKAN 45PX) ================== */
+
+/* Input, Select: Memberi tinggi yang seragam 45px */
+/* Input ini harus mencakup SEMUA input teks dan select */
 .data-form input[type="text"],
 .data-form input[type="number"],
 .data-form input[type="email"],
 .data-form input[type="url"],
-.data-form textarea {
+.data-form select {
     padding: 12px;
+    /* Disesuaikan agar isi tetap ditengah untuk tinggi 45px */
     height: 45px;
-    /* Menetapkan tinggi standar untuk input teks agar lurus */
     border: 1px solid #ccc;
     border-radius: 8px;
     margin-top: 6px;
     width: 100%;
+    box-sizing: border-box;
+    /* Penting untuk menjaga tinggi 45px */
 }
 
-/* Input File memerlukan perlakuan khusus */
-.data-form input[type="file"] {
-    /* Hapus height: 45px; karena input file sulit distyling */
-    padding: 10px 0;
+/* Textarea tidak diberi tinggi tetap, hanya padding */
+.data-form textarea {
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    margin-top: 6px;
+    width: 100%;
 }
 
 /* --- Perubahan untuk Tombol Kembali ke Judul --- */
@@ -2012,19 +2123,18 @@ header h1 {
     border: 1px solid #ffcdd2;
 }
 
-/* Status untuk Konten (Contoh yang diperbaiki) */
-.status-PUBLISHED,
-.status-Published {
-    background-color: #28a745;
-    /* Hijau */
-    color: #fff;
+/* PUBLISHED (Biasanya Hijau/Sukses) */
+.status.PUBLISHED {
+    background-color: #e8f5e9;
+    color: #4caf50;
+    border: 1px solid #c8e6c9;
 }
 
-.status-PENDING,
-.status-Draft {
-    background-color: #6c757d;
-    /* Abu-abu */
-    color: #fff;
+/* DRAFT (Biasanya Abu-abu/Peringatan Ringan) */
+.status.DRAFT {
+    background-color: #fff8e1;
+    color: #ff9800;
+    border: 1px solid #ffecb3;
 }
 
 /* Card Wrapper (Mirip data-container atau data-form) */
@@ -2102,6 +2212,108 @@ header h1 {
     overflow: hidden;
     text-overflow: ellipsis;
     font-weight: 600;
+}
+
+/* --- Perbaikan Tombol Detail (Biru & Font Kuat - Konsisten dengan Setuju/Tolak) --- */
+
+/* Gunakan class .btn-detail untuk warna biru, agar tombol Detail di peminjaman tetap biru */
+.btn-detail {
+    background-color: var(--primary-blue);
+    color: #ffffff;
+    border: 1px solid var(--primary-blue);
+    font-weight: 600;
+    /* Font kuat seperti Setuju/Tolak */
+    font-size: 12px;
+    /* Ukuran font yang konsisten */
+    padding: 8px 10px;
+    /* Padding yang konsisten */
+
+}
+
+.btn-detail:hover {
+    background-color: var(--light-blue);
+    border-color: var(--light-blue);
+}
+
+/* --- Tambahkan Kembali / Pastikan Layout Tombol Konten (1 FULL, 2 HALF) --- */
+
+/* Container utama untuk menampung tombol aksi vertikal (Konten) */
+.action-buttons-container-berita {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* Container untuk tombol Edit dan Hapus agar berjejer (Inline) */
+.action-buttons-inline {
+    display: flex;
+    gap: 8px;
+}
+
+/* Membuat tombol Full Width (untuk Draft/Publish) */
+.action-full-width {
+    flex-grow: 1;
+    width: 100%;
+    font-weight: 600;
+    /* Konsistensi Font */
+}
+
+/* Membuat tombol Half Width (untuk Edit dan Hapus) */
+.action-half-width {
+    flex-basis: calc(50% - 2.5px);
+    width: 50%;
+    box-sizing: border-box;
+    margin: 0;
+    font-weight: 600;
+    /* Konsistensi Font */
+}
+
+/* --- Warna Tombol Konten yang Diperbarui (Edit Kuning, Draft Abu) --- */
+
+/* Tombol Edit (Kuning) - Tetap Kuning */
+.btn-warning {
+    background-color: #ffc107;
+    color: #333;
+    border: 1px solid #ffc107;
+
+    font-weight: 600;
+    /* Kuat */
+    font-size: 12px;
+    padding: 8px 10px;
+}
+
+/* Tombol Draft (Abu) - Tetap Abu-abu */
+.btn-draft {
+    background-color: var(--primary-blue);
+    /* BIRU */
+    color: #ffffff;
+    border: 1px solid var(--primary-blue);
+    font-weight: 600;
+    /* Kuat */
+    font-size: 12px;
+    padding: 8px 10px;
+    align-items: center;
+}
+
+/* --- Layout Tombol Konten BARU (Horizontal dan Rata Lebar, seperti Detail/Setuju/Tolak) --- */
+
+/* Container baru untuk menampung tombol Edit, Hapus, dan Status secara horizontal */
+.action-buttons-konten-horizontal {
+    display: flex;
+    gap: 5px;
+    /* Jarak antar tombol */
+    /* Batasi lebar container agar tombol menyusut jika perlu (Opsional) */
+    /* max-width: 250px; */
+}
+
+/* Kelas untuk membuat semua tombol di dalam container ini memiliki lebar yang sama */
+.btn-konten-aksi {
+    flex: 1;
+    /* Membuat semua tombol memiliki flex-grow, flex-shrink, dan flex-basis yang sama */
+    min-width: 0;
+    /* Penting agar tombol menyusut dengan baik */
+    white-space: nowrap;
+    /* Mencegah teks tombol terpotong */
 }
 
 /* Menggabungkan tombol aksi (Edit, Delete, Toggle Publish) */
@@ -2285,3 +2497,163 @@ header h1 {
 .toast-info .toast-icon {
     color: #2196F3;
 }
+
+/* --- Styling Khusus untuk Modal Konfirmasi (Confirm Dialog) --- */
+
+.confirm-modal {
+    display: none;
+    /* Default: Sembunyikan */
+    position: fixed;
+    z-index: 2000;
+    /* Pastikan di atas modal lain (misal: 1000) */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.6);
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.confirm-modal.show {
+    display: flex;
+    opacity: 1;
+}
+
+.confirm-modal-content {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 30px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    animation: slideDown 0.3s ease-out;
+    position: relative;
+    text-align: center;
+}
+
+.confirm-modal-content h3 {
+    color: #333;
+    margin-top: 0;
+    font-weight: 600;
+}
+
+.confirm-modal-content p {
+    margin: 15px 0 25px 0;
+    line-height: 1.5;
+    color: #555;
+}
+
+.data-form input[type="url"] .confirm-modal-footer-custom {
+    /* Ganti nama class agar tidak konflik dengan .modal-footer yang sudah ada */
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    border-top: 1px solid #eee;
+    margin-top: 20px;
+    padding: 8px 15px;
+    box-sizing: border-box;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Menghapus garis (border-top) di atas tombol aksi di kolom kanan */
+.form-grid-2 .column-right .form-actions {
+    border-top: none !important;
+    /* Gunakan !important jika diperlukan, atau pastikan selektor lebih spesifik */
+    padding-top: 0 !important;
+}
+
+/* ================== STYLE UPLOAD FILE MODERN ================== */
+
+.file-upload-container {
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.3s ease, background-color 0.3s ease;
+    position: relative;
+    background-color: #f9f9f9;
+}
+
+.file-upload-container:hover {
+    /* Menggunakan variabel warna dari cssadmin.css */
+    border-color: var(--primary-blue);
+    background-color: #f3f3f3;
+}
+
+.file-upload-container .upload-icon {
+    font-size: 2em;
+    color: #aaa;
+    margin-bottom: 5px;
+}
+
+.file-upload-container p {
+    margin: 0;
+    color: #666;
+    font-size: 0.9em;
+}
+
+/* Sembunyikan input file standar */
+.file-upload-container input[type="file"] {
+    opacity: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+
+/* Tampilkan nama file yang dipilih */
+.file-name-display {
+    margin-top: 10px;
+    font-weight: 600;
+    color: var(--dark-grey);
+    display: block;
+    min-height: 1.2em;
+}
+
+/* ================== STYLING BADGE KATEGORI (FIXED: MATCHING STATUS) ================== */
+
+.category-badge {
+    display: inline-block;
+
+    /* Ukuran dan Bentuk SAMA dengan Status Badge */
+    padding: 6px 12px;
+    /* Sama dengan Status Badge */
+    border-radius: 20px;
+    /* Sama dengan Status Badge (Bentuk Pil) */
+    font-size: 11px;
+    /* Sama dengan Status Badge */
+    font-weight: 600;
+    /* Sama dengan Status Badge */
+    text-transform: uppercase;
+    /* Sama dengan Status Badge */
+    white-space: nowrap;
+
+    /* Warna Netral Kategori (Biru Muda) */
+    background-color: #e3f2fd;
+    /* Light Blue BG */
+    color: #1e88e5;
+    /* Darker Blue Text */
+    border: 1px solid #90caf9;
+    /* Soft Blue Border */
+}
+
+/* ================== AKHIR STYLING BADGE KATEGORI ================== */

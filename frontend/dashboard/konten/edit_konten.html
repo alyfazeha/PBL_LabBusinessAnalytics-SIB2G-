@@ -13,6 +13,9 @@
 
 <body>
 
+    <div id="toastNotificationContainer">
+    </div>
+
     <div class="sidebar">
         <div class="logo-area">
             <h3>Lab Admin</h3>
@@ -30,199 +33,325 @@
 
     <div class="main-content">
         <header>
-            <a href="konten.html" class="back-link"><i class="fas fa-arrow-left"></i> Kembali</a>
-            <h1>Edit Konten</h1>
+            <div class="header-title">
+                <a href="konten.html" class="back-icon-in-header"><i class="fas fa-arrow-left"></i></a>
+                <h2>Edit Konten: <span id="contentTitleDisplay">[Memuat...]</span></h2>
+            </div>
+            <div></div>
         </header>
 
-        <div class="data-section">
-            <div id="message" class="message-area" style="display: none;"></div>
+        <main>
+            <div class="form-card">
+                <div class="form-card-header"></div>
 
-            <form id="kontenForm" class="data-form" enctype="multipart/form-data">
-                <input type="hidden" id="content_id" name="content_id">
+                <form id="kontenForm" class="data-form" enctype="multipart/form-data">
+                    <input type="hidden" id="contentId" name="content_id">
+                    <div class="form-grid-2">
 
-                <div class="form-group">
-                    <label for="title">Judul Konten <span class="required">*</span></label>
-                    <input type="text" id="title" name="title" required>
-                </div>
+                        <div class="column-left">
 
-                <div class="form-group">
-                    <label for="category_id">Kategori <span class="required">*</span></label>
-                    <select id="category_id" name="category_id" required>
-                        <option value="">-- Sedang memuat... --</option>
-                    </select>
-                </div>
+                            <div class="form-group">
+                                <label for="title">Judul Konten <span class="required">*</span></label>
+                                <input type="text" id="title" name="title" required
+                                    placeholder="Masukkan judul berita...">
+                            </div>
 
-                <div class="form-group" id="currentImageContainer" style="display:none;">
-                    <label>Gambar Saat Ini:</label>
-                    <div>
-                        <img id="currentImagePreview" src="" alt="Preview"
-                            style="max-width: 200px; border-radius: 5px; border: 1px solid #ddd;">
+                            <div class="form-group">
+                                <label for="category_id">Kategori <span class="required">*</span></label>
+                                <select id="category_id" name="category_id" required>
+                                    <option value="">-- Sedang memuat kategori... --</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="featured_image_url">Link Gambar (URL) Saat Ini</label>
+                                <input type="url" id="featured_image_url" name="featured_image_url"
+                                    placeholder="Contoh: https://example.com/gambar.jpg">
+                                <small class="form-text">Biarkan kosong jika tidak ingin mengubah URL.</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Gambar Saat Ini</label>
+                                <div id="currentImagePreview"
+                                    style="min-height: 100px; text-align: center; border: 1px solid #ddd; padding: 10px; border-radius: 4px; display: flex; justify-content: center; align-items: center;">
+                                    <p style="color:#888; margin:0;">Tidak ada gambar</p>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="featured_image_file">Ganti dengan File Gambar Baru</label>
+                                <div class="file-upload-container">
+                                    <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                                    <p>Tarik & Letakkan File atau Klik untuk Memilih</p>
+                                    <span class="file-name-display" id="fileNameDisplay">Belum ada file dipilih</span>
+                                    <input type="file" id="featured_image_file" name="featured_image_file"
+                                        accept="image/*">
+                                </div>
+                                <small class="form-text">Pilih file baru untuk mengganti gambar saat ini. File akan
+                                    diutamakan daripada URL.</small>
+                            </div>
+
+                        </div>
+                        <div class="column-right">
+
+                            <div class="form-group">
+                                <label for="excerpt">Ringkasan (Max 150 Karakter)</label>
+                                <textarea id="excerpt" name="excerpt" rows="3"
+                                    placeholder="Ringkasan singkat..."></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="body">Isi Konten <span class="required">*</span></label>
+                                <textarea id="body" name="body" rows="10" required
+                                    placeholder="Isi berita lengkap..."></textarea>
+                            </div>
+
+                            <div class="form-actions align-bottom">
+                                <button type="submit" class="btn btn-ijo" id="submitBtn"><i class="fas fa-save"></i>
+                                    Simpan Perubahan</button>
+                                <a href="konten.html" class="btn btn-secondary"><i class="fas fa-times"></i> Batal</a>
+                            </div>
+
+                        </div>
                     </div>
-                </div>
+                </form>
 
-                <div class="form-group">
-                    <label for="featured_image_url">Ganti dengan URL (Link)</label>
-                    <input type="url" id="featured_image_url" name="featured_image_url" placeholder="https://...">
-                </div>
-
-                <div class="form-group">
-                    <label for="featured_image_file">Ganti dengan Upload File</label>
-                    <input type="file" id="featured_image_file" name="featured_image_file" accept="image/*">
-                    <small>Biarkan kosong jika tidak ingin mengubah gambar.</small>
-                </div>
-
-                <div class="form-group">
-                    <label for="excerpt">Ringkasan</label>
-                    <textarea id="excerpt" name="excerpt" rows="3"></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label for="body">Isi Konten <span class="required">*</span></label>
-                    <textarea id="body" name="body" rows="10" required></textarea>
-                </div>
-
-                <div class="form-actions">
-                    <button type="submit" class="btn btn-primary" id="submitBtn"><i class="fas fa-save"></i> Simpan
-                        Perubahan</button>
-                    <a href="konten.html" class="btn btn-secondary">Batal</a>
-                </div>
-            </form>
-        </div>
+            </div>
+        </main>
     </div>
 
-    <div id="logoutModal" class="modal">
+    <div id="logoutModal" class="modal logout-modal">
         <div class="modal-content">
-            <h2>Konfirmasi Logout</h2>
-            <p>Apakah Anda yakin ingin keluar dari Dashboard Admin?</p>
-            <button id="confirmLogoutBtn" class="btn btn-danger">Logout</button>
-            <button id="cancelLogoutBtn" class="btn btn-secondary">Batal</button>
+            <span class="close-btn" onclick="logoutModal.style.display='none';">&times;</span>
+            <h4><i class="fas fa-sign-out-alt"></i> Konfirmasi Logout</h4>
+            <p>Anda yakin ingin mengakhiri sesi dan keluar dari Panel Admin?</p>
+            <div class="modal-buttons">
+                <button id="cancelLogoutBtn" class="btn btn-secondary">Batal</button>
+                <button id="confirmLogoutBtn" class="btn btn-danger">Ya, Logout</button>
+            </div>
         </div>
     </div>
+
 
     <script>
-        function displayMessage(type, message) {
-            const messageArea = document.getElementById('message');
-            messageArea.textContent = message;
-            messageArea.className = 'message-area ' + type;
-            messageArea.style.display = 'block';
-            setTimeout(() => { messageArea.style.display = 'none'; }, 5000);
+        // --- 1. FUNGSI NOTIFIKASI TOAST (SAMA) ---
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastNotificationContainer');
+            if (!container) return;
+
+            const toast = document.createElement('div');
+            let iconClass = 'fas fa-info-circle';
+            let typeClass = 'toast-info';
+
+            if (type === 'success') {
+                iconClass = 'fas fa-check-circle';
+                typeClass = 'toast-success';
+            } else if (type === 'error') {
+                iconClass = 'fas fa-times-circle';
+                typeClass = 'toast-error';
+            }
+
+            toast.classList.add('toast-notification', typeClass);
+            toast.innerHTML = `
+                <i class="toast-icon ${iconClass}"></i>
+                <span class="toast-text">${message}</span>
+            `;
+
+            container.appendChild(toast);
+
+            setTimeout(() => { toast.classList.add('show'); }, 10);
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+                toast.classList.add('hide');
+                setTimeout(() => { toast.remove(); }, 300);
+            }, 4000);
         }
 
-        // Ambil ID dari URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const contentId = urlParams.get('id');
+        function displayMessage(type, message) {
+            if (type === 'status-error') type = 'error';
+            if (type === 'status-success') type = 'success';
+            showToast(message, type);
+        }
 
-        // 1. Fetch Kategori Dulu
+        // Global Variable
+        let currentContentId = null;
+
+        // 2. Fetch Kategori (SAMA)
         async function fetchKategori(selectedId = null) {
+            const url = '../../../backend/api/contents/kategori_list.php';
+            const select = document.getElementById('category_id');
+            select.innerHTML = '<option value="">-- Sedang memuat kategori... --</option>';
+
             try {
-                const response = await fetch('../../../backend/api/contents/kategori_list.php');
+                const response = await fetch(url);
                 const result = await response.json();
-                const select = document.getElementById('category_id');
+
                 select.innerHTML = '<option value="">-- Pilih Kategori --</option>';
 
                 if (result.status === 'success' && result.data) {
-                    result.data.forEach(cat => {
+                    result.data.forEach(kategori => {
                         const option = document.createElement('option');
-                        option.value = cat.category_id || cat.id;
-                        option.textContent = cat.category_name || cat.nama;
-                        if (option.value == selectedId) option.selected = true;
+                        const id = kategori.category_id || kategori.id;
+                        const name = kategori.category_name || kategori.nama || 'Kategori';
+
+                        option.value = id;
+                        option.textContent = name;
+
+                        if (selectedId && id == selectedId) {
+                            option.selected = true;
+                        }
+
                         select.appendChild(option);
                     });
+                } else {
+                    select.innerHTML = '<option value="">Gagal memuat kategori</option>';
+                    showToast('Gagal memuat daftar kategori.', 'error');
                 }
             } catch (error) {
-                console.error('Kategori Error:', error);
+                console.error('Kategori Fetch Error:', error);
+                select.innerHTML = '<option value="">Error koneksi</option>';
+                showToast('Error jaringan saat memuat kategori.', 'error');
             }
         }
 
-        // 2. Fetch Detail Konten
+        // 3. Setup Preview Gambar Saat Ini (SAMA)
+        function setupImagePreview(imageUrl) {
+            const previewContainer = document.getElementById('currentImagePreview');
+            previewContainer.innerHTML = '';
+
+            if (imageUrl && imageUrl.trim() !== '') {
+                const img = document.createElement('img');
+                img.src = imageUrl;
+                img.alt = 'Gambar Saat Ini';
+                img.style.maxWidth = '100%';
+                img.style.maxHeight = '150px';
+                img.style.objectFit = 'contain';
+                img.style.borderRadius = '4px';
+                previewContainer.appendChild(img);
+            } else {
+                previewContainer.innerHTML = '<p style="color:#888; margin:0;">Tidak ada gambar terlampir</p>';
+            }
+        }
+
+
+        // 4. Fetch Detail Konten (SAMA)
         async function fetchDetail() {
-            if (!contentId) {
-                displayMessage('error', 'ID tidak ditemukan!');
+            const urlParams = new URLSearchParams(window.location.search);
+            const id = urlParams.get('id');
+            if (!id) {
+                showToast('ID konten tidak ditemukan di URL.', 'error');
+                setTimeout(() => { window.location.href = 'konten.html'; }, 1500);
                 return;
             }
+            currentContentId = id;
+            document.getElementById('contentId').value = id;
+            document.getElementById('contentTitleDisplay').textContent = 'Loading...';
 
+            const url = `../../../backend/api/contents/detail.php?id=${id}`;
             try {
-                const response = await fetch(`../../../backend/api/contents/detail.php?id=${contentId}`);
+                const response = await fetch(url);
                 const result = await response.json();
 
                 if (result.status === 'success' && result.data) {
                     const data = result.data;
 
-                    // Isi Form
-                    document.getElementById('content_id').value = data.content_id || data.id;
-                    document.getElementById('title').value = data.title;
+                    document.getElementById('contentTitleDisplay').textContent = data.title;
+                    document.getElementById('title').value = data.title || '';
+                    document.getElementById('featured_image_url').value = data.featured_image || '';
                     document.getElementById('excerpt').value = data.excerpt || '';
-                    document.getElementById('body').value = data.body;
+                    document.getElementById('body').value = data.body || '';
 
-                    // Logic Gambar Preview
-                    if (data.featured_image) {
-                        document.getElementById('currentImageContainer').style.display = 'block';
-                        document.getElementById('currentImagePreview').src = data.featured_image;
-
-                        // Jika gambar lama adalah URL, isi kolom URL (Opsional)
-                        if (data.featured_image.startsWith('http')) {
-                            document.getElementById('featured_image_url').value = data.featured_image;
-                        }
-                    }
-
-                    // Load kategori dan set yang terpilih
-                    fetchKategori(data.category_id);
+                    await fetchKategori(data.category_id);
+                    setupImagePreview(data.featured_image);
 
                 } else {
-                    displayMessage('error', 'Gagal memuat data konten.');
+                    showToast(result.message || 'Gagal memuat detail konten.', 'error');
+                    document.getElementById('contentTitleDisplay').textContent = 'Error!';
                 }
             } catch (error) {
-                console.error('Detail Error:', error);
-                displayMessage('error', 'Terjadi kesalahan jaringan.');
+                console.error('Fetch error:', error);
+                showToast('Terjadi kesalahan jaringan saat memuat data.', 'error');
+                document.getElementById('contentTitleDisplay').textContent = 'Error Koneksi!';
             }
         }
 
-        // 3. Submit Form Update
+        // 5. Submit Form (Update)
         const kontenForm = document.getElementById('kontenForm');
+
         kontenForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const submitBtn = document.getElementById('submitBtn');
+            const originalText = submitBtn.innerHTML;
+
             submitBtn.disabled = true;
-            submitBtn.innerHTML = 'Menyimpan...';
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
 
             const formData = new FormData(kontenForm);
+            const url = '../../../backend/api/contents/update.php';
 
             try {
-                const response = await fetch('../../../backend/api/contents/update.php', {
+                const response = await fetch(url, {
                     method: 'POST',
                     body: formData
                 });
                 const result = await response.json();
 
-                if (result.status === 'success') {
-                    displayMessage('success', result.message);
-                    // Refresh data/preview setelah update
-                    fetchDetail();
+                if (response.ok && result.status === 'success') {
+                    showToast(result.message, 'success');
+
+                    // --- LOGIKA REDIRECT KE KONTEN.HTML ---
+                    document.getElementById('fileNameDisplay').textContent = 'Belum ada file dipilih';
+                    setTimeout(() => {
+                        window.location.href = 'konten.html';
+                    }, 1500);
+                    // --- AKHIR LOGIKA REDIRECT ---
+
                 } else {
-                    displayMessage('error', result.message);
+                    showToast(result.message || 'Gagal menyimpan perubahan.', 'error');
                 }
             } catch (error) {
-                displayMessage('error', 'Terjadi kesalahan server.');
+                console.error('Submit error:', error);
+                showToast('Terjadi kesalahan jaringan.', 'error');
             } finally {
                 submitBtn.disabled = false;
-                submitBtn.innerHTML = '<i class="fas fa-save"></i> Simpan Perubahan';
+                submitBtn.innerHTML = originalText;
             }
         });
 
-        // Jalankan saat load
-        document.addEventListener('DOMContentLoaded', fetchDetail);
 
-        // --- LOGOUT ---
+        // 6. Load Data & Event Listeners (SAMA)
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchDetail();
+
+            const featuredImageFile = document.getElementById('featured_image_file');
+            const fileNameDisplay = document.getElementById('fileNameDisplay');
+
+            featuredImageFile.addEventListener('change', () => {
+                if (featuredImageFile.files.length > 0) {
+                    fileNameDisplay.textContent = featuredImageFile.files[0].name;
+                } else {
+                    fileNameDisplay.textContent = 'Belum ada file dipilih';
+                }
+            });
+
+        });
+
+        // --- LOGOUT LOGIC (SAMA) ---
         const logoutModal = document.getElementById('logoutModal');
         const logoutTrigger = document.getElementById('logoutTrigger');
         const cancelLogoutBtn = document.getElementById('cancelLogoutBtn');
         const confirmLogoutBtn = document.getElementById('confirmLogoutBtn');
 
-        if (logoutTrigger) logoutTrigger.onclick = (e) => { e.preventDefault(); logoutModal.classList.add('show'); };
-        if (cancelLogoutBtn) cancelLogoutBtn.onclick = () => logoutModal.classList.remove('show');
+        if (logoutTrigger) logoutTrigger.onclick = (e) => { e.preventDefault(); logoutModal.style.display = 'flex'; };
+        if (cancelLogoutBtn) cancelLogoutBtn.onclick = () => logoutModal.style.display = 'none';
         if (confirmLogoutBtn) confirmLogoutBtn.onclick = async () => {
             await fetch('../../../backend/api/auth/logout.php', { method: 'POST' });
             window.location.href = '../../public/index.html';
+        };
+
+        window.onclick = (e) => {
+            if (e.target === logoutModal) logoutModal.style.display = 'none';
         };
     </script>
 </body>

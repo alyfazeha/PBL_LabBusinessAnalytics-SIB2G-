@@ -33,12 +33,14 @@
 
     <div class="main-content">
         <header>
+            
             <div class="header-title">
+                
                 <h2>Kelola Peminjaman</h2>
             </div>
 
             <div class="header-actions-group">
-
+                
                 <button id="btnToggleFilter" class="btn btn-secondary">
                     <i class="fas fa-filter"></i> Filter
                 </button>
@@ -73,12 +75,12 @@
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Nama Mahasiswa</th>
-                            <th>Nama Dosen PJ</th>
+                            <th>Mahasiswa</th>
+                            <th>Dosen PJ</th>
                             <th>Sarana</th>
                             <th>Tanggal</th>
                             <th>Waktu</th>
-                            <th>Keperluan Meminjam</th>
+                            <th>Keperluan</th>
                             <th>Status</th>
                             <th>Aksi</th>
                         </tr>
@@ -225,7 +227,7 @@
 
                         actionCell.innerHTML = `
                         <div class="action-buttons-list action-buttons-vertical">
-                            <a href="detail_peminjaman.html?id=${item.booking_id}" class="btn btn-detail action-full-width"><i class="fas fa-eye"></i> Detail</a>
+                            <a href="detail_peminjaman.html?id=${item.booking_id}" class="btn btn-detail "><i class="fas fa-eye"></i> Detail</a>
                             ${isPending ? `
                             <div class="action-buttons-list action-buttons-split">
                                 <button class="btn btn-ijo" onclick="showApproveModal(${item.booking_id})"><i class="fas fa-check"></i> Setuju</button>
