@@ -20,6 +20,9 @@
 </head>
 
 <body>
+    <div id="toastNotificationContainer">
+    </div>
+
     <div class="sidebar">
         <div class="logo-area">
             <h3>Lab Admin</h3>
@@ -100,7 +103,7 @@
                             </div>
 
                             <div class="form-actions align-bottom">
-                                <button type="submit" id="submitBtn" class="btn btn-action"><i class="fas fa-save"></i>
+                                <button type="submit" id="submitBtn" class="btn btn-ijo"><i class="fas fa-save"></i>
                                     Ajukan Peminjaman</button>
                                 <a href="peminjaman.html" class="btn btn-secondary"><i class="fas fa-times"></i>
                                     Batal</a>
@@ -125,153 +128,198 @@
     </div>
 
     <script>
-        const PEMINJAMAN_API_URL = '../../../backend/api/booking/';
-        const SARANA_API_URL = '../../../backend/api/sarana/list.php';
-        const DOSEN_API_URL = '../../../backend/api/dosen/list.php';
+    const PEMINJAMAN_API_URL = '../../../backend/api/booking/';
+    const SARANA_API_URL = '../../../backend/api/sarana/list.php';
+    const DOSEN_API_URL = '../../../backend/api/dosen/list.php';
 
-        // --- FUNGSI UTILITY ---
-        function showStatusMessage(message, type = 'error') {
-            const statusDiv = document.getElementById('statusMessage');
-            statusDiv.textContent = message;
-            // Gunakan class CSS yang sudah didefinisikan 
-            statusDiv.className = `status-message ${type}`;
-            statusDiv.style.display = 'block';
-            setTimeout(() => { statusDiv.style.display = 'none'; }, 5000);
+    // --- 1. FUNGSI NOTIFIKASI TOAST BARU ---
+    function showToast(message, type = 'info') {
+        const container = document.getElementById('toastNotificationContainer');
+        if (!container) return; 
+
+        const toast = document.createElement('div');
+        let iconClass = 'fas fa-info-circle';
+        let typeClass = 'toast-info';
+
+        if (type === 'success') {
+            iconClass = 'fas fa-check-circle';
+            typeClass = 'toast-success';
+        } else if (type === 'error') {
+            iconClass = 'fas fa-times-circle';
+            typeClass = 'toast-error';
         }
 
-        // 1. Fetch Data Sarana
-        async function fetchSarana() {
-            const saranaSelect = document.getElementById('sarana_id');
-            try {
-                const response = await fetch(SARANA_API_URL);
-                const result = await response.json();
-                const data = result.data || result;
+        toast.classList.add('toast-notification', typeClass);
+        toast.innerHTML = `
+            <i class="toast-icon ${iconClass}"></i>
+            <span class="toast-text">${message}</span>
+        `;
 
-                saranaSelect.innerHTML = '<option value="" disabled selected>Pilih Sarana</option>';
+        container.appendChild(toast);
 
-                if (Array.isArray(data)) {
-                    data.forEach(item => {
-                        // Pastikan field API yang digunakan: sarana_id dan nama_sarana
-                        saranaSelect.innerHTML += `<option value="${item.sarana_id}">${item.nama_sarana}</option>`;
-                    });
-                } else {
-                    saranaSelect.innerHTML = '<option value="">Gagal memuat sarana.</option>';
-                }
-            } catch (error) {
-                saranaSelect.innerHTML = '<option value="">Error Jaringan.</option>';
-                console.error('Fetch Sarana Error:', error);
-            }
+        setTimeout(() => { toast.classList.add('show'); }, 10); 
+
+        setTimeout(() => {
+            toast.classList.remove('show');
+            toast.classList.add('hide');
+            setTimeout(() => { toast.remove(); }, 300);
+        }, 4000);
+    }
+
+    // --- 2. FUNGSI FETCH SARANA (Menggunakan Logika Lama yang Berhasil) ---
+    async function fetchSarana() {
+        // ID: sarana_id
+        const saranaSelect = document.getElementById('sarana_id'); 
+        if (!saranaSelect) {
+            console.error("Elemen Sarana (ID: sarana_id) tidak ditemukan.");
+            return;
         }
+        
+        try {
+            const response = await fetch(SARANA_API_URL);
+            const result = await response.json();
+            const data = result.data || result;
 
-        // 2. Fetch Data Dosen
-        async function fetchDosen() {
-            const dosenSelect = document.getElementById('nidn');
-            try {
-                const response = await fetch(DOSEN_API_URL);
-                const result = await response.json();
-                const data = result.data || result;
+            saranaSelect.innerHTML = '<option value="" disabled selected>Pilih Sarana</option>';
 
-                dosenSelect.innerHTML = '<option value="" disabled selected>-- Pilih Dosen PJ --</option>';
-
-                if (Array.isArray(data)) {
-                    data.forEach(item => {
-                        // Pastikan field API yang digunakan: nidn dan nama
-                        dosenSelect.innerHTML += `<option value="${item.nidn}">${item.nama} (${item.nidn})</option>`;
-                    });
-                } else {
-                    dosenSelect.innerHTML = '<option value="">Gagal memuat dosen.</option>';
-                }
-            } catch (error) {
-                dosenSelect.innerHTML = '<option value="">Error Jaringan.</option>';
-                console.error('Fetch Dosen Error:', error);
-            }
-        }
-
-        // 3. Form Submission
-        document.getElementById('formPeminjaman').addEventListener('submit', async function (e) {
-            e.preventDefault();
-
-            const submitBtn = document.getElementById('submitBtn');
-            const originalText = submitBtn.innerHTML;
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengajukan...';
-
-            const form = e.target;
-            const formData = new FormData(form);
-
-            const sks = parseInt(formData.get('sks'));
-            if (isNaN(sks) || sks <= 0) {
-                showStatusMessage('Jumlah SKS harus lebih dari 0.');
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = originalText;
-                return;
-            }
-
-            formData.append('status', 'DIAJUKAN'); // Status default
-
-            try {
-                const response = await fetch(PEMINJAMAN_API_URL + 'create.php', {
-                    method: 'POST',
-                    body: formData
+            if (Array.isArray(data)) {
+                data.forEach(item => {
+                    // FIELD: sarana_id dan nama_sarana
+                    saranaSelect.innerHTML += `<option value="${item.sarana_id}">${item.nama_sarana}</option>`;
                 });
-                const result = await response.json();
-
-                if (response.ok && result.success) {
-                    showStatusMessage('Peminjaman berhasil diajukan! Menunggu persetujuan admin.', 'success');
-                    form.reset();
-                    setTimeout(() => { window.location.href = 'peminjaman.html'; }, 1500);
-                } else {
-                    showStatusMessage(result.message || 'Gagal menyimpan data.');
-                }
-            } catch (error) {
-                showStatusMessage('Terjadi kesalahan jaringan.');
-                console.error('Create Error:', error);
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = originalText;
+            } else {
+                saranaSelect.innerHTML = '<option value="">Gagal memuat sarana.</option>';
+                showToast('Gagal memuat data sarana.', 'error'); // Notifikasi Toast
             }
-        });
+        } catch (error) {
+            saranaSelect.innerHTML = '<option value="">Error Jaringan.</option>';
+            showToast('Error jaringan saat memuat sarana.', 'error'); // Notifikasi Toast
+            console.error('Fetch Sarana Error:', error);
+        }
+    }
 
-        // Load Data Awal
-        document.addEventListener('DOMContentLoaded', () => {
-            fetchSarana();
-            fetchDosen();
-            // Set minimal tanggal hari ini
-            document.getElementById('tanggal').min = new Date().toISOString().split('T')[0];
-        });
+    // --- 3. FUNGSI FETCH DOSEN (Menggunakan Logika Lama yang Berhasil) ---
+    async function fetchDosen() {
+        // ID: nidn
+        const dosenSelect = document.getElementById('nidn'); 
+        if (!dosenSelect) {
+            console.error("Elemen Dosen (ID: nidn) tidak ditemukan.");
+            return;
+        }
 
-        // --- LOGIKA LOGOUT ---
-        const logoutModal = document.getElementById('logoutModal');
-        const logoutTrigger = document.getElementById('logoutTrigger');
-        const cancelLogoutBtn = document.getElementById('cancelLogoutBtn');
-        const confirmLogoutBtn = document.getElementById('confirmLogoutBtn');
+        try {
+            const response = await fetch(DOSEN_API_URL);
+            const result = await response.json();
+            const data = result.data || result;
 
-        logoutTrigger.addEventListener('click', (e) => {
-            e.preventDefault();
-            logoutModal.style.display = 'flex';
-        });
+            dosenSelect.innerHTML = '<option value="" disabled selected>-- Pilih Dosen PJ --</option>';
 
-        cancelLogoutBtn.addEventListener('click', () => {
+            if (Array.isArray(data)) {
+                data.forEach(item => {
+                    // FIELD: nidn dan nama
+                    dosenSelect.innerHTML += `<option value="${item.nidn}">${item.nama} (${item.nidn})</option>`;
+                });
+            } else {
+                dosenSelect.innerHTML = '<option value="">Gagal memuat dosen.</option>';
+                showToast('Gagal memuat data dosen.', 'error'); // Notifikasi Toast
+            }
+        } catch (error) {
+            dosenSelect.innerHTML = '<option value="">Error Jaringan.</option>';
+            showToast('Error jaringan saat memuat dosen.', 'error'); // Notifikasi Toast
+            console.error('Fetch Dosen Error:', error);
+        }
+    }
+
+    // --- 4. Form Submission (Menggunakan Toast untuk Notifikasi Status) ---
+    document.getElementById('formPeminjaman').addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const submitBtn = document.getElementById('submitBtn');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengajukan...';
+
+        const form = e.target;
+        const formData = new FormData(form);
+
+        // Validasi SKS
+        const sks = parseInt(formData.get('sks'));
+        if (isNaN(sks) || sks <= 0) {
+            // Mengganti showStatusMessage dengan Toast Error
+            showToast('Jumlah SKS harus lebih dari 0.', 'error');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
+            return;
+        }
+
+        formData.append('status', 'DIAJUKAN'); 
+
+        try {
+            const response = await fetch(PEMINJAMAN_API_URL + 'create.php', {
+                method: 'POST',
+                body: formData
+            });
+            const result = await response.json();
+
+            if (response.ok && result.success) {
+                // Mengganti showStatusMessage dengan Toast Success
+                showToast('Peminjaman berhasil diajukan! Menunggu persetujuan admin.', 'success');
+                form.reset();
+                setTimeout(() => { window.location.href = 'peminjaman.html'; }, 1500);
+            } else {
+                // Mengganti showStatusMessage dengan Toast Error
+                showToast(result.message || 'Gagal menyimpan data.', 'error');
+            }
+        } catch (error) {
+            // Mengganti showStatusMessage dengan Toast Error
+            showToast('Terjadi kesalahan jaringan.', 'error');
+            console.error('Create Error:', error);
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
+        }
+    });
+
+    // --- 5. Load Data Awal ---
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchSarana();
+        fetchDosen();
+        // Set minimal tanggal hari ini
+        document.getElementById('tanggal').min = new Date().toISOString().split('T')[0];
+    });
+
+    // --- 6. LOGIKA LOGOUT (Sama seperti sebelumnya) ---
+    const logoutModal = document.getElementById('logoutModal');
+    const logoutTrigger = document.getElementById('logoutTrigger');
+    const cancelLogoutBtn = document.getElementById('cancelLogoutBtn');
+    const confirmLogoutBtn = document.getElementById('confirmLogoutBtn');
+
+    logoutTrigger.addEventListener('click', (e) => {
+        e.preventDefault();
+        logoutModal.style.display = 'flex';
+    });
+
+    cancelLogoutBtn.addEventListener('click', () => {
+        logoutModal.style.display = 'none';
+    });
+
+    confirmLogoutBtn.addEventListener('click', async () => {
+        const url = '../../../backend/api/auth/logout.php';
+        try {
+            await fetch(url, { method: 'POST' });
+            window.location.href = '../../public/index.html';
+        } catch (error) {
+            console.error('Logout Error:', error);
+            window.location.href = '../../public/index.html';
+        }
+    });
+
+    window.addEventListener('click', (e) => {
+        if (e.target === logoutModal) {
             logoutModal.style.display = 'none';
-        });
-
-        confirmLogoutBtn.addEventListener('click', async () => {
-            const url = '../../../backend/api/auth/logout.php';
-            try {
-                await fetch(url, { method: 'POST' });
-                window.location.href = '../../public/index.html';
-            } catch (error) {
-                console.error('Logout Error:', error);
-                window.location.href = '../../public/index.html';
-            }
-        });
-
-        window.addEventListener('click', (e) => {
-            if (e.target === logoutModal) {
-                logoutModal.style.display = 'none';
-            }
-        });
-    </script>
+        }
+    });
+</script>
 </body>
 
 </html>

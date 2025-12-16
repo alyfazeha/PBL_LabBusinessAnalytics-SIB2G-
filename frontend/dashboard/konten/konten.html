@@ -13,6 +13,8 @@
 </head>
 
 <body>
+    <div id="toastNotificationContainer">
+    </div>
 
     <div class="sidebar">
         <div class="logo-area">
@@ -59,7 +61,6 @@
                             <th>Foto</th>
                             <th>Judul</th>
                             <th>Kategori</th>
-                            <th>Penulis</th>
                             <th>Tgl. Publikasi</th>
                             <th>Status</th>
                             <th>Aksi</th>
@@ -73,6 +74,19 @@
                 </table>
             </div>
         </main>
+    </div>
+
+    <div id="deleteKontenModal" class="modal delete-modal-custom">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeDeleteModal()">&times;</span>
+            <h4><i class="fas fa-trash-alt modal-icon-danger"></i> Konfirmasi Penghapusan</h4>
+            <p>Anda yakin ingin menghapus konten berjudul: <strong id="kontenTitleToDelete"></strong>?</p>
+            <p class="modal-warning-text">Aksi ini tidak dapat dibatalkan.</p>
+            <div class="modal-buttons">
+                <button id="cancelDeleteBtn" class="btn btn-secondary">Batal</button>
+                <button id="confirmDeleteBtn" class="btn btn-danger">Ya, Hapus</button>
+            </div>
+        </div>
     </div>
 
     <div id="logoutModal" class="modal logout-modal">
@@ -93,133 +107,242 @@
 
     <script>
         // --- VARIABEL GLOBAL ---
-        let allKontenData = []; // Menyimpan data mentah dari server untuk keperluan filtering
-
-        function displayMessage(type, message) {
-            const messageArea = document.getElementById('message');
-            messageArea.textContent = message;
-            messageArea.className = 'message-area ' + type;
-            messageArea.style.display = 'block';
-            setTimeout(() => { messageArea.style.display = 'none'; }, 5000);
-        }
-
+        let allKontenData = [];
         const kontenTableBody = document.getElementById('kontenTableBody');
 
-        // [PERBAIKAN] Fetch Kategori
+        // --- VARIABEL MODAL HAPUS KUSTOM ---
+        const deleteKontenModal = document.getElementById('deleteKontenModal');
+        const kontenTitleToDelete = document.getElementById('kontenTitleToDelete');
+        const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+        const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+        let currentContentIdToDelete = null;
+
+        // FUNGSI PENUTUP MODAL HAPUS KUSTOM
+        function closeDeleteModal() {
+            if (deleteKontenModal) deleteKontenModal.classList.remove('show');
+            if (deleteKontenModal) deleteKontenModal.style.display = 'none';
+        }
+
+        // --- 1. FUNGSI NOTIFIKASI TOAST ---
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastNotificationContainer');
+            if (!container) return;
+
+            const toast = document.createElement('div');
+            let iconClass = 'fas fa-info-circle';
+            let typeClass = 'toast-info';
+
+            if (type === 'success') {
+                iconClass = 'fas fa-check-circle';
+                typeClass = 'toast-success';
+            } else if (type === 'error') {
+                iconClass = 'fas fa-times-circle';
+                typeClass = 'toast-error';
+            } else if (type === 'warning') {
+                iconClass = 'fas fa-exclamation-triangle';
+                typeClass = 'toast-warning';
+            }
+
+
+            toast.classList.add('toast-notification', typeClass);
+            toast.innerHTML = `<i class="toast-icon ${iconClass}"></i><span class="toast-text">${message}</span>`;
+            container.appendChild(toast);
+
+            setTimeout(() => { toast.classList.add('show'); }, 10);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                toast.classList.add('hide');
+                setTimeout(() => { toast.remove(); }, 300);
+            }, 4000);
+        }
+
+        function displayMessage(type, message) {
+            if (type === 'status-error') type = 'error';
+            if (type === 'status-success') type = 'success';
+            showToast(message, type);
+        }
+
+        // --- 2. FUNGSI BARU: FORMAT TANGGAL DAN WAKTU (2 BARIS) ---
+        function formatDateTime(dateTimeString) {
+            if (!dateTimeString) return 'N/A';
+
+            const cleanedString = dateTimeString.split('.')[0].replace('T', ' ');
+
+            if (!cleanedString) return 'N/A';
+
+            const date = new Date(cleanedString.replace(/-/g, "/"));
+
+            if (isNaN(date.getTime())) return cleanedString;
+
+            const dateOptions = {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour12: false,
+            };
+
+            const timeOptions = {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false,
+                timeZone: 'Asia/Jakarta'
+            };
+
+            const formattedDate = date.toLocaleDateString('id-ID', dateOptions);
+            const formattedTime = date.toLocaleTimeString('id-ID', timeOptions) + ' WIB';
+
+            return `
+                <div style="font-weight: 600; color: #333; line-height: 1.2;">${formattedDate}</div>
+                <div style="font-size: 11px; color: #777; margin-top: 2px;">${formattedTime}</div>
+            `;
+        }
+        // --- AKHIR FUNGSI FORMAT TANGGAL ---
+
+
+        // --- 3. FUNGSI FETCH KATEGORI ---
         async function fetchKategori() {
             try {
                 const response = await fetch('../../../backend/api/contents/kategori_list.php');
                 const result = await response.json();
                 const select = document.getElementById('filterKategori');
-
-                // Reset dropdown
                 select.innerHTML = '<option value=""> Tampilkan Semua </option>';
 
                 if (result.status === 'success' && Array.isArray(result.data)) {
                     result.data.forEach(item => {
                         const option = document.createElement('option');
-
-                        // PERBAIKAN: Gunakan 'item.nama' sesuai kolom database Anda
                         const namaKategori = item.nama;
-
-                        // Value kita set nama kategori agar mudah dicocokkan dengan tabel berita
                         option.value = namaKategori;
                         option.textContent = namaKategori;
                         select.appendChild(option);
                     });
+                } else {
+                    console.warn("Gagal memuat kategori:", result.message);
                 }
             } catch (error) {
                 console.error('Kategori Error:', error);
             }
         }
-        // [UPDATE] 2. Fetch Data Konten Utama
+
+        // --- 4. FUNGSI FETCH KONTEN ---
         async function fetchKonten() {
             const url = '../../../backend/api/contents/list.php';
+            kontenTableBody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Sedang memuat data...</td></tr>';
+
             try {
                 const response = await fetch(url);
                 const result = await response.json();
 
                 if (result.status === 'success') {
-                    allKontenData = result.data; // Simpan ke variabel global
-                    renderKontenTable(allKontenData); // Tampilkan semua saat awal load
+                    allKontenData = result.data;
+                    applyFilters();
                 } else {
-                    kontenTableBody.innerHTML = '<tr><td colspan="8" style="text-align:center;">Gagal memuat data.</td></tr>';
+                    kontenTableBody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Gagal memuat data.</td></tr>';
                     displayMessage('error', 'Gagal memuat data: ' + result.message);
                 }
             } catch (error) {
                 console.error('Fetch error:', error);
-                kontenTableBody.innerHTML = '<tr><td colspan="8" style="text-align:center;">Error koneksi.</td></tr>';
+                kontenTableBody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Error koneksi.</td></tr>';
                 displayMessage('error', 'Terjadi kesalahan jaringan.');
             }
         }
 
-        // [BARU] 3. Logika Filtering Client-Side
+        // --- 5. FILTER ---
         function applyFilters() {
             const selectedKategori = document.getElementById('filterKategori').value;
 
-            // Filter array global allKontenData
             const filteredData = allKontenData.filter(item => {
-                // Jika dropdown kosong ("") maka tampilkan semua (return true)
-                // Jika tidak, cek apakah category_name sama dengan pilihan
                 return selectedKategori === "" || item.category_name === selectedKategori;
             });
 
             renderKontenTable(filteredData);
         }
 
-        // 4. Render Tabel (Menampilkan Data ke HTML)
+        // --- 6. RENDER TABEL (Menggunakan Badge Kategori dan formatDateTime) ---
         function renderKontenTable(kontenList) {
-            kontenTableBody.innerHTML = '';
+            if (!kontenTableBody) return;
 
+            kontenTableBody.innerHTML = '';
             if (kontenList.length === 0) {
-                kontenTableBody.innerHTML = '<tr><td colspan="8" style="text-align:center;">Data tidak ditemukan.</td></tr>';
+                kontenTableBody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Data tidak ditemukan.</td></tr>';
                 return;
             }
 
             kontenList.forEach(konten => {
                 const row = kontenTableBody.insertRow();
-
-                // Cek status published
                 const isPub = konten.is_published === true || konten.is_published === 't' || konten.is_published === '1';
-                const statusClass = isPub ? 'status-published' : 'status-pending';
+                const statusText = isPub ? 'PUBLISHED' : 'DRAFT';
+                const statusClass = statusText;
 
-                // Tampilan Gambar
                 let imgDisplay = '<span style="color:#ccc; font-size: 0.8em;">No Img</span>';
                 if (konten.featured_image && konten.featured_image.trim() !== '') {
                     imgDisplay = `<img src="${konten.featured_image}" alt="Img" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; border: 1px solid #ddd;">`;
                 }
 
                 const id = konten.content_id;
-                const penulis = konten.user_name || 'Admin';
+                const escapedTitle = konten.title.replace(/'/g, "\\'");
+
+                const actionTextStatus = isPub ? 'Ubah ke DRAFT' : 'PUBLISH';
+                const actionClassStatus = isPub ? 'btn-draft' : 'btn-success';
+                const iconClassStatus = isPub ? 'fa-eye-slash' : 'fa-eye';
+
+                const statusButton = `
+                <button onclick="togglePublish(${id}, ${isPub})" 
+                        class="btn ${actionClassStatus} action-full-width" 
+                        title="${actionTextStatus}">
+                    <i class="fas ${iconClassStatus}"></i> ${actionTextStatus}
+                </button>
+            `;
+
+                const otherActions = `
+                <div class="action-buttons-inline">
+                    <a href="edit_konten.html?id=${id}" 
+                       class="btn btn-warning action-half-width" 
+                       title="Edit">
+                        <i class="fas fa-edit"></i> Edit
+                    </a>
+                    <button onclick="showDeleteModal(${id}, '${escapedTitle}')" 
+                            class="btn btn-danger action-half-width" 
+                            title="Hapus">
+                        <i class="fas fa-trash-alt"></i> Hapus
+                    </button>
+                </div>
+            `;
 
                 row.innerHTML = `
-                    <td>${id}</td>
-                    <td class="table-img-cell">${imgDisplay}</td> 
-                    <td>${konten.title}</td>
-                    <td>${konten.category_name || '-'}</td>
-                    <td>${penulis}</td>
-                    <td>${konten.created_at}</td>
-                    <td><span class="${statusClass}">${isPub ? 'Published' : 'Pending'}</span></td>
-                    <td>
-                        <a href="edit_konten.html?id=${id}" class="btn btn-warning btn-sm" title="Edit"><i class="fas fa-edit"></i></a>
-                        
-                        <button onclick="deleteKonten(${id}, '${konten.title}')" class="btn btn-danger btn-sm" title="Hapus"><i class="fas fa-trash-alt"></i></button>
-                        
-                        <button onclick="togglePublish(${id}, ${isPub})" 
-                                class="btn btn-sm ${isPub ? 'btn-secondary' : 'btn-success'}" 
-                                title="${isPub ? 'Unpublish' : 'Publish'}">
-                            <i class="fas ${isPub ? 'fa-eye-slash' : 'fa-eye'}"></i>
-                        </button>
-                    </td>
-                `;
+                <td>${id}</td>
+                <td class="table-img-cell">${imgDisplay}</td> 
+                <td>${konten.title}</td>
+                <td>
+                    <span class="category-badge">${konten.category_name || '-'}</span>
+                </td>
+                <td>${formatDateTime(konten.created_at)}</td>
+                <td><span class="status ${statusClass}">${statusText}</span></td>
+                
+                <td>
+                    <div class="action-buttons-container-berita">
+                        ${statusButton}
+                        ${otherActions}
+                    </div>
+                </td>
+            `;
             });
         }
 
-        // 5. Fungsi Hapus Konten
-        async function deleteKonten(id, title) {
-            if (!confirm(`Apakah Anda yakin ingin menghapus konten:\n"${title}"?`)) {
-                return;
-            }
+        // --- 7. FUNGSI MODAL HAPUS KUSTOM ---
+        function showDeleteModal(id, title) {
+            currentContentIdToDelete = id;
+            if (kontenTitleToDelete) kontenTitleToDelete.textContent = title;
+            if (deleteKontenModal) deleteKontenModal.style.display = 'flex';
+        }
+
+        // --- 8. FUNGSI EKSEKUSI HAPUS ---
+        async function executeDeleteKonten() {
+            if (!currentContentIdToDelete) return;
+
+            const id = currentContentIdToDelete;
+            const title = kontenTitleToDelete.textContent;
+
+            closeDeleteModal();
 
             const url = '../../../backend/api/contents/delete.php';
             const formData = new FormData();
@@ -230,21 +353,23 @@
                 const result = await response.json();
 
                 if (result.status === 'success') {
-                    displayMessage('success', result.message);
-                    fetchKonten(); // Refresh data dari server agar sinkron
+                    displayMessage('success', `Konten "${title}" berhasil dihapus.`);
+                    fetchKonten();
                 } else {
-                    displayMessage('error', result.message);
+                    displayMessage('error', result.message || 'Gagal menghapus konten.');
                 }
             } catch (error) {
                 console.error('Delete error:', error);
-                displayMessage('error', 'Gagal menghapus konten.');
+                displayMessage('error', 'Gagal menghapus konten karena kesalahan jaringan.');
+            } finally {
+                currentContentIdToDelete = null;
             }
         }
 
-        // 6. Fungsi Toggle Publish
+
+        // --- 9. Fungsi Toggle Publish ---
         async function togglePublish(id, currentStatus) {
             const newStatus = !currentStatus;
-
             const url = '../../../backend/api/contents/publish.php';
             const formData = new FormData();
             formData.append('content_id', id);
@@ -256,7 +381,7 @@
 
                 if (result.status === true || result.status === 'success') {
                     displayMessage('success', result.message);
-                    fetchKonten(); // Refresh data
+                    fetchKonten();
                 } else {
                     displayMessage('error', result.message);
                 }
@@ -267,26 +392,29 @@
         }
 
         // --- Event Listener Filter ---
-        // Panggil fungsi filter saat dropdown berubah
         document.getElementById('filterKategori').addEventListener('change', applyFilters);
 
         // --- Load Data Saat Halaman Dibuka ---
         document.addEventListener('DOMContentLoaded', () => {
-            fetchKategori(); // Ambil list kategori untuk filter
-            fetchKonten();   // Ambil data tabel
+            fetchKategori();
+            fetchKonten();
+
+            if (cancelDeleteBtn) cancelDeleteBtn.onclick = closeDeleteModal;
+            if (confirmDeleteBtn) confirmDeleteBtn.onclick = executeDeleteKonten;
         });
 
         // --- Logika Logout ---
         const logoutModal = document.getElementById('logoutModal');
-        document.getElementById('logoutTrigger').onclick = (e) => { e.preventDefault(); logoutModal.classList.add('show'); };
-        document.getElementById('cancelLogoutBtn').onclick = () => logoutModal.classList.remove('show');
+        document.getElementById('logoutTrigger').onclick = (e) => { e.preventDefault(); logoutModal.style.display = 'flex'; };
+        document.getElementById('cancelLogoutBtn').onclick = () => logoutModal.style.display = 'none';
         document.getElementById('confirmLogoutBtn').onclick = async () => {
             try { await fetch('../../../backend/api/auth/logout.php', { method: 'POST' }); } catch (e) { }
             window.location.href = '../../public/index.html';
         };
 
         window.onclick = (e) => {
-            if (e.target === logoutModal) logoutModal.classList.remove('show');
+            if (e.target === logoutModal) logoutModal.style.display = 'none';
+            if (deleteKontenModal && e.target === deleteKontenModal) closeDeleteModal();
         };
     </script>
 </body>
