@@ -12,6 +12,7 @@
 </head>
 
 <body>
+    <div id="toastNotificationContainer"></div>
 
     <div class="sidebar">
         <div class="logo-area">
@@ -30,170 +31,170 @@
 
     <div class="main-content">
         <header>
-            <div class="page-title-group">
-                <a href="mahasiswa.html" class="back-icon-link" title="Kembali ke Daftar Mahasiswa">
-                    <i class="fas fa-arrow-left"></i>
-                </a>
-                <h1>Tambah Data Mahasiswa</h1>
+            <div class="header-title">
+                <a href="mahasiswa.html" class="back-icon-in-header"><i class="fas fa-arrow-left"></i></a>
+                <h2>Tambah Data Mahasiswa</h2>
             </div>
+            <div></div>
         </header>
 
-        <div class="data-section">
-            <div id="message" class="message-area" style="display: none;"></div>
+        <main>
+            <div class="form-card">
+                <div class="form-card-header"></div>
+                <form id="tambahMahasiswaForm">
+                    <div class="form-grid-2">
+                        <div class="column-left" style="margin-right: 30px;">
+                            <h4 class="section-title" style="color: var(--primary-blue);">
+                                <i class="fas fa-university"></i> Informasi Akademik
+                            </h4>
 
-            <form id="addMahasiswaForm" class="data-form">
-                <div class="form-group">
-                    <label for="nim">NIM</label>
-                    <input type="text" id="nim" name="nim" required>
-                </div>
+                            <div class="form-row" style="display: flex; gap: 15px;">
+                                <div class="form-group" style="flex: 1;">
+                                    <label for="nim">NIM</label>
+                                    <input type="text" id="nim" name="nim" placeholder="2201001" required
+                                        style="width: 100%; box-sizing: border-box;">
+                                </div>
+                                <div class="form-group" style="flex: 2;">
+                                    <label for="nama">Nama Lengkap</label>
+                                    <input type="text" id="nama" name="nama" placeholder="Masukkan nama tanpa gelar"
+                                        required style="width: 100%; box-sizing: border-box;">
+                                </div>
+                            </div>
 
-                <div class="form-group">
-                    <label for="nama">Nama Lengkap</label>
-                    <input type="text" id="nama" name="nama" required>
-                </div>
+                            <div class="form-row" style="display: flex; gap: 15px;">
+                                <div class="form-group" style="flex: 2;">
+                                    <label for="prodi">Program Studi</label>
+                                    <select id="prodi" name="prodi" required
+                                        style="width: 100%; box-sizing: border-box; height: 42px;">
+                                        <option value="">Pilih Program Studi</option>
+                                        <option value="D-IV Teknik Informatika">D-IV Teknik Informatika</option>
+                                        <option value="D-IV Sistem Informasi Bisnis">D-IV Sistem Informasi Bisnis
+                                        </option>
+                                        <option value="D-II Pengembangan Perangkat Lunak">D-II Pengembangan Perangkat
+                                            Lunak</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="flex: 1;">
+                                    <label for="tingkat">Tingkat</label>
+                                    <select id="tingkat" name="tingkat" required
+                                        style="width: 100%; box-sizing: border-box; height: 42px;">
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
 
-                <div class="form-group">
-                    <label for="prodi">Program Studi</label>
-                    <select id="prodi" name="prodi" required>
-                        <option value="D-II PPLS">D-II PPLS</option>
-                        <option value="D-IV Teknik Informatika">D-IV Teknik Informatika</option>
-                        <option value="D-IV Sistem Informasi Bisnis">D-IV Sistem Informasi Bisnis</option>
-                        <option value="S2 Magister Terapan">S2 Magister Terapan</option>
-                    </select>
-                </div>
+                        <div class="column-right" style="display: flex; flex-direction: column;">
+                            <h4 class="section-title" style="color: var(--primary-blue);">
+                                <i class="fas fa-address-book"></i> Kontak & Akun
+                            </h4>
+                            <div class="form-group">
+                                <label for="email">Email Institusi</label>
+                                <input type="email" id="email" name="email" placeholder="mahasiswa@itb.ac.id" required
+                                    style="width: 100%; box-sizing: border-box;">
+                            </div>
+                            <div class="form-group">
+                                <label for="no_hp">Nomor WhatsApp</label>
+                                <input type="text" id="no_hp" name="no_hp" placeholder="0812xxxxxxxx" required
+                                    style="width: 100%; box-sizing: border-box;">
+                            </div>
 
-                <div class="form-group">
-                    <label for="tingkat">Tingkat/Semester</label>
-                    <select id="tingkat" name="tingkat" required>
-                        <option value="">-- Pilih Tingkat --</option>
-                        <option value="1">Tingkat 1</option>
-                        <option value="2">Tingkat 2</option>
-                        <option value="3">Tingkat 3</option>
-                        <option value="4">Tingkat 4</option>
-                        <option value="S2">S2</option>
-                    </select>
-                </div>
+                            <div
+                                style="background: #f8fafc; border: 1.5px dashed #cbd5e0; padding: 20px; border-radius: 10px; margin-top: 10px; flex: 1; display: flex; align-items: center; box-sizing: border-box; width: 100%;">
+                                <div>
+                                    <p style="font-size: 14px; color: #2d3748; margin-bottom: 8px; font-weight: 600;">
+                                        <i class="fas fa-shield-alt" style="color: #4A90E2;"></i> Keamanan Akun Otomatis
+                                    </p>
+                                    <p style="font-size: 13px; color: #718096; margin: 0; line-height: 1.6;">
+                                        Password default akan dibuat oleh sistem.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="email" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="no_hp">Nomor HP</label>
-                    <input type="text" id="no_hp" name="no_hp" placeholder="Contoh: 081234567890">
-                </div>
-
-                <button type="submit" class="submit-button"><i class="fas fa-save"></i> Simpan Mahasiswa</button>
-            </form>
-        </div>
+                    <div class="form-actions full-width">
+                        <button type="submit" id="submitBtn" class="btn btn-ijo">
+                            <i class="fas fa-save"></i> Simpan Data Mahasiswa
+                        </button>
+                        <a href="mahasiswa.html" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Batal
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </main>
     </div>
 
-    <div id="logoutModal" class="modal">
-        <div class="modal-content">
-            <h2>Konfirmasi Logout</h2>
-            <p>Apakah Anda yakin ingin keluar dari Dashboard Admin?</p>
-            <button id="cancelLogoutBtn" class="btn btn-secondary">Batal</button>
-            <button id="confirmLogoutBtn" class="btn btn-primary"
-                style="text-align: center; padding-left: 25px;">Logout</button>
+    <div id="logoutModal" class="modal logout-modal">
+        <div class="modal-content" style="text-align: left !important;">
+            <span class="close-btn" onclick="logoutModal.style.display='none';">&times;</span>
+            <h4><i class="fas fa-sign-out-alt"></i> Konfirmasi Logout</h4>
+            <p>Anda yakin ingin mengakhiri sesi dan keluar dari Panel Admin?</p>
+            <div class="modal-buttons">
+                <button id="cancelLogoutBtn" class="btn btn-secondary">Batal</button>
+                <button id="confirmLogoutBtn" class="btn btn-danger">Ya, Logout</button>
+            </div>
         </div>
     </div>
+    
 
     <script>
-        // Fungsi utilitas untuk menampilkan pesan
-        function displayMessage(type, message) {
-            const messageArea = document.getElementById('message');
-            messageArea.textContent = message;
-            messageArea.className = `message-area ${type}`;
-            messageArea.style.display = 'block';
-            setTimeout(() => {
-                messageArea.style.display = 'none';
-            }, 3000);
-        }
-
-        const form = document.getElementById('addMahasiswaForm');
+        const form = document.getElementById('tambahMahasiswaForm');
+        const submitBtn = document.getElementById('submitBtn');
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
+            const originalBtnText = submitBtn.innerHTML;
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
 
             const formData = new FormData(form);
-            // Endpoint Mahasiswa
-            const url = '../../../backend/api/mahasiswa/create.php';
-
-            const submitButton = form.querySelector('.submit-button');
-            submitButton.disabled = true;
-            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
 
             try {
-                const response = await fetch(url, {
+                const response = await fetch('../../../backend/api/mahasiswa/create.php', {
                     method: 'POST',
                     body: formData
                 });
-
                 const result = await response.json();
 
                 if (result.success) {
-                    displayMessage('success', result.message || 'Mahasiswa berhasil ditambahkan!');
+                    showToast('Mahasiswa berhasil didaftarkan!', 'success');
                     form.reset();
-
-                    setTimeout(() => {
-                        window.location.href = 'mahasiswa.html'; // Redirect ke halaman daftar
-                    }, 1500);
-
+                    setTimeout(() => window.location.href = 'mahasiswa.html', 2000);
                 } else {
-                    displayMessage('error', result.message || 'Gagal menambahkan Mahasiswa.');
+                    showToast(result.message || 'Gagal menambahkan data', 'error');
                 }
-
             } catch (error) {
-                console.error('Error adding Mahasiswa:', error);
-                displayMessage('error', 'Terjadi kesalahan jaringan/server saat menambahkan Mahasiswa.');
+                showToast('Kesalahan koneksi server', 'error');
             } finally {
-                submitButton.disabled = false;
-                submitButton.innerHTML = '<i class="fas fa-save"></i> Simpan Mahasiswa';
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnText;
             }
         });
 
-        // Logika Logout (PERTAMBAHAN BARU)
-        const logoutModal = document.getElementById('logoutModal');
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastNotificationContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast-notification toast-${type} show`;
+            toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${message}`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
         const logoutTrigger = document.getElementById('logoutTrigger');
-        const cancelLogoutBtn = document.getElementById('cancelLogoutBtn');
-        const confirmLogoutBtn = document.getElementById('confirmLogoutBtn');
+        const logoutModal = document.getElementById('logoutModal');
 
-        logoutTrigger.addEventListener('click', (e) => {
-            e.preventDefault();
-            // Ganti: logoutModal.style.display = 'flex';
-            // Tambahkan kelas 'show' yang memiliki display: flex di CSS
-            logoutModal.classList.add('show');
-        });
-
-        cancelLogoutBtn.addEventListener('click', () => {
-            // Ganti: logoutModal.style.display = 'none';
-            // Hapus kelas 'show'
-            logoutModal.classList.remove('show');
-        });
-
-        confirmLogoutBtn.addEventListener('click', async () => {
-            const url = '../../../backend/api/auth/logout.php';
-
-            try {
-                const response = await fetch(url, {
-                    method: 'POST',
-                });
-                const result = await response.json();
-
-                if (result.success) {
-                    // Pastikan modal ditutup
-                    logoutModal.classList.remove('show');
-                    window.location.href = '../../public/index.html'; // Redirect ke halaman utama
-                } else {
-                    window.location.href = '../../public/index.html';
-                }
-
-            } catch (error) {
-                console.error('Logout Error:', error);
-                window.location.href = '../../public/index.html';
-            }
-        });
+        logoutTrigger.onclick = (e) => { e.preventDefault(); logoutModal.classList.add('show'); };
+        document.getElementById('cancelLogoutBtn').onclick = () => logoutModal.classList.remove('show');
+        document.getElementById('confirmLogoutBtn').onclick = async () => {
+            await fetch('../../../backend/api/auth/logout.php', { method: 'POST' });
+            window.location.href = '../../public/index.html';
+        };
     </script>
 </body>
 
