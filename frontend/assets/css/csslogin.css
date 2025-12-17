@@ -501,3 +501,77 @@ body {
     margin-right: 10px;
     font-size: 1.1em;
 }
+
+/* Styling Tombol Melayang */
+.floating-preview-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: linear-gradient(135deg, #4A90E2, #357ABD);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 50px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    box-shadow: 0 10px 20px rgba(74, 144, 226, 0.3);
+    z-index: 9999;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.floating-preview-btn i {
+    font-size: 18px;
+}
+
+/* Efek Hover: Membesar dan Warna Terang */
+.floating-preview-btn:hover {
+    transform: scale(1.1) translateY(-5px);
+    color: white;
+    box-shadow: 0 15px 25px rgba(74, 144, 226, 0.4);
+}
+
+/* Animasi Denyut (Pulse) */
+.pulse-ring {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50px;
+    background: var(--primary-blue);
+    opacity: 0.5;
+    z-index: -1;
+    animation: pulse-animation 2s infinite;
+}
+
+@keyframes pulse-animation {
+    0% {
+        transform: scale(0.95);
+        opacity: 0.5;
+    }
+
+    70% {
+        transform: scale(1.2);
+        opacity: 0;
+    }
+
+    100% {
+        transform: scale(0.95);
+        opacity: 0;
+    }
+}
+
+/* Sembunyikan teks di layar kecil, hanya ikon saja */
+@media (max-width: 768px) {
+    .floating-preview-btn span {
+        display: none;
+    }
+
+    .floating-preview-btn {
+        padding: 15px;
+        border-radius: 50%;
+    }
+}
