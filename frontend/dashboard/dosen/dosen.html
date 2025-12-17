@@ -10,33 +10,96 @@
     <link rel="stylesheet" href="../../assets/css/cssadmin.css">
 
     <style>
-        /* Gaya untuk menampung tabel dengan scroll jika perlu */
-        .data-table-container {
-            overflow-x: auto;
+        /* Pengaturan Lebar Kolom agar Pas 1 Layar */
+        .data-table th:nth-child(1) {
+            width: 70px;
         }
 
-        .data-table {
+        /* Foto */
+        .data-table th:nth-child(2) {
+            width: 300px;
+        }
+
+        /* Nama Dosen (Lebar) */
+        .data-table th:nth-child(3) {
+            width: 250px;
+        }
+
+        /* Kontak & Akun */
+        .data-table th:nth-child(4) {
+            width: 150px;
+        }
+
+        /* Jabatan */
+        .data-table th:nth-child(5) {
+            width: 100px;
+        }
+
+        /* Prodi (Kecil) */
+        .data-table th:nth-child(6) {
+            width: 120px;
+        }
+
+        /* Aksi */
+
+        /* Container Utama Aksi */
+        .action-buttons {
+            display: flex;
+            /* Aktifkan Flexbox */
+            gap: 5px;
+            /* Jarak antar tombol */
+            justify-content: center;
+            /* Center secara Horizontal */
+            align-items: center;
+            /* Center secara Vertikal */
+            height: 100%;
+            /* Pastikan mengikuti tinggi sel */
             width: 100%;
-            min-width: 1050px;
-            border-collapse: collapse;
+            /* Memenuhi lebar kolom */
         }
 
-        .data-table th,
-        .data-table td {
-            white-space: normal;
-            vertical-align: middle;
-            padding: 10px;
+        /* Styling Tombol agar Ukurannya Sama */
+        .action-buttons button,
+        .action-buttons .edit-btn,
+        .action-buttons .delete-btn {
+            flex: 1;
+            /* Tombol akan membagi lebar kolom sama rata */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 8px 0;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 40px;
+            /* Lebar minimum agar tidak terlalu kecil */
+            max-width: 50px;
+            /* Lebar maksimum agar tidak terlalu lebar */
         }
 
-        .data-table tr {
-            border-bottom: 1px solid #ddd;
+        /* Warna Tombol */
+        .edit-btn {
+            background-color: #f39c12;
+            color: white;
         }
 
-        .data-table tbody tr:last-child {
-            border-bottom: none;
+        .edit-btn:hover {
+            background-color: #e67e22;
+            transform: translateY(-2px);
         }
 
-        /* Gaya khusus untuk Foto */
+        .delete-btn {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background-color: #c0392b;
+            transform: translateY(-2px);
+        }
+
+        /* Styling Konten Kolom */
         .dosen-photo {
             width: 50px;
             height: 50px;
@@ -44,110 +107,118 @@
             border-radius: 50%;
             display: block;
             margin: 0 auto;
-            border: 1px solid #ddd;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
-        /* Mengatur lebar spesifik untuk kolom */
-        /* Kolom 1: Foto */
-        .data-table th:nth-child(1),
-        .data-table td:nth-child(1) {
-            width: 60px;
-            text-align: center;
+        .sub-info {
+            display: block;
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: 2px;
+            font-weight: 400;
+            /* Tidak Bold */
         }
 
-        /* Kolom 2: NIDN */
-        .data-table th:nth-child(2),
-        .data-table td:nth-child(2) {
-            width: 100px;
-            word-break: break-all;
-        }
-
-        /* Kolom 3: NIP */
-        .data-table th:nth-child(3),
-        .data-table td:nth-child(3) {
-            width: 100px;
-            word-break: break-all;
-        }
-
-        /* Kolom 4: Nama Lengkap */
-        .data-table th:nth-child(4),
-        .data-table td:nth-child(4) {
-            width: 180px;
-        }
-
-        /* Kolom 5: Password Awal (Posisi Baru) */
-        .data-table th:nth-child(5),
-        .data-table td:nth-child(5) {
-            width: 120px; 
-            font-weight: bold;
-            font-size: 0.9em;
-        }
-        
-        /* Kolom 6: Email (Posisi Baru) */
-        .data-table th:nth-child(6),
-        .data-table td:nth-child(6) {
-            width: 150px;
-            font-size: 0.9em;
-            word-break: break-all;
-        }
-        
-        /* Kolom 9: Aksi (Kolom terakhir) */
-        .data-table th:last-child,
-        .data-table td:last-child {
-            width: 140px;
-            text-align: center;
-        }
-
-        /* Atur ulang lebar untuk Jabatan dan Prodi yang tersisa */
-        .data-table th:nth-child(7), /* Jabatan */
-        .data-table td:nth-child(7) {
-            width: 100px;
-        }
-        .data-table th:nth-child(8), /* Prodi */
-        .data-table td:nth-child(8) {
-            width: 100px;
-        }
-
-        .action-buttons {
+        .email-link {
+            text-decoration: none;
+            color: #0d6efd;
+            font-weight: 500;
             display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .email-link i {
+            font-size: 13px;
+            color: #95a5a6;
+        }
+
+        .password-box {
+            font-family: monospace;
+            color: #e67e22;
+            background: #fdf5e6;
+            padding: 1px 4px;
+            border-radius: 3px;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            align-items: center;
             justify-content: center;
-            gap: 5px;
         }
 
-        .action-buttons button {
-            cursor: pointer;
-            padding: 5px 10px;
-            border: none;
-            border-radius: 4px;
-            color: white;
-        }
-
-        .edit-btn {
-            background-color: #f39c12;
-        }
-
-        .delete-btn {
-            background-color: #e74c3c;
-        }
-        
-        /* Style untuk Search Input */
+        /* Container Pencarian Modern */
+        /* Memastikan Search Bar tidak rakus ruang */
         .search-container {
-            margin-bottom: 15px;
+            flex: 1;
+            /* Biarkan search bar mengambil ruang sisa secara fleksibel */
+            max-width: 400px;
+            /* Batasi lebar maksimalnya agar tidak terlalu panjang */
+            display: flex;
+            align-items: center;
+            background: #ffffff;
+            border: 1.5px solid #e0e6ed;
+            border-radius: 12px;
+            padding: 0 15px;
+            transition: all 0.3s ease;
+            padding-bottom: -30pxpx;
         }
+
+        /* Ikon di dalam Input */
+        .search-icon {
+            color: #a0aec0;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+
+        /* Input Field */
         .search-container input {
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            width: 300px;
-            max-width: 100%;
+            border: none;
+            outline: none;
+            padding: 12px 0;
+            width: 100%;
+            font-family: 'Poppins', sans-serif;
+            font-size: 13px;
+            background: transparent;
+            color: #2d3748;
+            padding-right: 20px;
+        }
+
+        /* Efek Focus (Saat Diklik) */
+        .search-container:focus-within {
+            border-color: #4A90E2;
+            /* Sesuaikan dengan --primary-blue Anda */
+            box-shadow: 0 4px 12px rgba(74, 144, 226, 0.15);
+            transform: translateY(-1px);
+        }
+
+        .search-container:focus-within .search-icon {
+            color: #4A90E2;
+        }
+
+        /* Header Action Group (Agar Search & Button Sejajar Rapi) */
+        .header-actions-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+
         }
     </style>
-
 </head>
 
 <body>
-
     <div class="sidebar">
+        <div id="toastNotificationContainer"></div>
         <div class="logo-area">
             <h3>Lab Admin</h3>
         </div>
@@ -164,282 +235,220 @@
 
     <div class="main-content">
         <header>
-            <h1>Kelola Data Dosen</h1>
+            <div class="header-title">
+                <h2>Kelola Data Dosen</h2>
+            </div>
+            <div class="header-actions-group">
+                <div class="search-container">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="searchInput" placeholder="Cari Nama atau NIDN" onkeyup="filterDosen()">
+                </div>
+                <a href="tambah_dosen.html" class="btn btn-primary btn-add"><i class="fas fa-plus"></i> Tambah Dosen</a>
+            </div>
         </header>
 
-        <div class="data-section">
-            <div id="message" class="message" style="margin-bottom: 20px; display: none;"></div>
-
-            <div class="data-controls">
-                <h2>Daftar Dosen</h2>
-                <a href="tambah_dosen.html" class="add-button">
-                    <i class="fas fa-plus"></i> Tambah Dosen
-                </a>
-            </div>
-            
-            <div class="search-container">
-                <input type="text" id="searchInput" placeholder="Cari NIDN, Nama, Email, Jabatan, atau Prodi..." onkeyup="filterDosen()">
-            </div>
-            <div class="data-table-container">
+        <main>
+            <div id="message" style="display:none;"></div>
+            <div class="table-wrapper">
                 <table class="data-table">
                     <thead>
                         <tr>
                             <th style="text-align: center;">Foto</th>
-                            <th>NIDN</th>
-                            <th>NIP</th>
-                            <th>Nama Lengkap</th>
-                            <th>Password Awal</th> <th>Email</th> <th>Jabatan</th>
+                            <th>Dosen</th>
+                            <th>Kontak & Akun</th>
+                            <th>Jabatan</th>
                             <th>Prodi</th>
                             <th style="text-align: center;">Aksi</th>
                         </tr>
                     </thead>
                     <tbody id="dosenTableBody">
                         <tr>
-                            <td colspan="9" style="text-align: center;">Memuat data dosen...</td>
+                            <td colspan="6" style="text-align: center;">Memuat data...</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
+        </main>
+    </div>
 
+    <div id="deleteDosenModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeDeleteModal()">&times;</span>
+            <h4><i class="fas fa-trash-alt" style="color: #dc3545;"></i> Konfirmasi Hapus</h4>
+            <p>Hapus data dosen: <strong id="dosenNamaHapus"></strong>?</p>
+            <div class="modal-buttons">
+                <button onclick="closeDeleteModal()" class="btn btn-secondary">Batal</button>
+                <button id="confirmDeleteDosenBtn" class="btn btn-danger">Ya, Hapus</button>
+            </div>
         </div>
     </div>
 
-    <div id="logoutModal" class="modal-overlay" style="display: none;">
-        <div class="modal-content">
-            <h3>Konfirmasi Logout</h3>
-            <p>Apakah Anda yakin ingin keluar dari sesi Admin?</p>
-            <div class="modal-actions">
-                <button id="cancelLogout" class="cancel-button">Batal</button>
-                <button id="confirmLogout" class="submit-button">Logout</button>
+
+
+    <div id="logoutModal" class="modal logout-modal">
+        <div class="modal-content" style="text-align: left !important;">
+            <span class="close-btn" onclick="logoutModal.style.display='none';">&times;</span>
+            <h4><i class="fas fa-sign-out-alt"></i> Konfirmasi Logout</h4>
+            <p>Anda yakin ingin mengakhiri sesi dan keluar dari Panel Admin?</p>
+            <div class="modal-buttons">
+                <button id="cancelLogoutBtn" class="btn btn-secondary">Batal</button>
+                <button id="confirmLogoutBtn" class="btn btn-danger">Ya, Logout</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Variabel global untuk menyimpan semua data dosen yang diambil
-        let allDosenData = []; 
-        
-        // --- LOGIKA LOGOUT ---
-        const logoutTrigger = document.getElementById('logoutTrigger');
+        let allDosenData = [];
+        let nidnToDelete = null;
+
+        // Fungsi untuk memicu notifikasi Toast
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastNotificationContainer');
+
+            // Membuat elemen toast
+            const toast = document.createElement('div');
+            toast.className = `toast-notification toast-${type}`;
+
+            // Menentukan ikon berdasarkan tipe
+            const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+
+            toast.innerHTML = `
+        <i class="fas ${icon} toast-icon"></i>
+        <div class="toast-text">${message}</div>
+    `;
+
+            // Masukkan ke container
+            container.appendChild(toast);
+
+            // Memicu animasi masuk (delay sedikit agar transisi CSS jalan)
+            setTimeout(() => toast.classList.add('show'), 10);
+
+            // Hilangkan otomatis setelah 3 detik
+            setTimeout(() => {
+                toast.classList.add('hide'); // Animasi keluar
+                setTimeout(() => toast.remove(), 300); // Hapus dari DOM
+            }, 3000);
+        }
+
+        // --- Logout Fix ---
         const logoutModal = document.getElementById('logoutModal');
-        const cancelLogoutBtn = document.getElementById('cancelLogout');
-        const confirmLogoutBtn = document.getElementById('confirmLogout');
+        document.getElementById('logoutTrigger').onclick = (e) => { e.preventDefault(); logoutModal.style.display = 'flex'; };
+        document.getElementById('cancelLogoutBtn').onclick = () => logoutModal.style.display = 'none';
+        document.getElementById('confirmLogoutBtn').onclick = async () => {
+            await fetch('../../../backend/api/auth/logout.php', { method: 'POST' });
+            window.location.href = '../../public/index.html';
+        };
 
-        logoutTrigger.addEventListener('click', (e) => {
-            e.preventDefault();
-            logoutModal.style.display = 'flex';
-        });
-
-        cancelLogoutBtn.addEventListener('click', () => {
-            logoutModal.style.display = 'none';
-        });
-
-        confirmLogoutBtn.addEventListener('click', async () => {
-            const url = '../../../backend/api/auth/logout.php';
-            try {
-                await fetch(url, { method: 'POST' });
-                window.location.href = '../../public/index.html';
-            } catch (error) {
-                console.error('Logout Error:', error);
-                window.location.href = '../../public/index.html';
-            }
-        });
-
-        window.addEventListener('click', (e) => {
-            if (e.target === logoutModal) {
-                logoutModal.style.display = 'none';
-            }
-        });
-
-        // --- UTILITY FUNCTION & DOM ELEMENTS ---
-        const messageDiv = document.getElementById('message');
-        const dosenTableBody = document.getElementById('dosenTableBody');
-        
-        function displayMessage(type, text) {
-            const messageArea = document.getElementById('message');
-            
-            // Tambahkan tombol tutup (X) ke dalam konten pesan
-            messageArea.innerHTML = `
-                ${text}
-                <span class="close-btn" 
-                      style="cursor: pointer; font-weight: bold; margin-left: 10px; float: right; font-size: 1.2em;">
-                    &times;
-                </span>
-            `;
-            
-            messageArea.className = `alert alert-${type}`;
-            messageArea.style.display = 'block';
-            
-            // Tambahkan event listener untuk tombol tutup
-            const closeBtn = messageArea.querySelector('.close-btn');
-            if (closeBtn) {
-                closeBtn.onclick = () => {
-                    messageArea.style.display = 'none';
-                    messageArea.className = 'message';
-                    messageArea.innerHTML = ''; // Bersihkan konten
-                };
-            }
-        }
-
-        // --- FUNGSI RENDER TABEL ---
-        function renderDosen(dosenArray) {
-            let html = '';
-            const totalCols = 9; // Jumlah kolom tetap 9
-            const DEFAULT_IMG_URL = 'https://via.placeholder.com/50?text=No+Img'; 
-            const ERROR_IMG_URL = 'https://via.placeholder.com/50?text=Error'; 
-            const LOCAL_BASE_PATH = '../../'; // Mundur 2 level dari /admin/dosen/
-
-            if (dosenArray.length === 0) {
-                dosenTableBody.innerHTML = `<tr><td colspan="${totalCols}" style="text-align: center;">Tidak ada data Dosen yang ditemukan.</td></tr>`;
-                return;
-            }
-
-            dosenArray.forEach(dosen => {
-                // ============================================================
-                // LOGIKA PATH FOTO
-                // ============================================================
-                let fotoSrc = DEFAULT_IMG_URL;
-
-                if (dosen.foto_path && dosen.foto_path !== 'NULL' && dosen.foto_path !== '') {
-                    if (dosen.foto_path.startsWith('http')) {
-                        fotoSrc = dosen.foto_path;
-                    } else {
-                        // Path dari DB: assets/uploads/dosen/file.jpg
-                        fotoSrc = LOCAL_BASE_PATH + dosen.foto_path;
-                    }
-                }
-
-                const nipText = dosen.nip ? dosen.nip : '-';
-                const emailText = dosen.email ? dosen.email : '-';
-                // Ambil initial password
-                const passwordText = dosen.initial_password ? dosen.initial_password : '-'; 
-
-
-                html += `
-                    <tr>
-                        <td>
-                            <img 
-                                src="${fotoSrc}" 
-                                alt="Foto" 
-                                class="dosen-photo" 
-                                onerror="this.src='${ERROR_IMG_URL}';" 
-                            />
-                        </td>
-                        <td>${dosen.nidn}</td>
-                        <td>${nipText}</td>
-                        <td>${dosen.nama}</td>
-                        
-                        <td>${passwordText}</td> <td>${emailText}</td> <td>${dosen.jabatan}</td>
-                        <td>${dosen.prodi}</td>
-                        
-                        <td class="action-buttons">
-                            <button 
-                                class="edit-btn" 
-                                onclick="window.location.href='edit_dosen.html?nidn=${dosen.nidn}'" 
-                                title="Edit Data"
-                            >
-                                <i class="fas fa-edit"></i> Edit
-                            </button>
-                            <button 
-                                class="delete-btn" 
-                                onclick="deleteDosen('${dosen.nidn}', '${dosen.nama}')" 
-                                title="Hapus Data"
-                            >
-                                <i class="fas fa-trash"></i> Hapus
-                            </button>
-                        </td>
-                    </tr>
-                `;
-            });
-            dosenTableBody.innerHTML = html;
-        }
-        
-        // --- FUNGSI FILTER DATA MULTI-FIELD ---
-        window.filterDosen = function() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            
-            if (searchTerm === "") {
-                renderDosen(allDosenData);
-                return;
-            }
-            
-            const filteredData = allDosenData.filter(dosen => {
-                // Konversi semua field yang dicari ke string lowercase
-                const nidn = String(dosen.nidn).toLowerCase();
-                const nama = String(dosen.nama).toLowerCase();
-                const email = String(dosen.email).toLowerCase();
-                const jabatan = String(dosen.jabatan).toLowerCase();
-                const prodi = String(dosen.prodi).toLowerCase();
-                
-                // Cek kecocokan di setiap field (menggunakan operator OR ||)
-                return nidn.includes(searchTerm) || 
-                       nama.includes(searchTerm) || 
-                       email.includes(searchTerm) || 
-                       jabatan.includes(searchTerm) || 
-                       prodi.includes(searchTerm);
-            });
-            
-            renderDosen(filteredData);
-        }
-
-
-        // --- FUNGSI FETCH DATA (READ) ---
+        // --- Fetch & Render ---
         async function fetchDosen() {
-            dosenTableBody.innerHTML = `<tr><td colspan="9" style="text-align: center;">Memuat data...</td></tr>`;
-
-            const url = '../../../backend/api/dosen/list.php';
-
             try {
-                const response = await fetch(url);
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const data = await response.json();
-                
-                // Simpan data ke variabel global sebelum merender
-                allDosenData = data; 
+                const res = await fetch('../../../backend/api/dosen/list.php');
+                allDosenData = await res.json();
                 renderDosen(allDosenData);
-
-            } catch (error) {
-                console.error('Error fetching Dosen:', error);
-                dosenTableBody.innerHTML = `<tr><td colspan="9" style="color: red; text-align: center;">Gagal memuat data Dosen. Cek koneksi server API.</td></tr>`;
+            } catch (e) {
+                document.getElementById('dosenTableBody').innerHTML = '<tr><td colspan="6">Gagal memuat data.</td></tr>';
             }
         }
 
-        // --- FUNGSI DELETE ---
-        window.deleteDosen = async (nidn, nama) => {
-            if (!confirm(`Apakah Anda yakin ingin menghapus Dosen: ${nama} (${nidn})? Tindakan ini tidak dapat dibatalkan.`)) {
-                return;
-            }
+        function renderDosen(data) {
+            const body = document.getElementById('dosenTableBody');
+            body.innerHTML = '';
 
-            const url = '../../../backend/api/dosen/delete.php';
-            const formData = new FormData();
-            formData.append('nidn', nidn);
+            data.forEach(d => {
+                // --- LOGIKA DETEKSI URL FOTO ---
+                let fotoSrc = '';
+                const path = d.foto_path || d.foto; // Sesuaikan dengan key dari API Anda
+
+                if (path && path.trim() !== '') {
+                    if (path.startsWith('http')) {
+                        // Jika sudah diawali http, maka itu URL luar (langsung pakai)
+                        fotoSrc = path;
+                    } else {
+                        // Jika bukan http, maka itu file lokal (tambah ../../)
+                        fotoSrc = '../../' + path;
+                    }
+                } else {
+                    // Jika kosong, pakai placeholder
+                    fotoSrc = 'https://via.placeholder.com/50?text=No+Img';
+                }
+
+                body.innerHTML += `
+            <tr>
+                <td style="text-align:center;">
+                    <img src="${fotoSrc}" class="dosen-photo" alt="Foto" 
+                         onerror="this.src='https://via.placeholder.com/50?text=Error';">
+                </td>
+                <td>
+                    <strong style="font-size: 14px; color: #2c3e50;">${d.nama}</strong>
+                    <span class="sub-info">NIDN: ${d.nidn}</span>
+                    <span class="sub-info">NIP: ${d.nip || '-'}</span>
+                </td>
+                <td>
+                    <a href="mailto:${d.email}" class="email-link">
+                        <i class="fas fa-envelope"></i> ${d.email || '-'}
+                    </a>
+                    <span class="sub-info">Password: <span class="password-box">${d.initial_password || '-'}</span></span>
+                </td>
+                <td><span class="category-badge">${d.jabatan}</span></td>
+                <td style="font-size: 13px;">${d.prodi}</td>
+<td style="vertical-align: middle;">
+    <div class="action-buttons">
+        <button class="edit-btn" onclick="window.location.href='edit_dosen.html?nidn=${d.nidn}'" title="Edit">
+            <i class="fas fa-edit"></i>
+        </button>
+        <button class="delete-btn" onclick="prepareDelete('${d.nidn}', '${d.nama}')" title="Hapus">
+            <i class="fas fa-trash"></i>
+        </button>
+    </div>
+</td>
+            </tr>`;
+            });
+        }
+
+        // --- Delete Logic ---
+        function prepareDelete(nidn, nama) {
+            nidnToDelete = nidn;
+            document.getElementById('dosenNamaHapus').innerText = nama;
+            document.getElementById('deleteDosenModal').style.display = 'flex';
+        }
+        function closeDeleteModal() { document.getElementById('deleteDosenModal').style.display = 'none'; }
+
+        document.getElementById('confirmDeleteDosenBtn').onclick = async () => {
+            const fd = new FormData();
+            fd.append('nidn', nidnToDelete);
 
             try {
-                const response = await fetch(url, {
-                    method: 'POST',
-                    body: formData
-                });
-
-                const result = await response.json();
+                const res = await fetch('../../../backend/api/dosen/delete.php', { method: 'POST', body: fd });
+                const result = await res.json();
 
                 if (result.success) {
-                    displayMessage('success', result.message || `Dosen ${nama} berhasil dihapus.`);
-                    fetchDosen(); // Muat ulang data tabel
+                    // Panggil toast sukses
+                    showToast('Dosen berhasil dihapus!', 'success');
+                    fetchDosen(); // Refresh tabel
                 } else {
-                    displayMessage('error', result.message || `Gagal menghapus Dosen ${nama}.`);
+                    // Panggil toast error jika gagal dari server
+                    showToast(result.message || 'Gagal menghapus data', 'error');
                 }
+            } catch (e) {
+                // Panggil toast error jika gagal koneksi
+                showToast('Terjadi kesalahan koneksi ke server', 'error');
+            }
 
-            } catch (error) {
-                console.error('Error deleting Dosen:', error);
-                displayMessage('error', 'Terjadi kesalahan jaringan/server saat menghapus.');
+            closeDeleteModal(); // Tutup modal konfirmasi
+        };
+
+        function filterDosen() {
+            const val = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = allDosenData.filter(d => d.nama.toLowerCase().includes(val) || d.nidn.toString().includes(val));
+            renderDosen(filtered);
+        }
+
+        window.onclick = (e) => {
+            if (e.target.classList.contains('modal')) {
+                e.target.style.display = 'none';
             }
         };
 
-        // Panggil fungsi saat halaman dimuat
         document.addEventListener('DOMContentLoaded', fetchDosen);
     </script>
 </body>

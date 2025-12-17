@@ -8,9 +8,11 @@
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../../assets/css/cssadmin.css">
+    <link rel="stylesheet" href="../../assets/css/cssmahasiswa.css">
 </head>
 
 <body>
+    <div id="toastNotificationContainer"></div>
 
     <div class="sidebar">
         <div class="logo-area">
@@ -27,274 +29,264 @@
         </nav>
     </div>
 
-    <div class="main-content-dosen">
+    <div class="main-content">
         <header>
-            <div class="page-title-group">
-                <a href="dosen.html" class="back-icon-link" title="Kembali ke Daftar Dosen">
-                    <i class="fas fa-arrow-left"></i>
-                </a>
-                <h1>Edit Data Dosen <span id="dosen-nidn-display" style="font-size: 0.7em; color: #888;"></span></h1>
+            <div class="header-title">
+                <a href="dosen.html" class="back-icon-in-header"><i class="fas fa-arrow-left"></i></a>
+                <h2>Edit Data Dosen: <span id="dosen-nidn-display"
+                        style="font-size: 0.7em; opacity: 0.6;">[Memuat...]</span></h2>
             </div>
+            <div></div>
         </header>
-        <div class="data-section">
-            <div id="message" class="message" style="margin-bottom: 20px; display: none;"></div>
 
-            <div class="data-form-container">
-                <h2>Form Edit Data Dosen</h2>
+        <main>
+            <div class="form-card">
+                <div class="form-card-header"></div>
 
-                <form id="editDosenForm" class="data-form form-grid" enctype="multipart/form-data">
-
+                <form id="editDosenForm" class="data-form">
                     <input type="hidden" id="input-nidn-key" name="nidn">
-
-                    <div class="form-column">
-                        <div class="form-group">
-                            <label for="input-user_id">User ID (Existing):</label>
-                            <input type="number" id="input-user_id" name="user_id" required readonly
-                                placeholder="ID pengguna dari tabel **users** (tidak dapat diubah).">
-                        </div>
-                        <div class="form-group">
-                            <label for="input-nidn">NIDN:</label>
-                            <input type="text" id="input-nidn" name="nidn_dummy" required readonly
-                                placeholder="Tidak dapat diubah karena NIDN adalah Primary Key.">
-                        </div>
-                        <div class="form-group">
-                            <label for="input-nip">NIP:</label>
-                            <input type="text" id="input-nip" name="nip" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="input-nama">Nama Lengkap:</label>
-                            <input type="text" id="input-nama" name="nama" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="input-email">Email:</label>
-                            <input type="email" id="input-email" name="email" required>
-                        </div>
-                    </div>
-
-                    <div class="form-column">
-                        <div class="form-group">
-                            <label for="input-jabatan">Jabatan:</label>
-                            <input type="text" id="input-jabatan" name="jabatan" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="input-prodi">Prodi:</label>
-                            <input type="text" id="input-prodi" name="prodi" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="input-pendidikan">Pendidikan Terakhir:</label>
-                            <input type="text" id="input-pendidikan" name="pendidikan" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Foto Profil Saat Ini:</label>
-                            <div id="foto-preview-area" style="margin-bottom: 10px;">
-                                <img id="current-foto" src="" alt="Foto Profil Lama"
-                                    style="max-width: 100px; max-height: 100px; border-radius: 8px; border: 1px solid #ddd; object-fit: cover; display: none;">
-                                <p id="no-foto-text" style="color: #888; font-style: italic; display: none;">Belum ada
-                                    foto.</p>
+                    <input type="hidden" id="input-user_id" name="user_id">
+                    <input type="hidden" id="input-foto-lama" name="foto_lama">
+                    <div class="form-grid-2">
+                        <div class="column-left">
+                            <h4 style="color: var(--primary-blue);"><i class="fas fa-id-card"></i> Identitas Dosen</h4>
+                            <div class="form-group">
+                                <label for="input-nidn">NIDN (Read Only)</label>
+                                <input type="text" id="input-nidn" readonly
+                                    style="background-color: #f9f9f9; cursor: not-allowed;">
+                            </div>
+                            <div class="form-group">
+                                <label for="input-nip">NIP <span class="required">*</span></label>
+                                <input type="text" id="input-nip" name="nip" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="input-nama">Nama Lengkap <span class="required">*</span></label>
+                                <input type="text" id="input-nama" name="nama" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="input-email">Email <span class="required">*</span></label>
+                                <input type="email" id="input-email" name="email" required>
                             </div>
 
-                            <label for="input-foto">Ganti Foto Profil:</label>
-                            <input type="file" id="input-foto" name="foto_file" accept="image/jpeg,image/png">
-                            <small>Kosongkan jika tidak ingin mengubah foto.</small>
+                            <div class="form-group">
+                                <label for="input-matkul">Mata Kuliah Diampu:</label>
+                                <textarea id="input-matkul" name="mata_kuliah" rows="3" required></textarea>
+                            </div>
                         </div>
 
-                        <div class="form-group">
-  
-                        <div class="form-group">
-                            <label for="foto_path_url">Atau Ganti/Setel Ulang dengan URL Foto:</label>
-                            <input type="text" name="foto_path" id="foto_path_url" placeholder="Masukkan URL Gambar di sini" value="">
-                        </div>
+                        <div class="column-right">
+                            <h4 style="color: var(--primary-blue);"><i class="fas fa-briefcase"></i> Akademik & Jabatan
+                            </h4>
+                            <div class="form-group">
+                                <label for="input-jabatan">Jabatan <span class="required">*</span></label>
+                                <select id="input-jabatan" name="jabatan" required>
+                                    <option value="Tenaga Pengajar">Tenaga Pengajar</option>
+                                    <option value="Asisten Ahli">Asisten Ahli</option>
+                                    <option value="Lektor">Lektor</option>
+                                    <option value="Lektor Kepala">Lektor Kepala</option>
+                                    <option value="Guru Besar">Guru Besar</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="input-prodi">Program Studi <span class="required">*</span></label>
+                                <select id="input-prodi" name="prodi" required>
+                                    <option value="D-IV Teknik Informatika">D-IV Teknik Informatika</option>
+                                    <option value="D-IV Sistem Informasi Bisnis">D-IV Sistem Informasi Bisnis</option>
+                                    <option value="D-II Pengembangan Perangkat (Piranti) Lunak Situs">D-II Pengembangan
+                                        Perangkat (Piranti) Lunak Situs</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="input-pendidikan">Pendidikan Terakhir <span
+                                        class="required">*</span></label>
+                                <input type="text" id="input-pendidikan" name="pendidikan" required>
+                            </div>
+                            <h4 style="color: var(--primary-blue);"><i class="fas fa-camera"></i> Foto Profil</h4>
+                            <div id="foto-preview-area"
+                                style="margin-bottom: 15px; display: flex; align-items: center; gap: 15px;">
+                                <img id="current-foto" src="" alt="Preview"
+                                    style="width: 80px; height: 80px; border-radius: 8px; object-fit: cover; border: 2px solid #ddd; display: none;">
+                                <p id="no-foto-text" style="color: #888; font-style: italic; margin: 0;">Belum ada foto.
+                                </p>
+                            </div>
 
-                        <div class="form-group full-width">
-                            <label for="input-matkul">Mata Kuliah Diampu:</label>
-                            <textarea id="input-matkul" name="mata_kuliah" required rows="3"></textarea>
-                        </div>
-                    </div>
+                            <div class="file-upload-wrapper">
+                                <div class="file-upload-container">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <p>Klik atau Tarik File Gambar Baru</p>
+                                    <input type="file" id="input-foto" name="foto_file" accept="image/jpeg,image/png">
+                                </div>
+                                <span id="fileNameDisplay" class="file-name-display">Belum ada file dipilih</span>
+                            </div>
 
-                    <div class="form-actions full-width">
-                        <button type="submit" class="submit-button update-button"><i class="fas fa-sync-alt"></i> Update
-                            Dosen</button>
-                        <a href="dosen.html" class="cancel-button"><i class="fas fa-times"></i> Batal</a>
+                            <div class="form-group" style="margin-top: 15px;">
+                                <label for="foto_path_url">Atau Ganti dengan URL Foto:</label>
+                                <input type="text" name="foto_path" id="foto_path_url"
+                                    placeholder="https://website.com/foto.jpg">
+                            </div>
+                            <small style="color: #666;">Biarkan kosong jika tidak ingin mengubah foto saat ini.</small>
+                            <div class="form-actions full-width" style="margin-top: 50px;">
+                                <button type="submit" id="submitBtn" class="btn btn-ijo">
+                                    <i class="fas fa-save"></i> Simpan Dosen
+                                </button>
+                                <a href="dosen.html" class="btn btn-secondary">
+                                    <i class="fas fa-times"></i> Batal
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </form>
 
+
+
+
+            </div>
+        </main>
+    </div>
+
+
+    <div id="logoutModal" class="modal logout-modal" style="display: none;">
+        <div class="modal-content" style="text-align: left !important;">
+            <h4><i class="fas fa-sign-out-alt"></i> Konfirmasi Logout</h4>
+            <p>Apakah Anda yakin ingin mengakhiri sesi Admin?</p>
+            <div class="modal-buttons">
+                <button id="cancelLogout" class="btn btn-secondary">Batal</button>
+                <button id="confirmLogout" class="btn btn-danger">Logout</button>
             </div>
         </div>
     </div>
-
-    <div id="logoutModal" class="modal-overlay" style="display: none;">
-        <div class="modal-content">
-            <h2>Konfirmasi Logout</h2>
-            <p>Apakah Anda yakin ingin keluar dari sesi Admin?</p>
-            <div class="modal-actions">
-                <button id="confirmLogout" class="btn-confirm">Logout</button>
-                <button id="cancelLogout" class="btn-cancel">Batal</button>
-            </div>
-        </div>
-    </div>
-
 
     <script>
-        // Logika Logout
-        const logoutTrigger = document.getElementById('logoutTrigger');
-        const logoutModal = document.getElementById('logoutModal');
-        const cancelLogoutBtn = document.getElementById('cancelLogout');
-        const confirmLogoutBtn = document.getElementById('confirmLogout');
-
-        logoutTrigger.addEventListener('click', (e) => {
-            e.preventDefault();
-            logoutModal.style.display = 'flex';
-        });
-
-        cancelLogoutBtn.addEventListener('click', () => {
-            logoutModal.style.display = 'none';
-        });
-
-        confirmLogoutBtn.addEventListener('click', async () => {
-            // Path API Logout sudah benar (Mundur 3 langkah ke backend)
-            const url = '../../../backend/api/auth/logout.php';
-            try {
-                await fetch(url, { method: 'POST' });
-                // Path Redirect sudah benar (Mundur 2 langkah ke public)
-                window.location.href = '../../public/index.html';
-            } catch (error) {
-                console.error('Logout Error:', error);
-                window.location.href = '../../public/index.html';
-            }
-        });
-
-        window.addEventListener('click', (e) => {
-            if (e.target === logoutModal) {
-                logoutModal.style.display = 'none';
-            }
-        });
-
-        // =======================================================
-        // DOSEN EDIT LOGIC (UPDATE)
-        // =======================================================
-        const form = document.getElementById('editDosenForm');
-        const messageDiv = document.getElementById('message');
-        const dosenNidnDisplay = document.getElementById('dosen-nidn-display');
-        const currentFoto = document.getElementById('current-foto');
-        const noFotoText = document.getElementById('no-foto-text');
-
-        function displayMessage(type, text) {
-            messageDiv.textContent = text;
-            messageDiv.className = `alert alert-${type}`;
-            messageDiv.style.display = 'block';
+        // --- TOAST NOTIFICATION ---
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastNotificationContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast-notification toast-${type}`;
+            const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+            toast.innerHTML = `<i class="fas ${icon} toast-icon"></i><div class="toast-text">${message}</div>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.classList.add('show'), 10);
             setTimeout(() => {
-                messageDiv.style.display = 'none';
-                messageDiv.className = 'message';
-            }, 5000);
+                toast.classList.add('hide');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
         }
 
-        function getNidnFromUrl() {
+        // --- FETCH DETAIL DATA (AUTO-FILL) ---
+        async function fetchDosenDetail() {
             const params = new URLSearchParams(window.location.search);
-            return params.get('nidn');
-        }
+            const nidn = params.get('nidn');
 
-        // --- FUNGSI MUAT DATA LAMA (DETAIL) ---
-        async function fetchDosenDetail(nidn) {
-            // Path API Detail sudah benar
-            const url = `../../../backend/api/dosen/detail.php?nidn=${nidn}`;
-            console.log('Fetching Dosen Detail from URL:', url);
+            if (!nidn) {
+                showToast('NIDN tidak ditemukan di URL!', 'error');
+                return;
+            }
+
             try {
-                const response = await fetch(url);
+                const response = await fetch(`../../../backend/api/dosen/detail.php?nidn=${nidn}`);
                 const data = await response.json();
 
                 if (data && data.nidn) {
-                    // Isi Form
+                    // Isi Kunci Update
                     document.getElementById('input-nidn-key').value = data.nidn;
-                    document.getElementById('input-nidn').value = data.nidn;
                     document.getElementById('input-user_id').value = data.user_id;
-                    document.getElementById('input-nip').value = data.nip;
-                    document.getElementById('input-nama').value = data.nama;
-                    document.getElementById('input-email').value = data.email;
-                    document.getElementById('input-jabatan').value = data.jabatan;
-                    document.getElementById('input-prodi').value = data.prodi;
-                    document.getElementById('input-pendidikan').value = data.pendidikan;
-                    document.getElementById('input-matkul').value = data.mata_kuliah;
 
-                    if (dosenNidnDisplay) {
-                        dosenNidnDisplay.textContent = `(${data.nidn})`;
+                    // --- TAMBAHKAN INI: Simpan path foto lama ---
+                    if (document.getElementById('input-foto-lama')) {
+                        document.getElementById('input-foto-lama').value = data.foto_path || '';
                     }
 
-                    // --- PERBAIKAN 2: LOGIKA PREVIEW FOTO PINTAR ---
-                    const fotoPath = data.foto_path;
-                    if (fotoPath && fotoPath !== "") {
-                        if (fotoPath.startsWith('http')) {
-                            // Jika Link Online (http...), pakai langsung
-                            currentFoto.src = fotoPath;
-                        } else {
-                            // Jika File Lokal (assets/...), mundur 2 langkah ke frontend/
-                            currentFoto.src = `../../${fotoPath}`;
-                        }
+                    // Isi Field Form
+                    document.getElementById('input-nidn').value = data.nidn;
+                    document.getElementById('input-nip').value = data.nip || '';
+                    document.getElementById('input-nama').value = data.nama || '';
+                    document.getElementById('input-email').value = data.email || '';
+                    document.getElementById('input-jabatan').value = data.jabatan || '';
+                    document.getElementById('input-prodi').value = data.prodi || '';
+                    document.getElementById('input-pendidikan').value = data.pendidikan || '';
+                    document.getElementById('input-matkul').value = data.mata_kuliah || '';
+                    document.getElementById('dosen-nidn-display').textContent = `(${data.nidn})`;
 
+                    /// Logika Preview Foto yang lebih aman
+                    const currentFoto = document.getElementById('current-foto');
+                    const noFotoText = document.getElementById('no-foto-text');
+                    const urlInput = document.getElementById('foto_path_url');
+                    const fotoPath = data.foto_path;
+
+                    if (fotoPath && fotoPath !== "") {
+                        // Tampilkan gambar
+                        currentFoto.src = fotoPath.startsWith('http') ? fotoPath : `../../${fotoPath}`;
                         currentFoto.style.display = 'block';
                         noFotoText.style.display = 'none';
-                    } else {
-                        currentFoto.style.display = 'none';
-                        noFotoText.style.display = 'block';
-                    }
 
+                        // HANYA isi kotak URL jika memang datanya berupa link (http)
+                        if (fotoPath.startsWith('http')) {
+                            urlInput.value = fotoPath;
+                        } else {
+                            // Jika file lokal, biarkan input URL kosong agar tidak menimpa data saat update
+                            urlInput.value = "";
+                        }
+                    }
                 } else {
-                    displayMessage('error', data.message || 'Gagal memuat data detail Dosen. NIDN tidak valid.');
+                    showToast('Gagal mengambil detail dosen.', 'error');
                 }
-            } catch (error) {
-                console.error('Error fetching detail:', error);
-                displayMessage('error', 'Terjadi kesalahan jaringan/server saat memuat data. Lihat console log.');
+            } catch (err) {
+                showToast('Kesalahan memuat data.', 'error');
             }
         }
 
-        // --- FUNGSI UPDATE DATA ---
+        // --- DISPLAY SELECTED FILE NAME ---
+        const inputFoto = document.getElementById('input-foto');
+        const fileNameDisplay = document.getElementById('fileNameDisplay');
+        inputFoto.addEventListener('change', () => {
+            fileNameDisplay.textContent = inputFoto.files.length > 0 ? inputFoto.files[0].name : 'Belum ada file dipilih';
+        });
+
+        // --- SUBMIT UPDATE ---
+        const form = document.getElementById('editDosenForm');
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
+            const submitBtn = document.getElementById('submitBtn');
+            const originalText = submitBtn.innerHTML;
 
-            // Path API Update sudah benar
-            const url = '../../../backend/api/dosen/update.php';
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
+
             const formData = new FormData(form);
 
-            const submitButton = form.querySelector('.submit-button');
-            submitButton.disabled = true;
-            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
-
             try {
-                const response = await fetch(url, {
+                const response = await fetch('../../../backend/api/dosen/update.php', {
                     method: 'POST',
-                    body: formData // Kirim FormData (termasuk file jika ada)
+                    body: formData
                 });
-
                 const result = await response.json();
 
                 if (result.success) {
-                    displayMessage('success', result.message || 'Data Dosen berhasil diubah!');
-
-                    setTimeout(() => {
-                        window.location.href = 'dosen.html'; // Redirect
-                    }, 1500);
+                    showToast('Data Dosen berhasil diperbarui!');
+                    setTimeout(() => window.location.href = 'dosen.html', 2000);
                 } else {
-                    displayMessage('error', result.message || 'Gagal mengubah Dosen.');
+                    showToast(result.message || 'Gagal update data', 'error');
                 }
-
             } catch (error) {
-                console.error('Error updating Dosen:', error);
-                displayMessage('error', 'Terjadi kesalahan jaringan/server saat mengubah Dosen.');
+                showToast('Kesalahan server atau koneksi', 'error');
             } finally {
-                submitButton.disabled = false;
-                submitButton.innerHTML = '<i class="fas fa-sync-alt"></i> Update Dosen';
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
             }
         });
 
-        // Panggil fungsi saat halaman dimuat
-        document.addEventListener('DOMContentLoaded', () => {
-            const nidn = getNidnFromUrl();
-            if (nidn) {
-                fetchDosenDetail(nidn);
-            } else {
-                displayMessage('error', 'NIDN Dosen tidak ditemukan di URL. Tidak bisa melakukan edit.');
-            }
-        });
+        // --- LOGOUT LOGIC ---
+        const logoutTrigger = document.getElementById('logoutTrigger');
+        const logoutModal = document.getElementById('logoutModal');
+        logoutTrigger.onclick = (e) => { e.preventDefault(); logoutModal.style.display = 'flex'; };
+        document.getElementById('cancelLogout').onclick = () => logoutModal.style.display = 'none';
+        document.getElementById('confirmLogout').onclick = async () => {
+            await fetch('../../../backend/api/auth/logout.php', { method: 'POST' });
+            window.location.href = '../../public/index.html';
+        };
+
+        // --- START UP ---
+        document.addEventListener('DOMContentLoaded', fetchDosenDetail);
     </script>
 </body>
 

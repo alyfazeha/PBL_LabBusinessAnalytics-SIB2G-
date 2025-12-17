@@ -9,7 +9,7 @@ error_reporting(E_ALL);
 
 try {
     // FIX PATH: Mundur 2 langkah (Perlu ditambahkan lagi di sini)
-    require_once __DIR__ . "/../../config/database.php"; 
+    require_once __DIR__ . "/../../config/database.php";
     require_once __DIR__ . "/../../models/Dosen.php";
     require_once __DIR__ . "/../../config/auth.php";
 
@@ -40,9 +40,10 @@ try {
     // -----------------------------
 
 
-    // --- LOGIKA UPDATE FOTO (YANG DIPERBAIKI) ---
-    $final_foto_path = $currentDosen['foto_path'];
+    // --- LOGIKA UPDATE FOTO (VERSI FULL FIX) ---
+    $final_foto_path = $currentDosen['foto_path']; // Default: Gunakan path yang sudah ada di DB
 
+    // 1. Prioritas Utama: Cek jika ada upload FILE fisik baru
     if (isset($_FILES['foto_file']) && $_FILES['foto_file']['error'] === UPLOAD_ERR_OK) {
         $fileTmpPath = $_FILES['foto_file']['tmp_name'];
         $fileName = $_FILES['foto_file']['name'];
@@ -52,30 +53,29 @@ try {
         $allowedfileExtensions = array('jpg', 'gif', 'png', 'jpeg', 'webp');
         if (in_array($fileExtension, $allowedfileExtensions)) {
             $newFileName = $nidn . '_' . time() . '.' . $fileExtension;
-            
-            // PATH DINAMIS (SAMA SEPERTI CREATE)
-            $projectRoot = dirname(__DIR__, 3); 
+
+            $projectRoot = dirname(__DIR__, 3);
             $uploadFileDir = $projectRoot . '/frontend/assets/uploads/dosen/';
-            
+
             if (!is_dir($uploadFileDir)) {
-                if (!mkdir($uploadFileDir, 0777, true)) {
-                    throw new Exception("Gagal membuat folder upload.");
-                }
+                mkdir($uploadFileDir, 0777, true);
             }
 
             $dest_path = $uploadFileDir . $newFileName;
 
-            if(move_uploaded_file($fileTmpPath, $dest_path)) {
-                // PATH BERSIH DISIMPAN DI DB
-                $final_foto_path = 'assets/uploads/dosen/' . $newFileName; 
-            } else {
-                throw new Exception("Gagal mengupload file foto.");
+            if (move_uploaded_file($fileTmpPath, $dest_path)) {
+                $final_foto_path = 'assets/uploads/dosen/' . $newFileName;
             }
         }
-    } 
-    elseif (isset($_POST['foto_path'])) {
+    }
+    // 2. Prioritas Kedua: Jika tidak ada file, cek apakah ada input URL baru dan TIDAK KOSONG
+    elseif (isset($_POST['foto_path']) && trim($_POST['foto_path']) !== "") {
         $final_foto_path = trim($_POST['foto_path']);
     }
+
+    // JIKA KEDUANYA KOSONG:
+    // $final_foto_path akan tetap berisi nilai dari $currentDosen['foto_path']
+    // Sehingga foto lama TIDAK AKAN TERHAPUS.
 
     // --- DATA FINAL UNTUK UPDATE ---
     $data = [
@@ -100,7 +100,6 @@ try {
     } else {
         throw new Exception('Gagal memperbarui data dosen.');
     }
-
 } catch (Exception $e) {
     http_response_code(500);
     // Tambahkan penanganan untuk duplikasi NIP yang diisi
@@ -112,4 +111,3 @@ try {
 
     echo json_encode(['success' => false, 'message' => $message]);
 }
-?>
