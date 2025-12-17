@@ -9,10 +9,11 @@
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
         integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
     <link rel="stylesheet" href="../assets/css/csslogin.css">
+    <link rel="stylesheet" href="../assets/css/cssadmin.css">
 </head>
 
 <body>
-
+    <div id="toastNotificationContainer"></div>
     <div class="container" id="container">
 
         <div class="form-container sign-up-container">
@@ -81,6 +82,11 @@
         </div>
     </div>
 
+    <a href="index.html" class="floating-preview-btn" title="Lihat Tampilan Depan">
+        <div class="pulse-ring"></div>
+        <i class="fas fa-eye"></i>
+        <span>Lihat Website</span>
+    </a>
     <script>
         const signUpButton = document.getElementById('signUp');
         const signInButton = document.getElementById('signIn');
@@ -105,8 +111,38 @@
             container.classList.remove("right-panel-active");
         });
 
-        function showNotification(message, isSuccess) {
-            alert((isSuccess ? "Sukses: " : "Error: ") + message);
+        function showNotification(message, type = 'info') {
+            // Normalisasi tipe (jika input boolean dari kode lama)
+            if (type === true) type = 'success';
+            if (type === false) type = 'error';
+
+            const container = document.getElementById('toastNotificationContainer');
+            if (!container) return;
+
+            // Buat elemen toast
+            const toast = document.createElement('div');
+            toast.className = `toast-notification toast-${type}`;
+
+            // Tentukan icon berdasarkan tipe
+            let icon = 'fa-info-circle';
+            if (type === 'success') icon = 'fa-check-circle';
+            if (type === 'error') icon = 'fa-exclamation-circle';
+
+            toast.innerHTML = `
+        <div class="toast-icon"><i class="fas ${icon}"></i></div>
+        <div class="toast-text">${message}</div>
+    `;
+
+            container.appendChild(toast);
+
+            // Trigger animasi muncul
+            setTimeout(() => toast.classList.add('show'), 100);
+
+            // Hilangkan otomatis setelah 3.5 detik
+            setTimeout(() => {
+                toast.classList.replace('show', 'hide');
+                setTimeout(() => toast.remove(), 500); // Hapus dari DOM setelah animasi selesai
+            }, 3500);
         }
 
         // --- LOGIC MULTI-STEP REGISTER ---
@@ -165,30 +201,21 @@
                     const result = await response.json();
 
                     if (result.success) {
-                        showNotification(result.message, true);
+                        showNotification(result.message, 'success'); // Gunakan toast success
 
-                        // LOGIKA PENGALIHAN BERDASARKAN ROLE
-                        if (result.data && result.data.role) {
-                            switch (result.data.role) {
-                                case 'admin':
-                                    window.location.href = '../dashboard/admin.html';
-                                    break;
-                                case 'mahasiswa':
-                                    window.location.href = '../dashboard_mahasiswa/index.html';
-                                    break;
-                                case 'dosen':
-                                    window.location.href = '../dashboard_dosen/index.html';
-                                    break;
-                                default:
-                                    window.location.href = '../homepage/index.html'; // Default ke halaman utama
+                        // Beri jeda 1.5 detik agar user bisa baca toast sebelum pindah halaman
+                        setTimeout(() => {
+                            if (result.data && result.data.role) {
+                                switch (result.data.role) {
+                                    case 'admin': window.location.href = '../dashboard/admin.html'; break;
+                                    case 'mahasiswa': window.location.href = '../dashboard_mahasiswa/index.html'; break;
+                                    case 'dosen': window.location.href = '../dashboard_dosen/index.html'; break;
+                                    default: window.location.href = 'index.html';
+                                }
+                            } else {
+                                window.location.href = 'index.html';
                             }
-                        } else {
-                            // Jika data role tidak ada, asumsikan sukses tapi arahkan ke default
-                            window.location.href = '../homepage/index.html';
-                        }
-
-                    } else {
-                        showNotification(result.message, false);
+                        }, 1500);
                     }
 
                 } catch (error) {
@@ -228,12 +255,11 @@
                     const result = await response.json();
 
                     if (result.success) {
-                        showNotification(result.message + " Silakan masuk.", true);
-                        // Pindah ke form login setelah sukses register
+                        showNotification(result.message + " Silakan masuk.", 'success');
+
+                        // Pindah ke form login
                         container.classList.remove("right-panel-active");
-                        goToStep(1); // Reset ke Step 1
-                    } else {
-                        showNotification(result.message, false);
+                        goToStep(1);
                     }
 
                 } catch (error) {
@@ -242,6 +268,15 @@
                 }
             });
         }
+
+        document.addEventListener('keydown', function (e) {
+            // Jika menekan huruf 'P' (shift + p) saat tidak sedang mengetik di input
+            if (e.shiftKey && e.key.toLowerCase() === 'p') {
+                if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+                    window.location.href = 'index.html';
+                }
+            }
+        });
     </script>
 
 </body>
