@@ -366,6 +366,10 @@
         </div>
         <nav>
             <a href="admin.html" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="../public/index.html"
+                style="border-top: 1px solid rgba(255,255,255,0.1); margin-top: 10px; padding-top: 15px;">
+                <i class="fas fa-external-link-alt"></i> Lihat Landing Page
+            </a>
             <a href="peminjaman/peminjaman.html"><i class="fas fa-calendar-alt"></i> Peminjaman</a>
             <a href="konten/konten.html"><i class="fas fa-newspaper"></i> Berita & Konten</a>
             <a href="publikasi/publikasi.html"><i class="fas fa-book"></i> Publikasi</a>
@@ -377,8 +381,8 @@
 
     <div class="main-content">
         <header style="margin-bottom: 35px; border-bottom: 1px solid #e2e8f0; padding-bottom: 15px;">
-            <h1 style="font-size: 1.8rem; color: #2d3748; margin: 0;">Selamat Datang, <span
-                    id="welcomeName">Admin</span>! 👋</h1>
+            <h1 style="font-size: 1.8rem; color: #2d3748; margin: 0;">Selamat Datang, <span id="welcomeName"
+                    style="color: var(--primary-blue);">Admin</span>! 👋</h1>
             <p style="color: #718096; margin-top: 5px;">Pantau aktivitas laboratorium hari ini secara real-time.</p>
         </header>
 
@@ -514,23 +518,23 @@
     </div>
     </main>
 
-    <div id="logoutModal" class="modal-overlay"
-        style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; justify-content:center; align-items:center;">
-        <div class="modal-content"
-            style="background:white; padding:30px; border-radius:15px; text-align:center; width: 380px;">
-            <div style="color: var(--danger-red); font-size: 50px; margin-bottom: 15px;">
-                <i class="fas fa-exclamation-circle"></i>
+    <div id="logoutModal" class="modal logout-modal">
+        <div class="modal-content" style="text-align: left !important;">
+            <span class="close-btn" onclick="logoutModal.style.display='none';">&times;</span>
+
+            <h4><i class="fas fa-sign-out-alt"></i> Konfirmasi Logout</h4>
+
+            <p>Anda yakin ingin mengakhiri sesi dan keluar dari Panel Admin?</p>
+
+            <div class="modal-buttons">
+                <button id="cancelLogout" class="btn btn-secondary">Batal</button>
+                <button id="confirmLogout" class="btn btn-danger">Ya, Logout</button>
             </div>
-            <h2 style="margin-bottom: 10px; color: #2d3748; font-size: 1.4rem;">Konfirmasi Keluar</h2>
-            <p style="color: #718096; margin-bottom: 25px;">Apakah Anda yakin ingin keluar dari sistem admin?</p>
-            <div class="modal-actions" style="display: flex; justify-content: center; gap: 12px;">
-                <button id="cancelLogout"
-                    style="padding:10px 25px; border:1.5px solid #edf2f7; background: #fff; border-radius:10px; cursor:pointer; font-weight: 600; color: #718096;">Batal</button>
-                <button id="confirmLogout"
-                    style="padding:10px 25px; background:var(--danger-red); color:white; border:none; border-radius:10px; cursor:pointer; font-weight: 600;">Ya,
-                    Logout</button>
-            </div>
+
         </div>
+    </div>
+
+
     </div>
 
     <script>
@@ -780,8 +784,17 @@
         document.getElementById('logoutTrigger').onclick = (e) => { e.preventDefault(); logoutModal.style.display = 'flex'; };
         document.getElementById('cancelLogout').onclick = () => logoutModal.style.display = 'none';
         document.getElementById('confirmLogout').onclick = async () => {
-            await fetch('../../backend/api/auth/logout.php', { method: 'POST' });
-            window.location.href = '../public/index.html';
+            try {
+                await fetch('../../backend/api/auth/logout.php', { method: 'POST' });
+
+                // Hapus penanda login di browser agar landing page tahu status sudah logout
+                localStorage.removeItem('admin_status');
+
+                // Redirect ke index
+                window.location.href = '../public/index.html';
+            } catch (error) {
+                console.error("Logout gagal", error);
+            }
         };
     </script>
 </body>

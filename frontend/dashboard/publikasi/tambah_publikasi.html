@@ -21,6 +21,10 @@
         </div>
         <nav>
             <a href="../admin.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="../../public/index.html"
+                style="border-top: 1px solid rgba(255,255,255,0.1); margin-top: 10px; padding-top: 15px;">
+                <i class="fas fa-external-link-alt"></i> Lihat Landing Page
+            </a>
             <a href="../peminjaman/peminjaman.html"><i class="fas fa-calendar-alt"></i> Peminjaman</a>
             <a href="../konten/konten.html"><i class="fas fa-newspaper"></i> Berita & Konten</a>
             <a href="publikasi.html" class="active"><i class="fas fa-book"></i> Publikasi</a>
@@ -310,11 +314,16 @@
 
         if (confirmLogoutBtn) confirmLogoutBtn.onclick = async () => {
             try {
-                await fetch('../../../backend/api/auth/logout.php', {
-                    method: 'POST'
-                });
-            } catch (e) { }
-            window.location.href = '../../public/index.html';
+                await fetch('../../../backend/api/auth/logout.php', { method: 'POST' });
+
+                // Hapus penanda login di browser agar landing page tahu status sudah logout
+                localStorage.removeItem('admin_status');
+
+                // Redirect ke index
+                window.location.href = '../../public/index.html';
+            } catch (error) {
+                console.error("Logout gagal", error);
+            }
         };
 
         // Menutup modal jika klik di luar area modal

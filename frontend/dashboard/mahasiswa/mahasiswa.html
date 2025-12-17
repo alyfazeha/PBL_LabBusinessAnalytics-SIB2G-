@@ -192,6 +192,10 @@
         </div>
         <nav>
             <a href="../admin.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="../../public/index.html"
+                style="border-top: 1px solid rgba(255,255,255,0.1); margin-top: 10px; padding-top: 15px;">
+                <i class="fas fa-external-link-alt"></i> Lihat Landing Page
+            </a>
             <a href="../peminjaman/peminjaman.html"><i class="fas fa-calendar-alt"></i> Peminjaman</a>
             <a href="../konten/konten.html"><i class="fas fa-newspaper"></i> Berita & Konten</a>
             <a href="../publikasi/publikasi.html"><i class="fas fa-book"></i> Publikasi</a>
@@ -357,8 +361,17 @@
         document.getElementById('logoutTrigger').onclick = (e) => { e.preventDefault(); document.getElementById('logoutModal').classList.add('show'); };
         document.getElementById('cancelLogoutBtn').onclick = () => document.getElementById('logoutModal').classList.remove('show');
         document.getElementById('confirmLogoutBtn').onclick = async () => {
-            await fetch('../../../backend/api/auth/logout.php', { method: 'POST' });
-            window.location.href = '../../public/index.html';
+            try {
+                await fetch('../../../backend/api/auth/logout.php', { method: 'POST' });
+
+                // Hapus penanda login di browser agar landing page tahu status sudah logout
+                localStorage.removeItem('admin_status');
+
+                // Redirect ke index
+                window.location.href = '../../public/index.html';
+            } catch (error) {
+                console.error("Logout gagal", error);
+            }
         };
 
         function showToast(message) {
