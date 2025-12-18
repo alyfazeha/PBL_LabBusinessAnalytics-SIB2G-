@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Dosen | Lab Business Analytics</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="../../frontend/assets/css/dashboarddns.css">
     <link rel="stylesheet" href="../assets/css/cssadmin.css">
     <link rel="stylesheet" href="../../assets/css/cssmahasiswa.css">
@@ -35,13 +36,13 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
             border: none;
         }
 
         .stat-card-new:hover {
             transform: translateY(-10px);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.12);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
             filter: brightness(1.05);
         }
 
@@ -52,13 +53,21 @@
             top: -20px;
             width: 100px;
             height: 100px;
-            background: rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.1);
             border-radius: 50%;
         }
 
-        .stat-card-new.blue { background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%); }
-        .stat-card-new.green { background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%); }
-        .stat-card-new.orange { background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%); }
+        .stat-card-new.blue {
+            background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+        }
+
+        .stat-card-new.green {
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+        }
+
+        .stat-card-new.orange {
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+        }
 
         .stat-card-new .info h2 {
             font-size: 2.2rem;
@@ -90,7 +99,7 @@
             background: white;
             padding: 30px;
             border-radius: 20px;
-            box-shadow: 0 4px 25px rgba(0,0,0,0.04);
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.04);
         }
 
         .table-wrapper {
@@ -124,8 +133,13 @@
             vertical-align: middle;
         }
 
-        .data-table tr:last-child td { border-bottom: none; }
-        .data-table tr:hover { background-color: #f8fbff; }
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .data-table tr:hover {
+            background-color: #f8fbff;
+        }
 
         /* Badge Status */
         .status {
@@ -137,9 +151,27 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-        .status.APPROVED, .status.DISETUJUI { background: #e6fffa; color: #047481; border: 1px solid #b2f5ea; }
-        .status.PENDING, .status.MENUNGGU { background: #fffaf0; color: #9c4221; border: 1px solid #feebc8; }
-        .status.REJECTED, .status.DITOLAK { background: #fff5f5; color: #c53030; border: 1px solid #feb2b2; }
+
+        .status.APPROVED,
+        .status.DISETUJUI {
+            background: #e6fffa;
+            color: #047481;
+            border: 1px solid #b2f5ea;
+        }
+
+        .status.PENDING,
+        .status.MENUNGGU {
+            background: #fffaf0;
+            color: #9c4221;
+            border: 1px solid #feebc8;
+        }
+
+        .status.REJECTED,
+        .status.DITOLAK {
+            background: #fff5f5;
+            color: #c53030;
+            border: 1px solid #feb2b2;
+        }
 
         .btn-edit-action {
             background-color: #f0f7ff;
@@ -170,12 +202,14 @@
         <div class="logo-area">
             <img src="../assets/images/LogoPolinema.png" alt="" style="width: 50px;">
             <img src="../assets/images/logoJTI.png" alt="" style="width: 45px;">
-            <img src="../assets/images/LogoLab2.png" alt="Logo" style="width: 70px; margin-bottom: -10px; margin-left: -10px;">
+            <img src="../assets/images/LogoLab2.png" alt="Logo"
+                style="width: 70px; margin-bottom: -10px; margin-left: -10px;">
             <h3>Dashboard Dosen</h3>
         </div>
         <nav>
             <a href="index.html" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-            <a href="../public/index.html" style="border-top: 1px solid rgba(255,255,255,0.1); margin-top: 10px; padding-top: 15px;">
+            <a href="../public/index.html"
+                style="border-top: 1px solid rgba(255,255,255,0.1); margin-top: 10px; padding-top: 15px;">
                 <i class="fas fa-external-link-alt"></i> Lihat Landing Page
             </a>
             <a href="profile.html"><i class="fas fa-user-tie"></i> Profil & Akun</a>
@@ -187,8 +221,8 @@
 
     <main class="main-content">
         <header style="margin-bottom: 35px; border-bottom: 1px solid #e2e8f0; padding-bottom: 15px;">
-            <h1 style="font-size: 1.8rem; color: #2d3748; margin: 0; font-weight: 700;">Halo, <span id="welcomeMessage" style="color: #4A90E2;">Dosen</span>! 👋</h1>
-            <p style="color: #718096; margin-top: 5px;">Berikut adalah ringkasan performa publikasi dan aktivitas Anda.</p>
+            <h1 style="font-size: 1.8rem; color: #2d3748; margin: 0; font-weight: 700;">Halo, <span id="welcomeMessage"
+                    style="color: #4A90E2;">Dosen</span>! 👋</h1>
         </header>
 
         <div class="stats-grid-dosen">
@@ -220,7 +254,8 @@
                 <h3 style="margin: 0; color: #2d3748; font-size: 1.2rem; font-weight: 700;">
                     <i class="fas fa-feather-alt" style="color: #4A90E2; margin-right: 10px;"></i> Publikasi Terkini
                 </h3>
-                <a href="publikasi.html" style="font-size: 0.85rem; color: #4A90E2; font-weight: 600; text-decoration: none; display: flex; align-items: center; gap: 5px;">
+                <a href="publikasi.html"
+                    style="font-size: 0.85rem; color: #4A90E2; font-weight: 600; text-decoration: none; display: flex; align-items: center; gap: 5px;">
                     Kelola Semua <i class="fas fa-chevron-right" style="font-size: 10px;"></i>
                 </a>
             </div>
@@ -253,11 +288,13 @@
 
     <div id="logoutModal" class="modal logout-modal">
         <div class="modal-content">
-            <span class="close-btn" onclick="document.getElementById('logoutModal').style.display='none';">&times;</span>
+            <span class="close-btn"
+                onclick="document.getElementById('logoutModal').style.display='none';">&times;</span>
             <h4><i class="fas fa-sign-out-alt"></i> Konfirmasi Logout</h4>
             <p>Anda yakin ingin keluar dari sistem?</p>
             <div class="modal-buttons">
-                <button onclick="document.getElementById('logoutModal').style.display='none';" class="btn btn-secondary">Batal</button>
+                <button onclick="document.getElementById('logoutModal').style.display='none';"
+                    class="btn btn-secondary">Batal</button>
                 <button id="confirmLogoutBtn" class="btn btn-danger">Ya, Logout</button>
             </div>
         </div>
@@ -267,6 +304,7 @@
         const API_DASHBOARD = '../../backend/api/dosen/get_dashboard_summary.php';
 
         async function loadDashboardData() {
+            localStorage.setItem('dosen_status', 'active');
             try {
                 const response = await fetch(API_DASHBOARD);
                 const result = await response.json();
@@ -284,7 +322,7 @@
                     if (data.latest_publications && data.latest_publications.length > 0) {
                         data.latest_publications.forEach(pub => {
                             const statusUpper = (pub.status || 'PENDING').toUpperCase();
-                            
+
                             listContainer.innerHTML += `
                                 <tr class="data-row">
                                     <td style="font-weight: 700; color: #4A90E2;">#${pub.id}</td>
@@ -327,11 +365,20 @@
         };
 
         document.getElementById('confirmLogoutBtn').onclick = async () => {
-            await fetch('../../backend/api/auth/logout.php', { method: 'POST' });
-            window.location.href = '../public/index.html';
+            try {
+                await fetch('../../backend/api/auth/logout.php', { method: 'POST' });
+
+                // Tambahkan baris ini untuk menghapus session browser
+                localStorage.removeItem('dosen_status');
+
+                window.location.href = '../public/index.html';
+            } catch (error) {
+                console.error("Logout gagal", error);
+            }
         };
 
         document.addEventListener('DOMContentLoaded', loadDashboardData);
     </script>
 </body>
+
 </html>

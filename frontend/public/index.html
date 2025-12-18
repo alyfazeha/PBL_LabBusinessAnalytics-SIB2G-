@@ -167,6 +167,11 @@
                   <i class="fas fa-tachometer-alt"></i> Dashboard Admin
                 </a>
               </li>
+              <li id="dosenDashboardBtn" style="display: none;">
+                <div class="gradient-button">
+                  <a href="../dashboard_dosen/index.html"><i class="fa fa-university"></i> Dashboard Dosen</a>
+                </div>
+              </li>
             </ul>
             <a class='menu-trigger'>
               <span>Menu</span>
@@ -1102,6 +1107,19 @@
       }
     }
 
+    async function checkUserSessions() {
+      // Cek Admin (Sudah ada di kode Anda)
+      await checkAdminSession();
+
+      // Tambahkan Cek Dosen
+      const dosenBtn = document.getElementById('dosenDashboardBtn');
+      const isDosenActive = localStorage.getItem('dosen_status');
+
+      if (isDosenActive === 'active') {
+        if (dosenBtn) dosenBtn.style.setProperty('display', 'inline-block', 'important');
+      }
+    }
+
     function bersihkanTampilanAdmin() {
       const dashBtn = document.getElementById('adminDashboardBtn');
       const toast = document.getElementById('adminToast');
@@ -1112,6 +1130,7 @@
     }
 
     document.addEventListener('DOMContentLoaded', checkAdminSession);
+    window.addEventListener('load', checkUserSessions);
   </script>
 </body>
 
