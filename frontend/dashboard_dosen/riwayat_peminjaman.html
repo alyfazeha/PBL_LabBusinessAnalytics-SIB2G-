@@ -7,6 +7,8 @@
     <title>Riwayat Peminjaman</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="../../frontend/assets/css/dashboarddns.css">
+    <link rel="stylesheet" href="../assets/css/cssadmin.css">
+
     <style>
         /* Tambahan style untuk badge status */
         .badge {
@@ -19,29 +21,54 @@
 
         }
 
-        .badge.approved, .badge.disetujui, .badge.kembali { background-color: #28a745; }
-        .badge.pending, .badge.menunggu { background-color: #ffc107; color: #333; }
-        .badge.rejected, .badge.ditolak { background-color: #dc3545; }
+        .badge.approved,
+        .badge.disetujui,
+        .badge.kembali {
+            background-color: #28a745;
+        }
+
+        .badge.pending,
+        .badge.menunggu {
+            background-color: #ffc107;
+            color: #333;
+        }
+
+        .badge.rejected,
+        .badge.ditolak {
+            background-color: #dc3545;
+        }
+
         /* Jika Anda memiliki status 'Dipinjam' atau 'Selesai' */
-        .badge.dipinjam { background-color: #007bff; }
-        .badge.selesai { background-color: #6c757d; }
+        .badge.dipinjam {
+            background-color: #007bff;
+        }
+
+        .badge.selesai {
+            background-color: #6c757d;
+        }
     </style>
 </head>
 
 <body>
-    <aside class="dsn-sidebar">
-        <div class="dsn-logo-area">
-            <h2><i class="fas fa-chalkboard-teacher"></i> DOSEN <br> DASHBOARD</h2>
+    <aside class="sidebar">
+        <div class="logo-area">
+            <img src="../assets/images/LogoPolinema.png" alt="" style="width: 50px;">
+            <img src="../assets/images/logoJTI.png" alt="" style="width: 45px;">
+            <img src="../assets/images/LogoLab2.png" alt="Business Analytics Laboratory"
+                style="width: 70px; margin-bottom: -10px; margin-left: -10px;">
+            <h3>Dashboard Dosen</h3>
         </div>
         <nav>
-            <a href="index.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="index.html" class=""><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="../public/index.html"
+                style="border-top: 1px solid rgba(255,255,255,0.1); margin-top: 10px; padding-top: 15px;">
+                <i class="fas fa-external-link-alt"></i> Lihat Landing Page
+            </a>
             <a href="profile.html"><i class="fas fa-user-tie"></i> Profil & Akun</a>
             <a href="riwayat_peminjaman.html" class="active"><i class="fas fa-book-reader"></i> Riwayat Peminjaman</a>
             <a href="publikasi.html"><i class="fas fa-file-invoice"></i> Kelola Publikasi</a>
-            <hr style="border-top: 1px solid #444; margin: 10px 0;">
-            <a href="../public/index.html"><i class="fas fa-home"></i> Landing Page</a> 
+
             <a href="#" id="logoutLink"><i class="fas fa-sign-out-alt"></i> Logout</a>
-            <hr style="border-top: 1px solid #444; margin: 10px 0;"> 
         </nav>
     </aside>
 
@@ -67,44 +94,44 @@
                         </tr>
                     </thead>
                     <tbody id="peminjamanTableBody">
-                        </tbody>
+                    </tbody>
                 </table>
             </div>
         </div>
     </main>
 
     <script>
-    const tableBody = document.getElementById('peminjamanTableBody');
-    const searchInput = document.getElementById('searchInput'); // Ambil elemen input
+        const tableBody = document.getElementById('peminjamanTableBody');
+        const searchInput = document.getElementById('searchInput'); // Ambil elemen input
 
-    function getStatusClass(status) {
-        const lowerStatus = status ? status.toLowerCase() : '';
-        if (lowerStatus.includes('setuju') || lowerStatus.includes('approved')) return 'approved';
-        if (lowerStatus.includes('tolak') || lowerStatus.includes('rejected')) return 'rejected';
-        if (lowerStatus.includes('kembali') || lowerStatus.includes('returned')) return 'kembali';
-        if (lowerStatus.includes('dipinjam')) return 'dipinjam';
-        return 'pending'; // Menunggu
-    }
-    
-    function formatDate(dateString) {
-        if (!dateString) return '-';
-        const date = new Date(dateString);
-        return date.toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' });
-    }
-
-    function renderPeminjaman(data) {
-        if (data.length === 0) {
-            tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center;">Tidak ada riwayat peminjaman yang cocok dengan pencarian Anda.</td></tr>`;
-            return;
+        function getStatusClass(status) {
+            const lowerStatus = status ? status.toLowerCase() : '';
+            if (lowerStatus.includes('setuju') || lowerStatus.includes('approved')) return 'approved';
+            if (lowerStatus.includes('tolak') || lowerStatus.includes('rejected')) return 'rejected';
+            if (lowerStatus.includes('kembali') || lowerStatus.includes('returned')) return 'kembali';
+            if (lowerStatus.includes('dipinjam')) return 'dipinjam';
+            return 'pending'; // Menunggu
         }
 
-        let html = '';
-        data.forEach(item => {
-            const statusText = item.status ? item.status.charAt(0).toUpperCase() + item.status.slice(1).toLowerCase() : 'Menunggu';
-            const statusClass = getStatusClass(item.status);
-            const tglPinjam = formatDate(item.tanggal_peminjaman);
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        }
 
-            html += `
+        function renderPeminjaman(data) {
+            if (data.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center;">Tidak ada riwayat peminjaman yang cocok dengan pencarian Anda.</td></tr>`;
+                return;
+            }
+
+            let html = '';
+            data.forEach(item => {
+                const statusText = item.status ? item.status.charAt(0).toUpperCase() + item.status.slice(1).toLowerCase() : 'Menunggu';
+                const statusClass = getStatusClass(item.status);
+                const tglPinjam = formatDate(item.tanggal_peminjaman);
+
+                html += `
                 <tr>
                     <td>${tglPinjam}</td>
                     <td>${item.nim_mahasiswa || '-'} | ${item.nama_mahasiswa || '-'}</td>
@@ -120,76 +147,76 @@
                     </td>
                 </tr>
             `;
-        });
-        tableBody.innerHTML = html;
-    }
-
-    // FUNGSI UTAMA: Menerima parameter pencarian
-    async function loadPeminjaman(searchQuery = null) {
-        const isInitialLoad = searchQuery === null;
-
-        if (isInitialLoad) {
-            searchQuery = '';
+            });
+            tableBody.innerHTML = html;
         }
 
-        tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center;">Memuat data peminjaman...</td></tr>`;
+        // FUNGSI UTAMA: Menerima parameter pencarian
+        async function loadPeminjaman(searchQuery = null) {
+            const isInitialLoad = searchQuery === null;
 
-        let apiUrl = '../../backend/api/booking/list_dosen.php';
-        const params = new URLSearchParams();
-
-        // 1. Tambahkan Query Pencarian (hanya jika ada teks yang dicari)
-        if (searchQuery.trim() !== '') {
-            params.append('search', searchQuery.trim());
-        } 
-
-        // 2. Tambahkan Cache Buster pada permintaan awal
-        if (isInitialLoad) {
-            params.append('cache_buster', new Date().getTime());
-        }
-
-        if (params.toString()) {
-            apiUrl += `?${params.toString()}`;
-        }
-
-        try {
-            const response = await fetch(apiUrl); 
-            const result = await response.json();
-
-            if (result.status === 'success') {
-                renderPeminjaman(result.data);
-            } else {
-                tableBody.innerHTML = `<tr><td colspan="6" style="color: red; text-align: center;">Gagal memuat data: ${result.message}</td></tr>`;
+            if (isInitialLoad) {
+                searchQuery = '';
             }
 
-        } catch (error) {
-            console.error('Error loading peminjaman:', error);
-            tableBody.innerHTML = `<tr><td colspan="6" style="color: red; text-align: center;">Terjadi kesalahan koneksi jaringan.</td></tr>`;
+            tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center;">Memuat data peminjaman...</td></tr>`;
+
+            let apiUrl = '../../backend/api/booking/list_dosen.php';
+            const params = new URLSearchParams();
+
+            // 1. Tambahkan Query Pencarian (hanya jika ada teks yang dicari)
+            if (searchQuery.trim() !== '') {
+                params.append('search', searchQuery.trim());
+            }
+
+            // 2. Tambahkan Cache Buster pada permintaan awal
+            if (isInitialLoad) {
+                params.append('cache_buster', new Date().getTime());
+            }
+
+            if (params.toString()) {
+                apiUrl += `?${params.toString()}`;
+            }
+
+            try {
+                const response = await fetch(apiUrl);
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    renderPeminjaman(result.data);
+                } else {
+                    tableBody.innerHTML = `<tr><td colspan="6" style="color: red; text-align: center;">Gagal memuat data: ${result.message}</td></tr>`;
+                }
+
+            } catch (error) {
+                console.error('Error loading peminjaman:', error);
+                tableBody.innerHTML = `<tr><td colspan="6" style="color: red; text-align: center;">Terjadi kesalahan koneksi jaringan.</td></tr>`;
+            }
         }
-    }
 
-    // Panggil fungsi saat halaman dimuat
-    document.addEventListener('DOMContentLoaded', () => {
-        loadPeminjaman(); 
-    });
+        // Panggil fungsi saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', () => {
+            loadPeminjaman();
+        });
 
-    // Event Listener BARU untuk Auto-Search saat tombol dilepas
-    searchInput.addEventListener('keyup', function(e) {
-        // Debouncing opsional: Anda bisa menambahkan jeda 300ms di sini 
-        // agar tidak terlalu banyak request saat mengetik cepat.
-        const query = searchInput.value.trim();
-        loadPeminjaman(query);
-    });
+        // Event Listener BARU untuk Auto-Search saat tombol dilepas
+        searchInput.addEventListener('keyup', function (e) {
+            // Debouncing opsional: Anda bisa menambahkan jeda 300ms di sini 
+            // agar tidak terlalu banyak request saat mengetik cepat.
+            const query = searchInput.value.trim();
+            loadPeminjaman(query);
+        });
 
-    // Logika Logout
-    document.getElementById('logoutLink').addEventListener('click', function (e) {
-        e.preventDefault();
-        if (confirm('Apakah Anda yakin ingin keluar dari sistem?')) {
-            const logoutUrl = '../../backend/api/auth/logout.php';
-            fetch(logoutUrl, { method: 'POST' })
-                .then(() => window.location.href = '../public/index.html')
-                .catch(() => window.location.href = '../public/index.html');
-        }
-    });
+        // Logika Logout
+        document.getElementById('logoutLink').addEventListener('click', function (e) {
+            e.preventDefault();
+            if (confirm('Apakah Anda yakin ingin keluar dari sistem?')) {
+                const logoutUrl = '../../backend/api/auth/logout.php';
+                fetch(logoutUrl, { method: 'POST' })
+                    .then(() => window.location.href = '../public/index.html')
+                    .catch(() => window.location.href = '../public/index.html');
+            }
+        });
     </script>
 </body>
 

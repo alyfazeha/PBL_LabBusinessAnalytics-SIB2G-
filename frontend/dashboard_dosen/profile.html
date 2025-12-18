@@ -7,32 +7,40 @@
     <title>Profil Dosen</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="../../frontend/assets/css/dashboarddns.css">
+    <link rel="stylesheet" href="../assets/css/cssadmin.css">
+
 </head>
 
 <body>
-    <aside class="dsn-sidebar">
-        <div class="dsn-logo-area">
-            <h2><i class="fas fa-chalkboard-teacher"></i> DOSEN <br> DASHBOARD</h2>
+    <aside class="sidebar">
+        <div class="logo-area">
+            <img src="../assets/images/LogoPolinema.png" alt="" style="width: 50px;">
+            <img src="../assets/images/logoJTI.png" alt="" style="width: 45px;">
+            <img src="../assets/images/LogoLab2.png" alt="Business Analytics Laboratory"
+                style="width: 70px; margin-bottom: -10px; margin-left: -10px;">
+            <h3>Dashboard Dosen</h3>
         </div>
         <nav>
-             <a href="index.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-            <a href="profile.html"><i class="fas fa-user-tie"></i> Profil & Akun</a>
-            <a href="riwayat_peminjaman.html" class="active"><i class="fas fa-book-reader"></i> Riwayat Peminjaman</a>
+            <a href="index.html" class=""><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="../public/index.html"
+                style="border-top: 1px solid rgba(255,255,255,0.1); margin-top: 10px; padding-top: 15px;">
+                <i class="fas fa-external-link-alt"></i> Lihat Landing Page
+            </a>
+            <a href="profile.html" class="active"><i class="fas fa-user-tie"></i> Profil & Akun</a>
+            <a href="riwayat_peminjaman.html"><i class="fas fa-book-reader"></i> Riwayat Peminjaman</a>
             <a href="publikasi.html"><i class="fas fa-file-invoice"></i> Kelola Publikasi</a>
-            <hr style="border-top: 1px solid #444; margin: 10px 0;">
-            <a href="../public/index.html"><i class="fas fa-home"></i> Landing Page</a> 
+
             <a href="#" id="logoutLink"><i class="fas fa-sign-out-alt"></i> Logout</a>
-            <hr style="border-top: 1px solid #444; margin: 10px 0;"> 
-            </nav>
+        </nav>
     </aside>
     <main class="main-content">
         <div class="content-card">
             <h2><i class="fas fa-address-card"></i> Profil Dosen</h2>
 
             <div class="profile-header">
-                <img id="dosenFoto" src="../../frontend/assets/img/default-profile.png" alt="Foto Profil" 
-                     style="width: 100px; height: 100px; object-fit: cover; border-radius: 50%; margin-bottom: 10px; display:none;">
-                
+                <img id="dosenFoto" src="../../frontend/assets/img/default-profile.png" alt="Foto Profil"
+                    style="width: 100px; height: 100px; object-fit: cover; border-radius: 50%; margin-bottom: 10px; display:none;">
+
                 <h3 id="headerNama">Memuat Nama...</h3>
                 <p id="headerNidn" style="color: #777;">...</p>
             </div>
@@ -68,7 +76,8 @@
                 </div>
                 <div class="profile-info-group">
                     <label> Sertifikasi</label>
-                    <p id="detailSertifikasi">-</p> </div>
+                    <p id="detailSertifikasi">-</p>
+                </div>
                 <div class="profile-info-group">
                     <label>Tautan Eksternal</label>
                     <p id="detailLinks">-</p>
@@ -99,19 +108,19 @@
                     document.getElementById('detailJabatan').textContent = data.jabatan || '-';
                     document.getElementById('detailEmail').textContent = data.email || '-';
                     document.getElementById('detailPendidikan').textContent = data.pendidikan || '-';
-                    document.getElementById('detailSertifikasi').textContent = data.sertifikasi || '-'; 
+                    document.getElementById('detailSertifikasi').textContent = data.sertifikasi || '-';
 
                     // 2. Link Eksternal
                     let links = [];
                     if (data.sinta_url) links.push(`<a href="${data.sinta_url}" target="_blank">SINTA</a>`);
                     if (data.scholar_url) links.push(`<a href="${data.scholar_url}" target="_blank">Google Scholar</a>`);
                     if (data.researchgate_url) links.push(`<a href="${data.researchgate_url}" target="_blank">ResearchGate</a>`);
-                    if (data.scopus_url) links.push(`<a href="${data.scopus_url}" target="_blank">Scopus</a>`); 
+                    if (data.scopus_url) links.push(`<a href="${data.scopus_url}" target="_blank">Scopus</a>`);
                     document.getElementById('detailLinks').innerHTML = links.length > 0 ? links.join(' | ') : '-';
 
                     // 3. PERBAIKAN PATH FOTO (Menggunakan Path Relatif yang Teruji)
                     const imgElem = document.getElementById('dosenFoto');
-                    
+
                     let finalFotoPath = "../../frontend/assets/img/default-profile.png"; // Default path
 
                     if (data.foto_path && data.foto_path !== 'null' && data.foto_path !== '') {
@@ -129,10 +138,10 @@
                             finalFotoPath = `../../frontend/assets/uploads/dosen/${path}`;
                         }
                     }
-                    
+
                     imgElem.src = finalFotoPath;
                     imgElem.style.display = 'block';
-                    
+
                     console.log("Loading Foto dari:", finalFotoPath);
 
                 } else {
@@ -163,4 +172,5 @@
         });
     </script>
 </body>
+
 </html>

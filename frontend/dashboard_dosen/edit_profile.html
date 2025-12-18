@@ -7,34 +7,42 @@
     <title>Edit Profil Dosen</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="../../frontend/assets/css/dashboarddns.css">
+    <link rel="stylesheet" href="../assets/css/cssadmin.css">
+
 </head>
 
 <body>
-    <aside class="dsn-sidebar">
-        <div class="dsn-logo-area">
-            <h2><i class="fas fa-chalkboard-teacher"></i> DOSEN <br> DASHBOARD</h2>
+    <aside class="sidebar">
+        <div class="logo-area">
+            <img src="../assets/images/LogoPolinema.png" alt="" style="width: 50px;">
+            <img src="../assets/images/logoJTI.png" alt="" style="width: 45px;">
+            <img src="../assets/images/LogoLab2.png" alt="Business Analytics Laboratory"
+                style="width: 70px; margin-bottom: -10px; margin-left: -10px;">
+            <h3>Dashboard Dosen</h3>
         </div>
         <nav>
-            <a href="index.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-            <a href="profile.html"><i class="fas fa-user-tie"></i> Profil & Akun</a>
-            <a href="riwayat_peminjaman.html" class="active"><i class="fas fa-book-reader"></i> Riwayat Peminjaman</a>
+            <a href="index.html" class=""><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="../public/index.html"
+                style="border-top: 1px solid rgba(255,255,255,0.1); margin-top: 10px; padding-top: 15px;">
+                <i class="fas fa-external-link-alt"></i> Lihat Landing Page
+            </a>
+            <a href="profile.html" class="active"><i class="fas fa-user-tie"></i> Profil & Akun</a>
+            <a href="riwayat_peminjaman.html"><i class="fas fa-book-reader"></i> Riwayat Peminjaman</a>
             <a href="publikasi.html"><i class="fas fa-file-invoice"></i> Kelola Publikasi</a>
-            <hr style="border-top: 1px solid #444; margin: 10px 0;">
-            <a href="../public/index.html"><i class="fas fa-home"></i> Landing Page</a> 
+
             <a href="#" id="logoutLink"><i class="fas fa-sign-out-alt"></i> Logout</a>
-            <hr style="border-top: 1px solid #444; margin: 10px 0;"> 
         </nav>
     </aside>
 
     <main class="main-content">
         <div class="content-card">
             <h2><i class="fas fa-user-edit"></i> Edit Profil</h2>
-            
+
             <form id="formEditProfile" enctype="multipart/form-data" style="max-width: 700px; margin-top: 20px;">
-                
+
                 <div class="form-group" style="margin-bottom: 20px; text-align: center;">
-                    <img id="previewFoto" src="../../frontend/assets/img/default-profile.png" 
-                         style="width: 120px; height: 120px; object-fit: cover; border-radius: 50%; border: 2px solid #ddd; margin-bottom: 10px;">
+                    <img id="previewFoto" src="../../frontend/assets/img/default-profile.png"
+                        style="width: 120px; height: 120px; object-fit: cover; border-radius: 50%; border: 2px solid #ddd; margin-bottom: 10px;">
                     <br>
                     <label for="foto" style="cursor: pointer; color: #007bff; font-size: 14px;">
                         <i class="fas fa-camera"></i> Ganti Foto
@@ -57,7 +65,8 @@
                 </div>
                 <div class="profile-info-group">
                     <label>Jabatan</label>
-                    <input type="text" id="jabatan" name="jabatan" class="form-control" placeholder="Contoh: Lektor Kepala">
+                    <input type="text" id="jabatan" name="jabatan" class="form-control"
+                        placeholder="Contoh: Lektor Kepala">
                 </div>
                 <div class="profile-info-group">
                     <label>Prodi</label>
@@ -65,12 +74,14 @@
                 </div>
                 <div class="profile-info-group">
                     <label>Pendidikan Terakhir</label>
-                    <input type="text" id="pendidikan" name="pendidikan" class="form-control" placeholder="Contoh: S3 Ilmu Komputer">
+                    <input type="text" id="pendidikan" name="pendidikan" class="form-control"
+                        placeholder="Contoh: S3 Ilmu Komputer">
                 </div>
 
                 <div class="profile-info-group">
                     <label>Sertifikasi</label>
-                    <input type="text" id="sertifikasi" name="sertifikasi" class="form-control" placeholder="Contoh: Sertifikat Dosen, AWS Certified">
+                    <input type="text" id="sertifikasi" name="sertifikasi" class="form-control"
+                        placeholder="Contoh: Sertifikat Dosen, AWS Certified">
                 </div>
 
                 <hr>
@@ -78,29 +89,34 @@
 
                 <div class="profile-info-group">
                     <label>Link SINTA</label>
-                    <input type="url" id="sinta_url" name="sinta_url" class="form-control" placeholder="https://sinta.kemdikbud.go.id/...">
+                    <input type="url" id="sinta_url" name="sinta_url" class="form-control"
+                        placeholder="https://sinta.kemdikbud.go.id/...">
                 </div>
 
                 <div class="profile-info-group">
                     <label>Link Google Scholar</label>
-                    <input type="url" id="scholar_url" name="scholar_url" class="form-control" placeholder="https://scholar.google.com/citations?user=...">
+                    <input type="url" id="scholar_url" name="scholar_url" class="form-control"
+                        placeholder="https://scholar.google.com/citations?user=...">
                 </div>
 
-                 <div class="profile-info-group">
+                <div class="profile-info-group">
                     <label>Link Scopus</label>
-                    <input type="url" id="scopus_url" name="scopus_url" class="form-control" placeholder="https://www.scopus.com/authid/...">
+                    <input type="url" id="scopus_url" name="scopus_url" class="form-control"
+                        placeholder="https://www.scopus.com/authid/...">
                 </div>
-                
+
                 <div class="profile-info-group">
                     <label>Link ResearchGate</label>
-                    <input type="url" id="researchgate_url" name="researchgate_url" class="form-control" placeholder="https://www.researchgate.net/profile/...">
+                    <input type="url" id="researchgate_url" name="researchgate_url" class="form-control"
+                        placeholder="https://www.researchgate.net/profile/...">
                 </div>
 
                 <div class="form-actions" style="margin-top: 30px; display: flex; gap: 10px;">
                     <button type="submit" id="btnSimpan" class="btn-edit-profile" style="border:none; cursor: pointer;">
                         <i class="fas fa-save"></i> Simpan Perubahan
                     </button>
-                    <a href="profile.html" class="btn-edit-profile" style="background-color: #6c757d; text-decoration: none; text-align: center;">
+                    <a href="profile.html" class="btn-edit-profile"
+                        style="background-color: #6c757d; text-decoration: none; text-align: center;">
                         Batal
                     </a>
                 </div>
@@ -117,6 +133,7 @@
             margin-top: 5px;
             font-size: 14px;
         }
+
         .profile-info-group {
             margin-bottom: 15px;
         }
@@ -140,12 +157,12 @@
                     document.getElementById('jabatan').value = data.jabatan || '';
                     document.getElementById('email').value = data.email || '';
                     document.getElementById('pendidikan').value = data.pendidikan || '';
-                    document.getElementById('sertifikasi').value = data.sertifikasi || ''; 
+                    document.getElementById('sertifikasi').value = data.sertifikasi || '';
                     document.getElementById('sinta_url').value = data.sinta_url || '';
                     document.getElementById('scholar_url').value = data.scholar_url || '';
-                    document.getElementById('researchgate_url').value = data.researchgate_url || ''; 
+                    document.getElementById('researchgate_url').value = data.researchgate_url || '';
                     document.getElementById('scopus_url').value = data.scopus_url || '';
-                    
+
                     // --- PATH PRATINJAU FOTO (FIXED) ---
                     const imgElem = document.getElementById('previewFoto');
 
@@ -155,14 +172,14 @@
 
                         // Ambil nama file terakhir dari path yang tersimpan di DB
                         let fileName = path.split('/').pop();
-                        
+
                         if (path.startsWith('http')) {
                             finalPath = path;
                         } else {
                             // [FIX] Gunakan path relatif yang panjang dan KONSISTEN dengan profile.html
                             finalPath = `../../frontend/assets/uploads/dosen/${fileName}`;
                         }
-                        
+
                         imgElem.src = finalPath;
                     }
                     // ------------------------------------------
@@ -177,11 +194,11 @@
         }
 
         // 2. Preview Foto Baru sebelum diupload
-        document.getElementById('foto').addEventListener('change', function(e) {
+        document.getElementById('foto').addEventListener('change', function (e) {
             const file = e.target.files[0];
             if (file) {
                 const reader = new FileReader();
-                reader.onload = function(e) {
+                reader.onload = function (e) {
                     document.getElementById('previewFoto').src = e.target.result;
                 }
                 reader.readAsDataURL(file);
@@ -189,9 +206,9 @@
         });
 
         // 3. Proses Simpan (Update)
-        document.getElementById('formEditProfile').addEventListener('submit', async function(e) {
+        document.getElementById('formEditProfile').addEventListener('submit', async function (e) {
             e.preventDefault();
-            
+
             const btn = document.getElementById('btnSimpan');
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
             btn.disabled = true;
@@ -207,7 +224,7 @@
 
                 if (result.status === 'success') {
                     alert('Profil berhasil diperbarui!');
-                    window.location.href = 'profile.html'; 
+                    window.location.href = 'profile.html';
                 } else {
                     alert('Gagal: ' + result.message);
                 }
@@ -234,4 +251,5 @@
         });
     </script>
 </body>
+
 </html>
