@@ -9,44 +9,7 @@
     <link rel="stylesheet" href="../../frontend/assets/css/dashboarddns.css">
     <link rel="stylesheet" href="../assets/css/cssadmin.css">
 
-    <style>
-        /* Tambahan style untuk badge status */
-        .badge {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.8em;
-            font-weight: 600;
-            color: #fff !important;
 
-        }
-
-        .badge.approved,
-        .badge.disetujui,
-        .badge.kembali {
-            background-color: #28a745;
-        }
-
-        .badge.pending,
-        .badge.menunggu {
-            background-color: #ffc107;
-            color: #333;
-        }
-
-        .badge.rejected,
-        .badge.ditolak {
-            background-color: #dc3545;
-        }
-
-        /* Jika Anda memiliki status 'Dipinjam' atau 'Selesai' */
-        .badge.dipinjam {
-            background-color: #007bff;
-        }
-
-        .badge.selesai {
-            background-color: #6c757d;
-        }
-    </style>
 </head>
 
 <body>
@@ -72,150 +35,207 @@
         </nav>
     </aside>
 
-    <main class="main-content">
-        <div class="content-card">
-            <h2><i class="fas fa-history"></i> Riwayat Peminjaman Aset Mahasiswa</h2>
-
-            <div style="margin-bottom: 20px;">
+    <div class="main-content">
+        <header>
+            <div class="header-title">
+                <h2><i class="fas fa-history"></i> Riwayat Peminjaman Aset Mahasiswa</h2>
+            </div>
+            <div class="header-actions-group">
                 <input type="text" id="searchInput" placeholder="Cari berdasarkan Nama/NIM..."
                     style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ddd;">
             </div>
-
-            <div style="overflow-x: auto;">
-                <table class="status-table">
+        </header>
+        <main>
+            <div class="table-wrapper">
+                <table class="data-table">
                     <thead>
                         <tr>
-                            <th>Tgl. Pinjam</th>
-                            <th>NIM/Nama MHS</th>
-                            <th>Aset</th>
+                            <th>ID</th>
+                            <th>Mahasiswa</th>
+                            <th>Sarana / Aset</th>
+                            <th>Waktu Pinjam</th>
                             <th>Keperluan</th>
                             <th>Status</th>
-                            <th>Aksi</th>
+                            <th style="text-align: center;">Aksi</th>
                         </tr>
                     </thead>
                     <tbody id="peminjamanTableBody">
                     </tbody>
                 </table>
             </div>
+        </main>
+    </div>
+
+    <div id="logoutModal" class="modal logout-modal">
+        <div class="modal-content" style="text-align: left !important;">
+            <span class="close-btn" onclick="logoutModal.style.display='none';">&times;</span>
+
+            <h4><i class="fas fa-sign-out-alt"></i> Konfirmasi Logout</h4>
+
+            <p>Apakah Anda yakin ingin keluar dari sistem dashboard dosen?</p>
+
+            <div class="modal-buttons">
+                <button id="cancelLogoutBtn" class="btn btn-secondary">Batal</button>
+                <button id="confirmLogoutBtn" class="btn btn-danger">Ya, Logout</button>
+            </div>
+
         </div>
-    </main>
+    </div>
 
     <script>
         const tableBody = document.getElementById('peminjamanTableBody');
-        const searchInput = document.getElementById('searchInput'); // Ambil elemen input
+        const searchInput = document.getElementById('searchInput');
 
-        function getStatusClass(status) {
-            const lowerStatus = status ? status.toLowerCase() : '';
-            if (lowerStatus.includes('setuju') || lowerStatus.includes('approved')) return 'approved';
-            if (lowerStatus.includes('tolak') || lowerStatus.includes('rejected')) return 'rejected';
-            if (lowerStatus.includes('kembali') || lowerStatus.includes('returned')) return 'kembali';
-            if (lowerStatus.includes('dipinjam')) return 'dipinjam';
-            return 'pending'; // Menunggu
+        // Variabel untuk menyimpan timer debounce
+        let searchTimeout;
+
+        // --- 1. Fungsi Format Tanggal & Jam ---
+        function formatPeminjamanDateTime(tanggal, mulai, selesai) {
+            if (!tanggal) return '-';
+
+            const m = mulai ? mulai.toString().substring(0, 5) : '--:--';
+            const s = selesai ? selesai.toString().substring(0, 5) : '--:--';
+
+            // Ganti '-' menjadi '/' agar kompatibel dengan Safari/iOS
+            const dateObj = new Date(tanggal.replace(/-/g, "/"));
+            const options = { day: '2-digit', month: 'short', year: 'numeric' };
+            const formattedDate = dateObj.toLocaleDateString('id-ID', options);
+
+            return `
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                <i class="far fa-calendar-alt" style="color: #4A90E2; width: 14px;"></i>
+                <span style="font-weight: 500; color: #333;">${formattedDate}</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px; font-size: 0.85em; color: #666;">
+                <i class="far fa-clock" style="color: #4A90E2; width: 14px;"></i>
+                <span>${m} - ${s} WIB</span>
+            </div>
+        `;
         }
 
-        function formatDate(dateString) {
-            if (!dateString) return '-';
-            const date = new Date(dateString);
-            return date.toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' });
-        }
-
-        function renderPeminjaman(data) {
-            if (data.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center;">Tidak ada riwayat peminjaman yang cocok dengan pencarian Anda.</td></tr>`;
-                return;
-            }
-
-            let html = '';
-            data.forEach(item => {
-                const statusText = item.status ? item.status.charAt(0).toUpperCase() + item.status.slice(1).toLowerCase() : 'Menunggu';
-                const statusClass = getStatusClass(item.status);
-                const tglPinjam = formatDate(item.tanggal_peminjaman);
-
-                html += `
-                <tr>
-                    <td>${tglPinjam}</td>
-                    <td>${item.nim_mahasiswa || '-'} | ${item.nama_mahasiswa || '-'}</td>
-                    <td>${item.aset_dipinjam || '-'}</td>
-                    <td>${item.keperluan || '-'}</td>
-                    <td><span class="badge ${statusClass}">${statusText}</span></td>
-                    <td>
-                        <div class="action-buttons">
-                            <a href="detail_peminjaman.html?id=${item.id}" class="detail-btn">
-                                <i class="fas fa-eye"></i> Detail
-                            </a>
-                        </div>
-                    </td>
-                </tr>
-            `;
-            });
-            tableBody.innerHTML = html;
-        }
-
-        // FUNGSI UTAMA: Menerima parameter pencarian
-        async function loadPeminjaman(searchQuery = null) {
-            const isInitialLoad = searchQuery === null;
-
-            if (isInitialLoad) {
-                searchQuery = '';
-            }
-
-            tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center;">Memuat data peminjaman...</td></tr>`;
+        // --- 2. Fungsi Fetch & Render ---
+        async function loadPeminjaman(searchQuery = '') {
+            // Tampilkan loading state dengan tinggi tetap agar layout tidak melompat
+            tableBody.innerHTML = `
+            <tr>
+                <td colspan="7" style="text-align: center; padding: 50px;">
+                    <i class="fas fa-spinner fa-spin" style="font-size: 24px; color: #4A90E2;"></i>
+                    <p style="margin-top: 10px; color: #666;">Memuat data...</p>
+                </td>
+            </tr>`;
 
             let apiUrl = '../../backend/api/booking/list_dosen.php';
-            const params = new URLSearchParams();
-
-            // 1. Tambahkan Query Pencarian (hanya jika ada teks yang dicari)
-            if (searchQuery.trim() !== '') {
-                params.append('search', searchQuery.trim());
-            }
-
-            // 2. Tambahkan Cache Buster pada permintaan awal
-            if (isInitialLoad) {
-                params.append('cache_buster', new Date().getTime());
-            }
-
-            if (params.toString()) {
-                apiUrl += `?${params.toString()}`;
-            }
+            if (searchQuery) apiUrl += `?search=${encodeURIComponent(searchQuery)}`;
 
             try {
                 const response = await fetch(apiUrl);
                 const result = await response.json();
 
                 if (result.status === 'success') {
-                    renderPeminjaman(result.data);
-                } else {
-                    tableBody.innerHTML = `<tr><td colspan="6" style="color: red; text-align: center;">Gagal memuat data: ${result.message}</td></tr>`;
-                }
+                    const data = result.data;
+                    tableBody.innerHTML = ''; // Kosongkan setelah data didapat
 
+                    if (data.length === 0) {
+                        tableBody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 60px; color: #999;">Tidak ada data peminjaman ditemukan.</td></tr>';
+                        return;
+                    }
+
+                    data.forEach(item => {
+                        const row = tableBody.insertRow();
+                        row.classList.add('data-row');
+
+                        // 1. Kolom ID
+                        row.insertCell().innerHTML = `<span style="font-weight: 700; color: #4A90E2;">#${item.id}</span>`;
+
+                        // 2. Kolom Mahasiswa
+                        const mhsCell = row.insertCell();
+                        mhsCell.innerHTML = `
+                        <div style="font-weight: 600; color: #1a1a1a; margin-bottom: 2px;">${item.nama_mahasiswa || '-'}</div>
+                        <div style="font-size: 0.8em; color: #888; font-weight: 500;">NIM: ${item.nim_mahasiswa || '-'}</div>
+                    `;
+
+                        // 3. Kolom Sarana
+                        const saranaCell = row.insertCell();
+                        saranaCell.innerHTML = `
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div style="width: 32px; height: 32px; background: #f0f7ff; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #4A90E2; flex-shrink: 0;">
+                                <i class="fas fa-laptop"></i>
+                            </div>
+                            <span style="font-weight: 500; color: #333;">${item.aset_dipinjam || '-'}</span>
+                        </div>
+                    `;
+
+                        // 4. Kolom Waktu Pinjam
+                        row.insertCell().innerHTML = formatPeminjamanDateTime(item.tanggal_peminjaman, item.start_time, item.end_time);
+
+                        // 5. Kolom Keperluan (Truncate agar tetap presisi)
+                        const kepCell = row.insertCell();
+                        kepCell.innerHTML = `<div style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #666;" title="${item.keperluan}">${item.keperluan || '-'}</div>`;
+
+                        // 6. Kolom Status
+                        const statusText = (item.status || 'pending').toUpperCase();
+                        row.insertCell().innerHTML = `<span class="status ${statusText}">${statusText}</span>`;
+
+                        // 7. Kolom Aksi
+                        const actionCell = row.insertCell();
+                        actionCell.style.textAlign = "center";
+                        actionCell.innerHTML = `
+                        <a href="detail_peminjaman.html?id=${item.id}" class="btn btn-detail">
+                            <i class="fas fa-eye"></i> Detail
+                        </a>
+                    `;
+                    });
+                }
             } catch (error) {
-                console.error('Error loading peminjaman:', error);
-                tableBody.innerHTML = `<tr><td colspan="6" style="color: red; text-align: center;">Terjadi kesalahan koneksi jaringan.</td></tr>`;
+                console.error(error);
+                tableBody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: red; padding: 20px;">Gagal terhubung ke server.</td></tr>';
             }
         }
 
-        // Panggil fungsi saat halaman dimuat
-        document.addEventListener('DOMContentLoaded', () => {
-            loadPeminjaman();
-        });
+        // --- 3. LOGIKA MODAL LOGOUT ---
+        const logoutModal = document.getElementById('logoutModal');
+        const logoutTrigger = document.getElementById('logoutLink');
+        const cancelLogoutBtn = document.getElementById('cancelLogoutBtn');
+        const confirmLogoutBtn = document.getElementById('confirmLogoutBtn');
 
-        // Event Listener BARU untuk Auto-Search saat tombol dilepas
-        searchInput.addEventListener('keyup', function (e) {
-            // Debouncing opsional: Anda bisa menambahkan jeda 300ms di sini 
-            // agar tidak terlalu banyak request saat mengetik cepat.
-            const query = searchInput.value.trim();
-            loadPeminjaman(query);
-        });
-
-        // Logika Logout
-        document.getElementById('logoutLink').addEventListener('click', function (e) {
+        logoutTrigger?.addEventListener('click', (e) => {
             e.preventDefault();
-            if (confirm('Apakah Anda yakin ingin keluar dari sistem?')) {
-                const logoutUrl = '../../backend/api/auth/logout.php';
-                fetch(logoutUrl, { method: 'POST' })
-                    .then(() => window.location.href = '../public/index.html')
-                    .catch(() => window.location.href = '../public/index.html');
+            logoutModal.style.display = 'flex';
+        });
+
+        cancelLogoutBtn?.addEventListener('click', () => {
+            logoutModal.style.display = 'none';
+        });
+
+        confirmLogoutBtn?.addEventListener('click', async () => {
+            confirmLogoutBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Keluar...';
+            confirmLogoutBtn.disabled = true;
+            try {
+                await fetch('../../backend/api/auth/logout.php', { method: 'POST' });
+                window.location.href = '../public/index.html';
+            } catch (error) {
+                window.location.href = '../public/index.html';
             }
+        });
+
+        window.addEventListener('click', (e) => {
+            if (e.target === logoutModal) logoutModal.style.display = 'none';
+        });
+
+        // --- 4. Inisialisasi & Search Debounce ---
+        document.addEventListener('DOMContentLoaded', () => loadPeminjaman());
+
+        // Ganti 'keyup' menjadi 'input' + Debounce
+        searchInput.addEventListener('input', (e) => {
+            const value = e.target.value;
+
+            // Bersihkan timer sebelumnya
+            clearTimeout(searchTimeout);
+
+            // Set timer baru (jeda 400ms)
+            searchTimeout = setTimeout(() => {
+                loadPeminjaman(value);
+            }, 400);
         });
     </script>
 </body>

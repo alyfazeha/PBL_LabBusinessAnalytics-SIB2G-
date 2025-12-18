@@ -2,76 +2,18 @@
 <html lang="id">
 
 <head>
-       
     <meta charset="UTF-8">
-       
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Detail Peminjaman</title>
-       
+    <title>Detail Peminjaman | Dosen</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-       
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../../frontend/assets/css/dashboarddns.css">
     <link rel="stylesheet" href="../assets/css/cssadmin.css">
-
-
-    <style>
-        /* Menggunakan Flexbox untuk memastikan label dan konten berada dalam satu baris yang rapi */
-        .profile-info-group {
-            display: flex;
-            align-items: flex-start;
-            /* Sejajarkan di bagian atas */
-            margin-bottom: 10px;
-            padding: 5px 0;
-            border-bottom: 1px solid #eee;
-            /* Garis pemisah */
-        }
-
-        /* Mengatur lebar tetap untuk LABEL dan mengatur warna biru */
-        .profile-info-group label {
-            width: 170px;
-            font-weight: 600;
-            margin-right: 15px;
-            flex-shrink: 0;
-            text-align: left;
-            color: #4791e0;
-            /* <--- WARNA BIRU UNTUK LABEL */
-        }
-
-        /* Mengatur agar konten (p) mengisi sisa ruang dan rata kiri */
-        .profile-info-group p {
-            flex-grow: 1;
-            margin-bottom: 0;
-            word-break: break-word;
-            line-height: 1.5;
-            text-align: left;
-            color: #333;
-            /* Konten tetap hitam/abu-abu agar mudah dibaca */
-        }
-
-        /* Perbaikan Kontras Badge */
-        .badge {
-            font-size: 0.8em;
-            padding: 4px 8px;
-            border-radius: 4px;
-        }
-
-        .badge.approved,
-        .badge.disetujui {
-            background-color: #28a745;
-            color: #fff !important;
-            /* Dipaksa putih agar kontras dengan hijau */
-        }
-
-        .badge.pending,
-        .badge.menunggu {
-            background-color: #ffc107;
-            color: #333;
-        }
-    </style>
 </head>
 
 <body>
-        <aside class="sidebar">
+
+    <aside class="sidebar">
         <div class="logo-area">
             <img src="../assets/images/LogoPolinema.png" alt="" style="width: 50px;">
             <img src="../assets/images/logoJTI.png" alt="" style="width: 45px;">
@@ -80,7 +22,7 @@
             <h3>Dashboard Dosen</h3>
         </div>
         <nav>
-            <a href="index.html" class=""><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="index.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
             <a href="../public/index.html"
                 style="border-top: 1px solid rgba(255,255,255,0.1); margin-top: 10px; padding-top: 15px;">
                 <i class="fas fa-external-link-alt"></i> Lihat Landing Page
@@ -88,206 +30,163 @@
             <a href="profile.html"><i class="fas fa-user-tie"></i> Profil & Akun</a>
             <a href="riwayat_peminjaman.html" class="active"><i class="fas fa-book-reader"></i> Riwayat Peminjaman</a>
             <a href="publikasi.html"><i class="fas fa-file-invoice"></i> Kelola Publikasi</a>
-
             <a href="#" id="logoutLink"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </nav>
     </aside>
 
-        <main class="main-content">
-                <div class="content-card">
-                                    <h2><i class="fas fa-file-alt"></i> Detail Peminjaman <span
-                    id="headerBookingId">Memuat...</span></h2>
-
-                        <div class="detail-group">
-                                <h3><i class="fas fa-info-circle"></i> Informasi Peminjaman</h3>
-
-                                <div class="profile-info-group"><label>Tanggal Pengajuan</label>
-                                        <p id="tglPengajuan">Memuat...</p>
-                                    </div>
-
-                                <div class="profile-info-group"><label>Tujuan Peminjaman</label>
-                                        <p id="tujuan">Memuat...</p>
-                                    </div>
-
-                                <div class="profile-info-group"><label>Status Saat Ini</label>
-                                        <p id="statusBadge"><span class="badge pending">Memuat...</span></p>
-                                    </div>
-
-                                <div class="profile-info-group"><label>Catatan Dosen</label>
-                                        <p id="catatanAdmin">Memuat...</p>
-                                    </div>
-                            </div>
-
-                        <div class="detail-group">
-                                <h3><i class="fas fa-user"></i> Informasi Peminjam</h3>
-                                <div class="profile-info-group"><label>NIM / ID</label>
-                                        <p id="nimMhs">Memuat...</p>
-                                    </div>
-                                <div class="profile-info-group"><label>Nama Mahasiswa</label>
-                                        <p id="namaMhs">Memuat...</p>
-                                    </div>
-                                <div class="profile-info-group"><label>Kontak (HP)</label>
-                                        <p id="noHpMhs">Memuat...</p>
-                                    </div>
-                                <div class="profile-info-group"><label>Email</label>
-                                        <p id="emailMhs">Memuat...</p>
-                                    </div>
-                            </div>
-
-                        <div class="detail-group">
-                                <h3><i class="fas fa-box-open"></i> Aset yang Dipinjam</h3>
-                                <table class="status-table">
-                                        <thead>
-                                                <tr>
-                                                        <th>Nama Aset</th>
-                                                        <th>Kode Aset</th>
-                                                        <th>Jumlah</th>
-                                                        <th>Kondisi</th>
-                                                    </tr>
-                                            </thead>
-                                        <tbody id="asetTableBody">
-                                                <tr>
-                            <td colspan="4" style="text-align: center;">Memuat data aset...</td>
-                        </tr>
-                                            </tbody>
-                                    </table>
-                            </div>
-
-            <div style="text-align: center; margin-top: 30px;">
-                <a href="riwayat_peminjaman.html" class="btn-submit"
-                    style="width: auto; padding: 12px 25px; display: inline-block; text-decoration: none;">
-                    <i class="fas fa-arrow-left"></i>
-                    Kembali ke Riwayat
-                </a>
+    <div class="main-content">
+        <header style="margin-bottom: 30px;">
+            <div class="header-title">
+                <a href="riwayat_peminjaman.html" class="back-icon-in-header"><i class="fas fa-arrow-left"></i></a>
+                <h2>Detail Peminjaman #<span id="bookingIdDisplay">...</span></h2>
             </div>
+        </header>
 
+        <main>
+            <div id="statusMessage" class="message" style="display:none;"></div>
+            <div id="detailContent">
+                <p id="loadingState" class="detail-card-wrapper" style="padding: 30px; text-align: center;">Memuat
+                    detail peminjaman...</p>
+            </div>
+        </main>
+    </div>
+
+    <div id="logoutModal" class="modal logout-modal">
+        <div class="modal-content">
+            <span class="close-btn"
+                onclick="document.getElementById('logoutModal').style.display='none';">&times;</span>
+            <h4><i class="fas fa-sign-out-alt"></i> Konfirmasi Logout</h4>
+            <p>Apakah Anda yakin ingin keluar dari sistem dashboard dosen?</p>
+            <div class="modal-buttons">
+                <button onclick="document.getElementById('logoutModal').style.display='none';"
+                    class="btn btn-secondary">Batal</button>
+                <button id="confirmLogoutBtn" class="btn btn-danger">Ya, Logout</button>
+            </div>
         </div>
+    </div>
 
-
-                </div>
-            </main>
-
-       
     <script>
-        // Fungsi utilitas untuk format tanggal
-        function formatDate(dateString) {
-            if (!dateString) return '-';
-            const options = { day: '2-digit', month: 'long', year: 'numeric' };
-            try {
-                return new Date(dateString).toLocaleDateString('id-ID', options);
-            } catch (e) {
-                return dateString;
-            }
-        }
+        const urlParams = new URLSearchParams(window.location.search);
+        const bookingId = urlParams.get('id');
 
-        // Fungsi utilitas untuk mendapatkan kelas status
-        function getStatusClass(status) {
-            const lowerStatus = status ? status.toLowerCase() : '';
-            if (lowerStatus.includes('setuju') || lowerStatus.includes('approved')) return 'approved';
-            if (lowerStatus.includes('tolak') || lowerStatus.includes('rejected')) return 'rejected';
-            if (lowerStatus.includes('kembali') || lowerStatus.includes('returned') || lowerStatus.includes('selesai')) return 'kembali';
-            if (lowerStatus.includes('dipinjam')) return 'dipinjam';
-            return 'pending';
-        }
-
-
-        async function loadDetailPeminjaman() {
-            // 1. Ambil ID dari URL
-            const urlParams = new URLSearchParams(window.location.search);
-            const bookingId = urlParams.get('id');
-
-            // Ambil elemen-elemen kunci
-            const headerBookingId = document.getElementById('headerBookingId');
-            const asetTableBody = document.getElementById('asetTableBody');
-
-            // Set loading state awal
-            if (headerBookingId) headerBookingId.textContent = 'Memuat...';
-            if (asetTableBody) asetTableBody.innerHTML = `<tr><td colspan="4" style="text-align: center;">Memuat data aset...</td></tr>`;
+        // --- 1. FUNGSI FETCH DETAIL ---
+        async function fetchDetailPeminjaman() {
+            const detailWrapper = document.getElementById('detailContent');
+            const bookingIdDisplay = document.getElementById('bookingIdDisplay');
 
             if (!bookingId) {
-                if (headerBookingId) headerBookingId.textContent = 'ID Tidak Ditemukan';
-                alert('ID Peminjaman tidak ditemukan di URL.');
+                detailWrapper.innerHTML = '<div class="detail-card-wrapper" style="padding: 30px; color: red; text-align: center;">ID Peminjaman tidak ditemukan.</div>';
                 return;
             }
 
-            if (headerBookingId) headerBookingId.textContent = `#${bookingId}`;
-
-            // 2. Tentukan PATH API BACKEND Anda
-            // PATH DIJAGA KONSISTEN SESUAI PERMINTAAN
-            const apiPath = `../../backend/api/booking/detail_booking.php?id=${bookingId}`;
+            bookingIdDisplay.textContent = bookingId;
 
             try {
-                // 3. Panggil API Backend
-                const response = await fetch(apiPath);
+                // Path API disesuaikan dengan folder dosen
+                const response = await fetch(`../../backend/api/booking/detail_booking.php?id=${bookingId}`);
                 const result = await response.json();
 
                 if (result.status === 'success' && result.data) {
-                    const data = result.data;
-
-                    // A. Isi Informasi Peminjaman
-                    document.getElementById('tglPengajuan').textContent = formatDate(data.tanggal) || '-';
-                    document.getElementById('tujuan').textContent = data.keperluan || '-';
-
-                    const statusText = data.status ? data.status.charAt(0).toUpperCase() + data.status.slice(1).toLowerCase() : 'Menunggu';
-                    const statusClass = getStatusClass(data.status);
-                    document.getElementById('statusBadge').innerHTML = `<span class="badge ${statusClass}">${statusText}</span>`;
-
-                    document.getElementById('catatanAdmin').textContent = data.admin_response || '-';
-
-
-                    // B. Isi Informasi Peminjam
-                    document.getElementById('nimMhs').textContent = data.mahasiswa_nim || '-';
-                    document.getElementById('namaMhs').textContent = data.nama_mahasiswa || '-';
-                    document.getElementById('noHpMhs').textContent = data.no_hp || '-';
-                    document.getElementById('emailMhs').textContent = data.email || '-';
-
-                    // C. Isi Aset yang Dipinjam
-
-                    if (data.nama_sarana) {
-                        asetTableBody.innerHTML = `
-                            <tr>
-                                <td>${data.nama_sarana || '-'}</td>
-                                <td>${data.sarana_id || '-'}</td>
-                                <td>1 Unit</td>
-                                <td>Baik</td>
-                            </tr>
-                        `;
-                    } else {
-                        asetTableBody.innerHTML = `<tr><td colspan="4" style="text-align: center;">Tidak ada detail aset terkait.</td></tr>`;
-                    }
-
-
-                } else if (result.status === 'error') {
-                    if (headerBookingId) headerBookingId.textContent = 'Error';
-                    alert('Gagal memuat detail peminjaman: ' + result.message);
+                    renderDetail(result.data);
                 } else {
-                    alert('Data peminjaman tidak ditemukan.');
+                    detailWrapper.innerHTML = `<div class="detail-card-wrapper" style="padding: 30px;"><p style="color: red;">${result.message || 'Data tidak ditemukan.'}</p></div>`;
                 }
-
             } catch (error) {
-                console.error('Error memuat detail:', error);
-                if (headerBookingId) headerBookingId.textContent = 'Error Jaringan';
-                alert('Terjadi kesalahan jaringan atau server.');
+                detailWrapper.innerHTML = '<div class="detail-card-wrapper" style="padding: 30px; text-align: center; color:red;">Gagal terhubung ke server.</div>';
             }
         }
 
-        document.addEventListener('DOMContentLoaded', loadDetailPeminjaman);
+        // --- 2. FUNGSI RENDER DETAIL ---
+        function renderDetail(data) {
+            const detailWrapper = document.getElementById('detailContent');
 
-        // Logika Logout (PATH TIDAK DIUBAH SAMA SEKALI)
-        document.getElementById('logoutLink').addEventListener('click', function (e) {
+            // Samakan Style Status dengan tabel riwayat
+            const statusText = (data.status || 'pending').toUpperCase();
+
+            // Format Tanggal
+            const dateObj = new Date(data.tanggal || data.tanggal_peminjaman);
+            const formattedDate = dateObj.toLocaleDateString('id-ID', {
+                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+            });
+
+            // Format Waktu
+            const jamMulai = (data.start_time || data.jam_mulai || '00:00').substring(0, 5);
+            const jamSelesai = (data.end_time || data.jam_selesai || '00:00').substring(0, 5);
+
+            detailWrapper.innerHTML = `
+                <div class="detail-card-wrapper">
+                    <div style="height: 10px; background-color: #4A90E2; border-radius: 8px 8px 0 0;"></div>
+
+                    <div style="padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee;">
+                        <h3 style="margin: 0; font-size: 1.1em; color: #555;">Status: <span class="status ${statusText}">${statusText}</span></h3>
+                    </div>
+                    
+                    <div class="detail-columns">
+                        <div class="detail-column">
+                            <h4 style="color: #4A90E2; margin-bottom: 15px; font-size: 1.1em;"><i class="fas fa-user-graduate"></i> Data Mahasiswa</h4>
+                            <div class="detail-item">
+                                <strong style="display: block; color: #888; font-size: 0.85em;">Nama Mahasiswa:</strong>
+                                <span>${data.nama_mahasiswa || '-'}</span>
+                            </div>
+                            <div class="detail-item">
+                                <strong style="display: block; color: #888; font-size: 0.85em;">NIM:</strong>
+                                <span>${data.mahasiswa_nim || data.nim_mahasiswa || '-'}</span>
+                            </div>
+                            <div class="detail-item">
+                                <strong style="display: block; color: #888; font-size: 0.85em;">Kontak:</strong>
+                                <span><i class="fab fa-whatsapp"></i> ${data.no_hp || '-'}</span>
+                            </div>
+                        </div>
+
+                        <div class="detail-column">
+                            <h4 style="color: #4A90E2; margin-bottom: 15px; font-size: 1.1em;"><i class="fas fa-calendar-check"></i> Detail Peminjaman</h4>
+                            <div class="detail-item">
+                                <strong style="display: block; color: #888; font-size: 0.85em;">Sarana / Aset:</strong>
+                                <span style="font-weight: 600;">${data.nama_sarana || data.aset_dipinjam || '-'}</span>
+                            </div>
+                            <div class="detail-item">
+                                <strong style="display: block; color: #888; font-size: 0.85em;">Tanggal:</strong>
+                                <span>${formattedDate}</span>
+                            </div>
+                            <div class="detail-item">
+                                <strong style="display: block; color: #888; font-size: 0.85em;">Waktu:</strong>
+                                <span>${jamMulai} - ${jamSelesai} WIB</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="padding: 0 30px 30px; border-top: 1px solid #eee; margin-top: 10px;">
+                        <h4 style="margin-top: 20px; color: #555;"><i class="fas fa-pencil"></i> Keperluan</h4>
+                        <p style="background: #f9f9f9; padding: 15px; border-radius: 8px; border-left: 5px solid #4A90E2; margin-bottom: 20px;">
+                            ${data.keperluan || 'Tidak ada keterangan.'}
+                        </p>
+
+                        ${data.rejection_reason || data.admin_response ? `
+                            <h4 style="color: #DC3545;"><i class="fas fa-comment-dots"></i> Catatan Penolakan/Admin</h4>
+                            <p style="background: #fff5f5; border-left: 5px solid #DC3545; color: #DC3545; padding: 15px; border-radius: 8px;">
+                                ${data.rejection_reason || data.admin_response}
+                            </p>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- 3. LOGIKA LOGOUT & INIT ---
+        document.addEventListener('DOMContentLoaded', fetchDetailPeminjaman);
+
+        const logoutModal = document.getElementById('logoutModal');
+        document.getElementById('logoutLink').addEventListener('click', (e) => {
             e.preventDefault();
-            if (confirm('Apakah Anda yakin ingin keluar dari sistem?')) {
-                const logoutUrl = '../../backend/api/auth/logout.php';
-                fetch(logoutUrl, { method: 'POST' })
-                    .then(response => response.json())
-                    .then(data => {
-                        alert(data.message);
-                        window.location.href = '../public/index.html';
-                    })
-                    .catch(error => {
-                        alert('Terjadi kesalahan saat logout.');
-                        window.location.href = '../public/index.html';
-                    });
+            logoutModal.style.display = 'flex';
+        });
+
+        document.getElementById('confirmLogoutBtn').addEventListener('click', async () => {
+            try {
+                await fetch('../../backend/api/auth/logout.php', { method: 'POST' });
+                window.location.href = '../public/index.html';
+            } catch (error) {
+                console.error("Logout gagal", error);
             }
         });
     </script>

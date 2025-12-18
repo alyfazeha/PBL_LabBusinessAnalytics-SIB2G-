@@ -1,13 +1,15 @@
 <?php
 // backend/api/booking/list_dosen.php
 ini_set('display_errors', 0);
-error_reporting(E_ALL); 
+error_reporting(E_ALL);
 
-if (session_status() === PHP_SESSION_NONE) { session_start(); }
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 header('Content-Type: application/json');
 header("Access-Control-Allow-Origin: *");
 
-require_once __DIR__ . "/../../config/database.php"; 
+require_once __DIR__ . "/../../config/database.php";
 
 try {
     // 1. Cek Login & Role
@@ -15,10 +17,10 @@ try {
         http_response_code(403);
         throw new Exception("Akses ditolak. Silakan login sebagai Dosen.");
     }
-    
+
     $db = Database::getInstance();
     $userId = $_SESSION['user_id'];
-    
+
     // 2. Ambil NIDN Dosen yang sedang Login
     $stmtDosen = $db->prepare("SELECT nidn FROM dosen WHERE user_id = :uid");
     $stmtDosen->execute([':uid' => $userId]);
@@ -28,10 +30,12 @@ try {
         throw new Exception("Data NIDN Dosen tidak ditemukan. Periksa tabel dosen.");
     }
 
-    // 3. Ambil Data Peminjaman (Query Khusus Dosen Bimbingan)
+    // 3. Ambil Data Peminjaman (Tambahkan start_time dan end_time)
     $select_fields = "
         b.booking_id AS id, 
         b.tanggal AS tanggal_peminjaman,  
+        b.start_time,
+        b.end_time,
         b.keperluan,
         b.status,
         s.nama_sarana AS aset_dipinjam, 
@@ -44,29 +48,29 @@ try {
         LEFT JOIN sarana s ON b.sarana_id = s.sarana_id
         LEFT JOIN mahasiswa m ON b.mahasiswa_nim = m.nim
     ";
-    
+
     // 4. LOGIKA PENCARIAN (Dual Query Logic)
-    
+
     // Ambil keyword pencarian (trim() untuk membersihkan spasi)
-    $searchQuery = trim($_GET['search'] ?? ''); 
-    
+    $searchQuery = trim($_GET['search'] ?? '');
+
     // Filter Wajib (NIDN Dosen)
     $where_base = " WHERE b.booking_dosen_nidn = :nidn_dosen";
     $params = [':nidn_dosen' => $nidnDosen];
-    
+
     // Cek apakah ada keyword pencarian
     if (!empty($searchQuery)) {
         // --- QUERY DENGAN PENCARIAN ---
-        
-        $searchTerm = "%{$searchQuery}%"; 
-        
+
+        $searchTerm = "%{$searchQuery}%";
+
         // Tambahkan filter NIM/Nama ke klausa WHERE
         // Menggunakan ILIKE untuk PostgreSQL atau LIKE untuk kompatibilitas MySQL
         $where_search = " AND (m.nim ILIKE :search_term OR m.nama ILIKE :search_term)";
-        
+
         // Tambahkan parameter pencarian ke array params
         $params[':search_term'] = $searchTerm;
-        
+
         // Gabungkan SQL untuk pencarian
         $sql = "
             SELECT {$select_fields}
@@ -76,7 +80,7 @@ try {
         ";
     } else {
         // --- QUERY LOAD NORMAL (TANPA PENCARIAN) ---
-        
+
         // Gunakan where_base saja
         $sql = "
             SELECT {$select_fields}
@@ -85,19 +89,17 @@ try {
             ORDER BY b.tanggal DESC, b.booking_id DESC
         ";
     }
-    
+
     // 5. Eksekusi Query
     $stmtPeminjaman = $db->prepare($sql);
-    $stmtPeminjaman->execute($params); 
+    $stmtPeminjaman->execute($params);
     $peminjamanList = $stmtPeminjaman->fetchAll(PDO::FETCH_ASSOC);
 
     echo json_encode([
         'status' => 'success',
         'data' => $peminjamanList
     ]);
-
 } catch (Exception $e) {
     http_response_code(500);
     echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
 }
-?>
