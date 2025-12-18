@@ -4,24 +4,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tambah Publikasi</title>
+    <title>Tambah Publikasi | Dosen</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/dashboarddns.css">
     <link rel="stylesheet" href="../assets/css/cssadmin.css">
-
+    <link rel="stylesheet" href="../../assets/css/cssmahasiswa.css">
 </head>
 
 <body>
+    <div id="toastNotificationContainer"></div>
+
     <aside class="sidebar">
         <div class="logo-area">
             <img src="../assets/images/LogoPolinema.png" alt="" style="width: 50px;">
             <img src="../assets/images/logoJTI.png" alt="" style="width: 45px;">
-            <img src="../assets/images/LogoLab2.png" alt="Business Analytics Laboratory"
+            <img src="../assets/images/LogoLab2.png" alt="Logo"
                 style="width: 70px; margin-bottom: -10px; margin-left: -10px;">
             <h3>Dashboard Dosen</h3>
         </div>
         <nav>
-            <a href="index.html" class=""><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="index.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
             <a href="../public/index.html"
                 style="border-top: 1px solid rgba(255,255,255,0.1); margin-top: 10px; padding-top: 15px;">
                 <i class="fas fa-external-link-alt"></i> Lihat Landing Page
@@ -29,126 +31,208 @@
             <a href="profile.html"><i class="fas fa-user-tie"></i> Profil & Akun</a>
             <a href="riwayat_peminjaman.html"><i class="fas fa-book-reader"></i> Riwayat Peminjaman</a>
             <a href="publikasi.html" class="active"><i class="fas fa-file-invoice"></i> Kelola Publikasi</a>
-
             <a href="#" id="logoutLink"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </nav>
     </aside>
 
-    <main class="main-content">
-        <div class="content-card">
-            <h2><i class="fas fa-file-upload"></i> Tambah Publikasi Baru</h2>
+    <div class="main-content">
+        <header>
+            <div class="header-title">
+                <a href="publikasi.html" class="back-icon-in-header"><i class="fas fa-arrow-left"></i></a>
+                <h2>Tambah Publikasi Jurnal & Artikel</h2>
+            </div>
+            <div></div>
+        </header>
 
-            <form id="formPublikasi">
-                <div class="form-grid">
+        <main>
+            <div class="form-card">
+                <div class="form-card-header"></div>
+                <form id="formPublikasi">
+                    <div class="form-grid-2">
+                        <div class="column-left" style="margin-right: 30px;">
+                            <h4 class="section-title" style="color: #4A90E2; margin-bottom: 20px;">
+                                <i class="fas fa-file-alt"></i> Identitas Publikasi
+                            </h4>
 
-                    <div class="form-group full-width">
-                        <label for="judul">Judul Publikasi</label>
-                        <input type="text" id="judul" name="judul" required placeholder="Judul Jurnal / Penelitian...">
+                            <div class="form-group">
+                                <label for="judul">Judul Publikasi</label>
+                                <input type="text" id="judul" name="judul" required
+                                    placeholder="Masukkan judul lengkap penelitian..."
+                                    style="width: 100%; box-sizing: border-box;">
+                            </div>
+
+                            <div class="form-row" style="display: flex; gap: 15px;">
+                                <div class="form-group" style="flex: 1;">
+                                    <label for="tahun">Tahun Terbit</label>
+                                    <input type="number" id="tahun" name="tahun" required placeholder="2025"
+                                        style="width: 100%; box-sizing: border-box;">
+                                </div>
+                                <div class="form-group" style="flex: 2;">
+                                    <label for="kategori_id">Kategori Jurnal</label>
+                                    <select id="kategori_id" name="kategori_id" required
+                                        style="width: 100%; box-sizing: border-box; height: 42px;">
+                                        <option value="">Memuat...</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="column-right" style="display: flex; flex-direction: column;">
+                            <h4 class="section-title" style="color: #4A90E2; margin-bottom: 20px;">
+                                <i class="fas fa-project-diagram"></i> Klasifikasi & Tautan
+                            </h4>
+
+                            <div class="form-group">
+                                <label for="focus_id">Topik Riset (Research Focus)</label>
+                                <select id="focus_id" name="focus_id" required
+                                    style="width: 100%; box-sizing: border-box; height: 42px;">
+                                    <option value="">Memuat...</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="link">Link Eksternal (URL)</label>
+                                <input type="url" id="link" name="external_link" placeholder="https://doi.org/..."
+                                    style="width: 100%; box-sizing: border-box;">
+                            </div>
+
+                            <div style="background: #f0f7ff; border: 1.5px dashed #4A90E2; padding: 20px; border-radius: 10px; margin-top: 10px; flex: 1; display: flex; align-items: center; box-sizing: border-box; width: 100%;">
+                                <div>
+                                    <p style="font-size: 14px; color: #2d3748; margin-bottom: 8px; font-weight: 600;">
+                                        <i class="fas fa-info-circle"></i> Verifikasi Admin
+                                    </p>
+                                    <p style="font-size: 13px; color: #718096; margin: 0; line-height: 1.6;">
+                                        Publikasi akan masuk ke status <b>Pending</b> untuk divalidasi oleh Admin.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="form-group">
-                        <label for="tahun">Tahun Publikasi</label>
-                        <input type="number" id="tahun" name="tahun" required placeholder="2025" min="1900" max="2100">
+                    <div class="form-actions full-width">
+                        <button type="submit" id="btnSimpan" class="btn btn-ijo">
+                            <i class="fas fa-save"></i> Simpan Publikasi
+                        </button>
+                        <a href="publikasi.html" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Batal
+                        </a>
                     </div>
+                </form>
+            </div>
+        </main>
+    </div>
 
-                    <div class="form-group">
-                        <label for="kategori_id">Kategori Publikasi</label>
-                        <select id="kategori_id" name="kategori_id" required>
-                            <option value="">-- Memuat Kategori... --</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="focus_id">Topik Riset (Research Focus)</label>
-                        <select id="focus_id" name="focus_id" required>
-                            <option value="">-- Memuat Topik... --</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group full-width">
-                        <label for="link">Link Dokumen / Jurnal (URL)</label>
-                        <input type="url" id="link" name="external_link"
-                            placeholder="Contoh: https://jurnal.universitas.ac.id/...">
-                    </div>
-
-                    <div class="form-group full-width">
-                        <button type="submit" id="btnSimpan" class="btn-submit"><i class="fas fa-save"></i> Simpan
-                            Publikasi</button>
-                    </div>
-                </div>
-            </form>
+    <div id="logoutModal" class="modal logout-modal">
+        <div class="modal-content" style="text-align: left !important;">
+            <span class="close-btn"
+                onclick="document.getElementById('logoutModal').style.display='none';">&times;</span>
+            <h4><i class="fas fa-sign-out-alt"></i> Konfirmasi Logout</h4>
+            <p>Anda yakin ingin mengakhiri sesi dan keluar dari Panel Dosen?</p>
+            <div class="modal-buttons">
+                <button onclick="document.getElementById('logoutModal').style.display='none';" class="btn btn-secondary">Batal</button>
+                <button id="confirmLogoutBtn" class="btn btn-danger">Ya, Logout</button>
+            </div>
         </div>
-    </main>
+    </div>
 
     <script>
-        // 1. Load Data Dropdown (Kategori & Fokus) saat halaman dibuka
+        // --- 1. Fungsi Toast ---
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastNotificationContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast-notification toast-${type} show`;
+            toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${message}`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 500);
+            }, 3000);
+        }
+
+        // --- 2. Load Dropdowns ---
         async function loadDropdowns() {
             try {
-                // Kategori
-                const resKat = await fetch('../../backend/api/publikasi/kategori_list.php');
+                const [resKat, resFoc] = await Promise.all([
+                    fetch('../../backend/api/publikasi/kategori_list.php'),
+                    fetch('../../backend/api/research/list.php')
+                ]);
+
                 const jsonKat = await resKat.json();
+                const jsonFoc = await resFoc.json();
+
                 const selKat = document.getElementById('kategori_id');
-                selKat.innerHTML = '<option value="">-- Pilih Kategori --</option>';
+                const selFoc = document.getElementById('focus_id');
+
+                selKat.innerHTML = '<option value="">Pilih Kategori</option>';
                 if (jsonKat.status === 'success') {
                     jsonKat.data.forEach(d => selKat.innerHTML += `<option value="${d.id}">${d.nama_kategori}</option>`);
                 }
 
-                // Fokus Riset
-                const resFoc = await fetch('../../backend/api/research/list.php');
-                const jsonFoc = await resFoc.json();
-                const selFoc = document.getElementById('focus_id');
-                selFoc.innerHTML = '<option value="">-- Pilih Topik Riset --</option>';
+                selFoc.innerHTML = '<option value="">Pilih Fokus Riset</option>';
                 if (jsonFoc.status === 'success') {
                     jsonFoc.data.forEach(d => selFoc.innerHTML += `<option value="${d.focus_id}">${d.nama_fokus}</option>`);
                 }
-            } catch (error) { console.error('Error load dropdowns:', error); }
+            } catch (error) {
+                showToast('Gagal memuat pilihan kategori', 'error');
+            }
         }
 
-        // 2. Submit Form
+        // --- 3. Submit Form ---
         document.getElementById('formPublikasi').addEventListener('submit', async (e) => {
-            e.preventDefault(); // Mencegah reload halaman
+            e.preventDefault();
             const btn = document.getElementById('btnSimpan');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengirim...';
-            btn.disabled = true;
+            const originalText = btn.innerHTML;
 
-            const formData = new FormData(e.target);
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
 
             try {
-                // Kirim ke create.php (Logic backend akan otomatis set status=pending & NIDN dosen)
                 const response = await fetch('../../backend/api/publikasi/create.php', {
                     method: 'POST',
-                    body: formData
+                    body: new FormData(e.target)
                 });
                 const result = await response.json();
 
                 if (result.status === 'success') {
-                    alert(result.message); // Pesan: Menunggu verifikasi Admin
-                    window.location.href = 'publikasi.html'; // Redirect kembali ke list
+                    showToast('Publikasi berhasil diajukan!', 'success');
+                    setTimeout(() => window.location.href = 'publikasi.html', 2000);
                 } else {
-                    alert('Gagal: ' + result.message);
+                    showToast(result.message || 'Gagal menyimpan', 'error');
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
                 }
             } catch (error) {
-                console.error('Error:', error);
-                alert('Terjadi kesalahan koneksi.');
-            } finally {
-                btn.innerHTML = '<i class="fas fa-save"></i> Simpan Publikasi';
+                showToast('Terjadi kesalahan koneksi server', 'error');
                 btn.disabled = false;
+                btn.innerHTML = originalText;
             }
         });
 
-        // Panggil fungsi load saat halaman siap
-        document.addEventListener('DOMContentLoaded', loadDropdowns);
-
-        // Logika Logout
-        document.getElementById('logoutLink').addEventListener('click', function (e) {
+        // --- 4. Modal Logout (Logic Sesuai Halaman Publikasi) ---
+        const logoutModal = document.getElementById('logoutModal');
+        
+        document.getElementById('logoutLink').onclick = (e) => {
             e.preventDefault();
-            if (confirm('Apakah Anda yakin ingin keluar dari sistem?')) {
-                const logoutUrl = '../../backend/api/auth/logout.php';
-                fetch(logoutUrl, { method: 'POST' })
-                    .then(() => window.location.href = '../public/index.html')
-                    .catch(() => window.location.href = '../public/index.html');
+            logoutModal.style.display = 'flex';
+        };
+
+        document.getElementById('confirmLogoutBtn').onclick = async () => {
+            try {
+                const btn = document.getElementById('confirmLogoutBtn');
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>...';
+                
+                await fetch('../../backend/api/auth/logout.php', { method: 'POST' });
+                window.location.href = '../public/index.html';
+            } catch (error) {
+                window.location.href = '../public/index.html';
             }
-        });
+        };
+
+        window.onclick = (e) => {
+            if (e.target == logoutModal) logoutModal.style.display = 'none';
+        }
+
+        document.addEventListener('DOMContentLoaded', loadDropdowns);
     </script>
 </body>
 

@@ -973,3 +973,121 @@ header.dashboard-header h1 {
         box-sizing: border-box;
     }
 }
+
+/* Modern Publication Card Style */
+.publication-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 10px;
+    min-height: 300px;
+}
+
+.pub-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #ffffff;
+    padding: 24px;
+    border-radius: 12px;
+    border: 1px solid #edf2f7;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.pub-item:hover {
+    transform: translateX(5px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    border-color: #4A90E2;
+}
+
+.pub-info h3 {
+    margin: 0 0 10px 0;
+    color: #1a202c;
+    font-size: 1.15em;
+    font-weight: 700;
+    line-height: 1.4;
+}
+
+.pub-meta {
+    font-size: 0.9em;
+    color: #718096;
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.pub-meta span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.pub-meta i {
+    color: #4A90E2;
+}
+
+/* Action Buttons */
+.pub-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.btn-action {
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.85em;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+    cursor: pointer;
+    border: none;
+    text-decoration: none;
+}
+
+.btn-edit-pub {
+    background: #ebf4ff;
+    color: #3182ce;
+}
+
+.btn-edit-pub:hover {
+    background: #3182ce;
+    color: white;
+}
+
+.btn-delete-pub {
+    background: #fff5f5;
+    color: #e53e3e;
+}
+
+.btn-delete-pub:hover {
+    background: #e53e3e;
+    color: white;
+}
+
+/* Badge Styling */
+.badge {
+    padding: 5px 14px;
+    border-radius: 999px;
+    font-size: 0.75em;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.badge.published {
+    background: #c6f6d5;
+    color: #22543d;
+}
+
+.badge.pending {
+    background: #feebc8;
+    color: #744210;
+}
+
+.badge.rejected {
+    background: #fed7d7;
+    color: #822727;
+}
