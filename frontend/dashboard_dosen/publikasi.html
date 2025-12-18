@@ -7,25 +7,33 @@
     <title>Kelola Publikasi</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="../../frontend/assets/css/dashboarddns.css">
+    <link rel="stylesheet" href="../assets/css/cssadmin.css">
+
 </head>
 
 <body>
-    <aside class="dsn-sidebar">
-        <div class="dsn-logo-area">
-            <h2><i class="fas fa-chalkboard-teacher"></i> DOSEN <br> DASHBOARD</h2>
+    <aside class="sidebar">
+        <div class="logo-area">
+            <img src="../assets/images/LogoPolinema.png" alt="" style="width: 50px;">
+            <img src="../assets/images/logoJTI.png" alt="" style="width: 45px;">
+            <img src="../assets/images/LogoLab2.png" alt="Business Analytics Laboratory"
+                style="width: 70px; margin-bottom: -10px; margin-left: -10px;">
+            <h3>Dashboard Dosen</h3>
         </div>
         <nav>
-            <a href="index.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="index.html" class=""><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="../public/index.html"
+                style="border-top: 1px solid rgba(255,255,255,0.1); margin-top: 10px; padding-top: 15px;">
+                <i class="fas fa-external-link-alt"></i> Lihat Landing Page
+            </a>
             <a href="profile.html"><i class="fas fa-user-tie"></i> Profil & Akun</a>
-            <a href="riwayat_peminjaman.html" class="active"><i class="fas fa-book-reader"></i> Riwayat Peminjaman</a>
-            <a href="publikasi.html"><i class="fas fa-file-invoice"></i> Kelola Publikasi</a>
-            <hr style="border-top: 1px solid #444; margin: 10px 0;">
-            <a href="../public/index.html"><i class="fas fa-home"></i> Landing Page</a> 
+            <a href="riwayat_peminjaman.html"><i class="fas fa-book-reader"></i> Riwayat Peminjaman</a>
+            <a href="publikasi.html" class="active"><i class="fas fa-file-invoice"></i> Kelola Publikasi</a>
+
             <a href="#" id="logoutLink"><i class="fas fa-sign-out-alt"></i> Logout</a>
-            <hr style="border-top: 1px solid #444; margin: 10px 0;"> 
         </nav>
     </aside>
-    
+
     <main class="main-content">
         <div class="content-card">
             <h2><i class="fas fa-scroll"></i> Kelola Publikasi Jurnal & Artikel</h2>
@@ -100,21 +108,21 @@
 
         // 2. Fungsi Hapus (Opsional, agar tombol hapus berfungsi)
         async function deletePublikasi(id) {
-            if(!confirm('Apakah Anda yakin ingin menghapus publikasi ini?')) return;
-            
+            if (!confirm('Apakah Anda yakin ingin menghapus publikasi ini?')) return;
+
             const formData = new FormData();
             formData.append('id', id);
 
             try {
                 const res = await fetch('../../backend/api/publikasi/delete.php', { method: 'POST', body: formData });
                 const json = await res.json();
-                if(json.status === 'success') {
+                if (json.status === 'success') {
                     alert('Berhasil dihapus');
                     loadMyPublications(); // Reload list
                 } else {
                     alert('Gagal: ' + json.message);
                 }
-            } catch(e) {
+            } catch (e) {
                 alert('Error jaringan');
             }
         }
@@ -134,4 +142,5 @@
         });
     </script>
 </body>
+
 </html>
