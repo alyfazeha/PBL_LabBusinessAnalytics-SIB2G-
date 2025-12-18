@@ -4,24 +4,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kelola Publikasi</title>
+    <title>Kelola Publikasi | Dosen</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="../../frontend/assets/css/dashboarddns.css">
     <link rel="stylesheet" href="../assets/css/cssadmin.css">
-
+    <link rel="stylesheet" href="../../assets/css/cssmahasiswa.css">
 </head>
 
 <body>
+    <div id="toastNotificationContainer"></div>
+
     <aside class="sidebar">
         <div class="logo-area">
             <img src="../assets/images/LogoPolinema.png" alt="" style="width: 50px;">
             <img src="../assets/images/logoJTI.png" alt="" style="width: 45px;">
-            <img src="../assets/images/LogoLab2.png" alt="Business Analytics Laboratory"
+            <img src="../assets/images/LogoLab2.png" alt="Logo"
                 style="width: 70px; margin-bottom: -10px; margin-left: -10px;">
             <h3>Dashboard Dosen</h3>
         </div>
         <nav>
-            <a href="index.html" class=""><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="index.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
             <a href="../public/index.html"
                 style="border-top: 1px solid rgba(255,255,255,0.1); margin-top: 10px; padding-top: 15px;">
                 <i class="fas fa-external-link-alt"></i> Lihat Landing Page
@@ -29,117 +31,191 @@
             <a href="profile.html"><i class="fas fa-user-tie"></i> Profil & Akun</a>
             <a href="riwayat_peminjaman.html"><i class="fas fa-book-reader"></i> Riwayat Peminjaman</a>
             <a href="publikasi.html" class="active"><i class="fas fa-file-invoice"></i> Kelola Publikasi</a>
-
             <a href="#" id="logoutLink"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </nav>
     </aside>
 
-    <main class="main-content">
-        <div class="content-card">
-            <h2><i class="fas fa-scroll"></i> Kelola Publikasi Jurnal & Artikel</h2>
+    <div class="main-content">
+        <header style="margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center;">
+            <div class="header-title">
+                <h2><i class="fas fa-scroll"></i> Kelola Publikasi Jurnal</h2>
+            </div>
+            <a href="tambah_publikasi.html" class="btn btn-add"
+                style="background: #4A90E2; border-radius: 8px; padding: 12px 20px;">
+                <i class="fas fa-plus"></i> Tambah Publikasi
+            </a>
+        </header>
 
-            <a href="tambah_publikasi.html" class="btn-add-pub"><i class="fas fa-plus"></i> Tambah Publikasi Baru</a>
+        <main>
+            <div class="table-wrapper" style="background: transparent; box-shadow: none; padding: 0;">
+                <div class="publication-list" id="publicationContainer">
+                    <div style="text-align: center; padding: 100px;">
+                        <i class="fas fa-circle-notch fa-spin fa-3x" style="color: #4A90E2;"></i>
+                        <p style="margin-top: 15px; color: #718096;">Memuat data...</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
 
-            <div class="publication-list" id="publicationContainer">
-                <p style="text-align: center; color: #666; margin-top: 20px;">Memuat data publikasi...</p>
+    <div id="logoutModal" class="modal logout-modal">
+        <div class="modal-content">
+            <span class="close-btn"
+                onclick="document.getElementById('logoutModal').style.display='none';">&times;</span>
+            <h4><i class="fas fa-sign-out-alt"></i> Konfirmasi Logout</h4>
+            <p>Apakah Anda yakin ingin keluar dari sistem?</p>
+            <div class="modal-buttons">
+                <button onclick="document.getElementById('logoutModal').style.display='none';"
+                    class="btn btn-secondary">Batal</button>
+                <button id="confirmLogoutBtn" class="btn btn-danger">Ya, Logout</button>
             </div>
         </div>
-    </main>
+    </div>
+
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeDeleteModal()">&times;</span>
+            <h4><i class="fas fa-exclamation-triangle" style="color: #e53e3e;"></i> Konfirmasi Hapus</h4>
+            <p>Apakah Anda yakin ingin menghapus publikasi ini? Tindakan ini tidak dapat dibatalkan.</p>
+            <div class="modal-buttons">
+                <button onclick="closeDeleteModal()" class="btn btn-secondary">Batal</button>
+                <button id="confirmDeleteBtn" class="btn btn-danger">Ya, Hapus</button>
+            </div>
+        </div>
+    </div>
 
     <script>
-        // 1. Fungsi Mengambil Data dari API
+        let selectedPublikasiId = null;
+
+        // Fungsi Toast
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastNotificationContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast-notification toast-${type} show`;
+            toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${message}`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 500);
+            }, 3000);
+        }
+
         async function loadMyPublications() {
             const container = document.getElementById('publicationContainer');
-
             try {
-                // Panggil API khusus Dosen
                 const response = await fetch('../../backend/api/publikasi/list_dosen.php');
                 const result = await response.json();
-
-                if (result.status === 'success' && result.data.length > 0) {
-                    container.innerHTML = ''; // Hapus tulisan loading
-
-                    result.data.forEach(pub => {
-                        // Logika Warna Badge
-                        let badgeClass = 'pending';
-                        let statusText = pub.status || 'Pending';
-
-                        if (statusText.toLowerCase() === 'published') {
-                            badgeClass = 'published';
-                        } else if (statusText.toLowerCase() === 'rejected') {
-                            badgeClass = 'rejected';
-                        }
-
-                        // HTML Item (SAMA PERSIS DENGAN TAMPILAN LAMA)
-                        const itemHtml = `
-                            <div class="pub-item">
-                                <div class="pub-info">
-                                    <h3>${pub.judul}</h3>
-                                    <p>
-                                        Tahun: <strong>${pub.tahun}</strong> | 
-                                        Kategori: <strong>${pub.nama_kategori || '-'}</strong> | 
-                                        Status: <span class="badge ${badgeClass}">${statusText}</span>
-                                    </p>
-                                    ${pub.external_link ? `<small><a href="${pub.external_link}" target="_blank" style="color:#007bff;">Lihat Dokumen <i class="fas fa-external-link-alt"></i></a></small>` : ''}
-                                </div>
-                                <div class="pub-actions">
-                                    
-                                    <a href="edit_publikasi.html?id=${pub.id}" class="btn-edit" style="text-decoration:none; color:white; display:inline-flex; align-items:center; justify-content:center;">
-                                        <i class="fas fa-edit" style="margin-right:5px;"></i> Edit
-                                    </a>
-
-                                    <button class="btn-delete" onclick="deletePublikasi(${pub.id})">
-                                        <i class="fas fa-trash-alt"></i> Hapus
-                                    </button>
-                                </div>
-                            </div>
-                        `;
-                        container.innerHTML += itemHtml;
-                    });
-
+                if (result.status === 'success') {
+                    renderPublications(result.data);
                 } else {
-                    container.innerHTML = '<p style="text-align: center; padding: 20px;">Belum ada publikasi yang diajukan.</p>';
+                    container.innerHTML = `<p style="text-align: center; color: red; padding: 40px;">Gagal mengambil data: ${result.message}</p>`;
                 }
             } catch (error) {
-                console.error('Error:', error);
-                container.innerHTML = '<p style="text-align: center; color: red;">Gagal memuat data.</p>';
+                container.innerHTML = '<p style="text-align: center; color: red; padding: 40px;">Terjadi kesalahan koneksi.</p>';
             }
         }
 
-        // 2. Fungsi Hapus (Opsional, agar tombol hapus berfungsi)
-        async function deletePublikasi(id) {
-            if (!confirm('Apakah Anda yakin ingin menghapus publikasi ini?')) return;
+        function renderPublications(data) {
+            const container = document.getElementById('publicationContainer');
+            container.innerHTML = '';
 
-            const formData = new FormData();
-            formData.append('id', id);
+            if (data.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 80px; background: white; border-radius: 12px; border: 1px dashed #cbd5e0;">
+                        <i class="fas fa-file-alt fa-3x" style="color: #e2e8f0; margin-bottom: 15px;"></i>
+                        <p style="color: #718096; font-weight: 500;">Belum ada data publikasi.</p>
+                    </div>`;
+                return;
+            }
+
+            data.forEach(pub => {
+                let statusText = (pub.status || 'Pending').toUpperCase();
+                let badgeClass = statusText.toLowerCase();
+
+                container.innerHTML += `
+                    <div class="pub-item">
+                        <div class="pub-info">
+                            <h3>${pub.judul}</h3>
+                            <div class="pub-meta">
+                                <span><i class="far fa-calendar-alt"></i> ${pub.tahun}</span>
+                                <span><i class="fas fa-bookmark"></i> ${pub.nama_kategori || '-'}</span>
+                                <span class="badge ${badgeClass}">${statusText}</span>
+                            </div>
+                            ${pub.external_link ? `
+                                <a href="${pub.external_link}" target="_blank" style="display:inline-block; margin-top:12px; color:#4A90E2; font-size:0.85em; text-decoration:none; font-weight: 500;">
+                                    <i class="fas fa-external-link-alt"></i> Lihat Dokumen Eksternal
+                                </a>` : ''}
+                        </div>
+                        <div class="pub-actions">
+                            <a href="edit_publikasi.html?id=${pub.id}" class="btn-action btn-edit-pub">
+                                <i class="fas fa-pen"></i> Edit
+                            </a>
+                            <button onclick="openDeleteModal(${pub.id})" class="btn-action btn-delete-pub">
+                                <i class="fas fa-trash"></i> Hapus
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // Logic Modal Hapus
+        function openDeleteModal(id) {
+            selectedPublikasiId = id;
+            document.getElementById('deleteModal').style.display = 'flex';
+        }
+
+        function closeDeleteModal() {
+            selectedPublikasiId = null;
+            document.getElementById('deleteModal').style.display = 'none';
+        }
+
+        document.getElementById('confirmDeleteBtn').onclick = async function() {
+            if (!selectedPublikasiId) return;
+            
+            const btn = this;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menghapus...';
 
             try {
-                const res = await fetch('../../backend/api/publikasi/delete.php', { method: 'POST', body: formData });
+                const fd = new FormData();
+                fd.append('id', selectedPublikasiId);
+                const res = await fetch('../../backend/api/publikasi/delete.php', { method: 'POST', body: fd });
                 const json = await res.json();
+                
                 if (json.status === 'success') {
-                    alert('Berhasil dihapus');
-                    loadMyPublications(); // Reload list
+                    showToast('Publikasi berhasil dihapus');
+                    loadMyPublications();
                 } else {
-                    alert('Gagal: ' + json.message);
+                    showToast('Gagal: ' + json.message, 'error');
                 }
             } catch (e) {
-                alert('Error jaringan');
+                showToast('Gagal menghapus data.', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'Ya, Hapus';
+                closeDeleteModal();
             }
+        };
+
+        // Modal Logout Logic
+        const logoutModal = document.getElementById('logoutModal');
+        document.getElementById('logoutLink').onclick = (e) => {
+            e.preventDefault();
+            logoutModal.style.display = 'flex';
+        };
+
+        document.getElementById('confirmLogoutBtn').onclick = async () => {
+            await fetch('../../backend/api/auth/logout.php', { method: 'POST' });
+            window.location.href = '../public/index.html';
+        };
+
+        window.onclick = (e) => {
+            if (e.target == logoutModal) logoutModal.style.display = 'none';
+            if (e.target == document.getElementById('deleteModal')) closeDeleteModal();
         }
 
-        // Jalankan saat halaman dimuat
         document.addEventListener('DOMContentLoaded', loadMyPublications);
-
-        // 3. Logika Logout
-        document.getElementById('logoutLink').addEventListener('click', function (e) {
-            e.preventDefault();
-            if (confirm('Apakah Anda yakin ingin keluar dari sistem?')) {
-                const logoutUrl = '../../backend/api/auth/logout.php';
-                fetch(logoutUrl, { method: 'POST' })
-                    .then(() => window.location.href = '../public/index.html')
-                    .catch(() => window.location.href = '../public/index.html');
-            }
-        });
     </script>
 </body>
 
