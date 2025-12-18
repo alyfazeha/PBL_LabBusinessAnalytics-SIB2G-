@@ -205,6 +205,192 @@ header.dashboard-header h1 {
     padding-bottom: 15px;
 }
 
+
+/* --- EDIT PROFILE STYLING --- */
+.edit-profile-container {
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    padding: 30px;
+    margin-top: 20px;
+}
+
+/* Pengaturan Grid 1:2 (Kiri lebih kecil dari Kanan) */
+.edit-grid {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    /* Kolom kiri 1 bagian, kanan 2 bagian */
+    gap: 25px;
+    align-items: flex-start;
+}
+
+/* Foto Upload Area */
+.photo-upload-section {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.preview-container {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 15px;
+}
+
+#previewFoto {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 3px solid #f1f5f9;
+}
+
+.btn-upload-photo {
+    display: inline-block;
+    padding: 6px 15px;
+    background: #f1f5f9;
+    color: var(--primary-blue);
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 20px;
+    cursor: pointer;
+    border: 1px solid var(--primary-blue);
+}
+
+.btn-upload-photo:hover {
+    background: #357ABD;
+    transform: translateY(-2px);
+}
+
+/* Form Grid Styling */
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.form-group-full {
+    grid-column: span 2;
+}
+
+/* Grid Internal untuk Kolom Kanan agar input berjejer 2-2 */
+.form-grid-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+/* Styling Form Group */
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    color: #94a3b8;
+    margin-bottom: 8px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px 15px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    box-sizing: border-box;
+    /* Penting agar padding tidak merusak lebar */
+    transition: 0.3s;
+}
+
+.form-control:focus {
+    border-color: var(--primary-blue);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+}
+
+.edit-section-card {
+    background: #fff;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+/* Section Divider */
+.form-section-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--dark-grey);
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #f1f5f9;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Tombol Aksi */
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #f1f5f9;
+}
+
+.btn-save {
+    background: var(--primary-blue);
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-cancel {
+    background: #e2e8f0;
+    color: #475569;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+
+
+.btn-save:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+}
+
+.btn-cancel:hover {
+    background: #e2e8f0;
+}
+
+@media (max-width: 768px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-group-full,
+    .form-section-title,
+    .form-actions {
+        grid-column: span 1;
+    }
+}
+
+/* Responsif Tablet/HP */
+@media (max-width: 992px) {
+    .edit-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-grid-inner {
+        grid-template-columns: 1fr;
+    }
+}
+
 /* ================== FORM & PROFIL STYLING (IDENTIK) ================== */
 
 .form-grid {
@@ -610,4 +796,180 @@ header.dashboard-header h1 {
 /* Menghapus border-bottom ganda yang ada di .profile-info-group untuk tampilan lebih bersih */
 .detail-group .profile-info-group:last-child {
     border-bottom: none;
+}
+
+.profile-container {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+    margin-top: 20px;
+}
+
+/* --- SISI KIRI (FOTO & SUMMARY) --- */
+.profile-left {
+    flex: 1;
+    background: #fff;
+    padding: 30px 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    text-align: center;
+    position: sticky;
+    top: 20px;
+}
+
+#dosenFoto {
+    width: 160px;
+    height: 160px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 5px solid #f8fafc;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
+    background-color: #f1f1f1;
+}
+
+/* Badge Dosen Aktif */
+.status-badge-active {
+    display: inline-block;
+    background: #ecfdf5;
+    color: #10b981;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-top: 15px;
+    border: 1px solid #10b981;
+    letter-spacing: 0.5px;
+}
+
+/* Bidang Keahlian */
+.expertise-section {
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid #f1f5f9;
+}
+
+.expertise-section label {
+    font-size: 10px;
+    color: #94a3b8;
+    text-transform: uppercase;
+    font-weight: 800;
+    display: block;
+    margin-bottom: 12px;
+    text-align: center;
+}
+
+.expertise-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+}
+
+.tag {
+    background: #f8fafc;
+    color: #475569;
+    padding: 5px 12px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 600;
+    border: 1px solid #e2e8f0;
+}
+
+/* Motto Box */
+.motto-box {
+    margin-top: 25px;
+    padding: 20px;
+    background: #fafafa;
+    border-radius: 12px;
+    border: 1px dashed #e2e8f0;
+    font-style: italic;
+    color: #64748b;
+    font-size: 13px;
+}
+
+.motto-box i {
+    color: #cbd5e1;
+    display: block;
+    margin-bottom: 8px;
+    font-size: 18px;
+}
+
+/* --- SISI KANAN (DETAIL) --- */
+.profile-right {
+    flex: 3;
+}
+
+.info-group-wrapper {
+    background: #fff;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    margin-bottom: 25px;
+}
+
+.group-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #f8fafc;
+    color: var(--dark-grey);
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.profile-details-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.info-card {
+    background: #ffffff;
+    padding: 15px 20px;
+    border-radius: 12px;
+    border: 1px solid #f1f5f9;
+    border-left: 4px solid var(--primary-blue);
+}
+
+.info-card label {
+    display: block;
+    font-size: 11px;
+    color: #94a3b8;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.info-card p {
+    margin: 0;
+    color: var(--dark-grey);
+    font-weight: 600;
+    font-size: 15px;
+}
+
+.badge-link {
+    display: inline-block;
+    padding: 10px 18px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+@media (max-width: 992px) {
+    .profile-container {
+        flex-direction: column;
+    }
+
+    .profile-left {
+        position: static;
+        width: 100%;
+        box-sizing: border-box;
+    }
 }

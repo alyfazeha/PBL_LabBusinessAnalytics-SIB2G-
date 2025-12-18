@@ -12,6 +12,7 @@
 </head>
 
 <body>
+    <div id="toastNotificationContainer"></div>
     <aside class="sidebar">
         <div class="logo-area">
             <img src="../assets/images/LogoPolinema.png" alt="" style="width: 50px;">
@@ -34,123 +35,156 @@
         </nav>
     </aside>
 
-    <main class="main-content">
-        <div class="content-card">
-            <h2><i class="fas fa-user-edit"></i> Edit Profil</h2>
+    <div class="main-content">
+        <header>
+            <div class="header-title">
+                <a href="profile.html" class="back-icon-in-header"><i class="fas fa-arrow-left"></i></a>
+                <h2>Edit Profile Anda</h2>
+            </div>
+            <div></div>
+        </header>
+        <main>
+            <form id="formEditProfile" enctype="multipart/form-data">
+                <div class="profile-container">
 
-            <form id="formEditProfile" enctype="multipart/form-data" style="max-width: 700px; margin-top: 20px;">
+                    <div class="profile-left">
+                        <div class="edit-section-card full-height">
+                            <div class="photo-upload-section">
+                                <div class="preview-container">
+                                    <img id="previewFoto" src="../../frontend/assets/img/default-profile.png"
+                                        alt="Preview">
+                                </div>
+                                <label for="foto" class="btn-upload-photo">
+                                    <i class="fas fa-camera"></i> Ganti Foto
+                                </label>
+                                <input type="file" id="foto" name="foto" style="display: none;" accept="image/*">
+                            </div>
 
-                <div class="form-group" style="margin-bottom: 20px; text-align: center;">
-                    <img id="previewFoto" src="../../frontend/assets/img/default-profile.png"
-                        style="width: 120px; height: 120px; object-fit: cover; border-radius: 50%; border: 2px solid #ddd; margin-bottom: 10px;">
-                    <br>
-                    <label for="foto" style="cursor: pointer; color: #007bff; font-size: 14px;">
-                        <i class="fas fa-camera"></i> Ganti Foto
-                    </label>
-                    <input type="file" id="foto" name="foto" style="display: none;" accept="image/*">
-                </div>
+                            <div class="form-section-title"><i class="fas fa-user-circle"></i> Data Pribadi</div>
 
-                <div class="profile-info-group">
-                    <label>Nama Lengkap</label>
-                    <input type="text" id="nama" name="nama" class="form-control" required>
-                </div>
+                            <div class="form-group">
+                                <label>Nama Lengkap & Gelar</label>
+                                <input type="text" id="nama" name="nama" class="form-control" placeholder="Nama Lengkap"
+                                    required>
+                            </div>
 
-                <div class="profile-info-group">
-                    <label>NIP</label>
-                    <input type="text" id="nip" name="nip" class="form-control">
-                </div>
-                <div class="profile-info-group">
-                    <label>Email</label>
-                    <input type="email" id="email" name="email" class="form-control" required>
-                </div>
-                <div class="profile-info-group">
-                    <label>Jabatan</label>
-                    <input type="text" id="jabatan" name="jabatan" class="form-control"
-                        placeholder="Contoh: Lektor Kepala">
-                </div>
-                <div class="profile-info-group">
-                    <label>Prodi</label>
-                    <input type="text" id="prodi" name="prodi" class="form-control">
-                </div>
-                <div class="profile-info-group">
-                    <label>Pendidikan Terakhir</label>
-                    <input type="text" id="pendidikan" name="pendidikan" class="form-control"
-                        placeholder="Contoh: S3 Ilmu Komputer">
-                </div>
+                            <div class="form-group">
+                                <label>NIP / NIK</label>
+                                <input type="text" id="nip" name="nip" class="form-control" placeholder="Masukkan NIP">
+                            </div>
 
-                <div class="profile-info-group">
-                    <label>Sertifikasi</label>
-                    <input type="text" id="sertifikasi" name="sertifikasi" class="form-control"
-                        placeholder="Contoh: Sertifikat Dosen, AWS Certified">
-                </div>
+                            <div class="form-group">
+                                <label>Email Institusi</label>
+                                <input type="email" id="email" name="email" class="form-control"
+                                    placeholder="email@polinema.ac.id" required>
+                            </div>
+                        </div>
+                    </div>
 
-                <hr>
-                <h4 style="margin-bottom: 15px; font-size: 16px;">Tautan Eksternal</h4>
+                    <div class="profile-right">
+                        <div class="edit-section-card full-height">
+                            <div class="form-section-title"><i class="fas fa-graduation-cap"></i> Informasi Akademik
+                            </div>
+                            <div class="form-grid-inner">
+                                <div class="form-group">
+                                    <label>Program Studi</label>
+                                    <input type="text" id="prodi" name="prodi" class="form-control" placeholder="D4 TI">
+                                </div>
+                                <div class="form-group">
+                                    <label>Jabatan Fungsional</label>
+                                    <input type="text" id="jabatan" name="jabatan" class="form-control"
+                                        placeholder="Lektor">
+                                </div>
+                                <div class="form-group">
+                                    <label>Pendidikan Terakhir</label>
+                                    <input type="text" id="pendidikan" name="pendidikan" class="form-control"
+                                        placeholder="S3 Komputer">
+                                </div>
+                                <div class="form-group">
+                                    <label>Sertifikasi Utama</label>
+                                    <input type="text" id="sertifikasi" name="sertifikasi" class="form-control"
+                                        placeholder="AWS Certified">
+                                </div>
+                            </div>
 
-                <div class="profile-info-group">
-                    <label>Link SINTA</label>
-                    <input type="url" id="sinta_url" name="sinta_url" class="form-control"
-                        placeholder="https://sinta.kemdikbud.go.id/...">
-                </div>
+                            <div class="form-section-title" style="margin-top: 30px;"><i class="fas fa-link"></i> Tautan
+                                Publikasi</div>
+                            <div class="form-grid-inner">
+                                <div class="form-group">
+                                    <label>Link SINTA</label>
+                                    <input type="url" id="sinta_url" name="sinta_url" class="form-control"
+                                        placeholder="https://...">
+                                </div>
+                                <div class="form-group">
+                                    <label>Link Google Scholar</label>
+                                    <input type="url" id="scholar_url" name="scholar_url" class="form-control"
+                                        placeholder="https://...">
+                                </div>
+                                <div class="form-group">
+                                    <label>Link Scopus</label>
+                                    <input type="url" id="scopus_url" name="scopus_url" class="form-control"
+                                        placeholder="https://...">
+                                </div>
+                                <div class="form-group">
+                                    <label>Link ResearchGate</label>
+                                    <input type="url" id="researchgate_url" name="researchgate_url" class="form-control"
+                                        placeholder="https://...">
+                                </div>
+                            </div>
 
-                <div class="profile-info-group">
-                    <label>Link Google Scholar</label>
-                    <input type="url" id="scholar_url" name="scholar_url" class="form-control"
-                        placeholder="https://scholar.google.com/citations?user=...">
-                </div>
+                            <div class="form-actions">
+                                <a href="profile.html" class="btn-cancel">Batal</a>
+                                <button type="submit" id="btnSimpan" class="btn-save">
+                                    <i class="fas fa-save"></i> Simpan Perubahan
+                                </button>
+                            </div>
+                        </div>
+                    </div>
 
-                <div class="profile-info-group">
-                    <label>Link Scopus</label>
-                    <input type="url" id="scopus_url" name="scopus_url" class="form-control"
-                        placeholder="https://www.scopus.com/authid/...">
-                </div>
-
-                <div class="profile-info-group">
-                    <label>Link ResearchGate</label>
-                    <input type="url" id="researchgate_url" name="researchgate_url" class="form-control"
-                        placeholder="https://www.researchgate.net/profile/...">
-                </div>
-
-                <div class="form-actions" style="margin-top: 30px; display: flex; gap: 10px;">
-                    <button type="submit" id="btnSimpan" class="btn-edit-profile" style="border:none; cursor: pointer;">
-                        <i class="fas fa-save"></i> Simpan Perubahan
-                    </button>
-                    <a href="profile.html" class="btn-edit-profile"
-                        style="background-color: #6c757d; text-decoration: none; text-align: center;">
-                        Batal
-                    </a>
                 </div>
             </form>
+        </main>
+    </div>
+
+    <div id="logoutModal" class="modal logout-modal">
+        <div class="modal-content" style="text-align: left !important;">
+            <span class="close-btn" onclick="logoutModal.style.display='none';">&times;</span>
+
+            <h4><i class="fas fa-sign-out-alt"></i> Konfirmasi Logout</h4>
+
+            <p>Apakah Anda yakin ingin keluar dari sistem dashboard dosen?</p>
+
+            <div class="modal-buttons">
+                <button id="cancelLogoutBtn" class="btn btn-secondary">Batal</button>
+                <button id="confirmLogoutBtn" class="btn btn-danger">Ya, Logout</button>
+            </div>
+
         </div>
-    </main>
-
-    <style>
-        .form-control {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            margin-top: 5px;
-            font-size: 14px;
-        }
-
-        .profile-info-group {
-            margin-bottom: 15px;
-        }
-    </style>
+    </div>
 
     <script>
-        // 1. Load Data Lama saat halaman dibuka
+        // --- 1. Fungsi Toast ---
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastNotificationContainer');
+            if (!container) return;
+            const toast = document.createElement('div');
+            toast.className = `toast-notification toast-${type} show`;
+            const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+            toast.innerHTML = `<i class="fas ${icon}"></i> ${message}`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 500);
+            }, 3000);
+        }
+
+        // --- 2. Load Data Lama ---
         async function loadInitialData() {
             try {
-                // Path API tetap relative ../ karena server backend strukturnya tetap
                 const response = await fetch('../../backend/api/dosen/me.php');
                 const result = await response.json();
-
                 if (result.status === 'success') {
                     const data = result.data;
-
-                    // Isi Form
                     document.getElementById('nama').value = data.nama || '';
                     document.getElementById('nip').value = data.nip || '';
                     document.getElementById('prodi').value = data.prodi || '';
@@ -163,92 +197,91 @@
                     document.getElementById('researchgate_url').value = data.researchgate_url || '';
                     document.getElementById('scopus_url').value = data.scopus_url || '';
 
-                    // --- PATH PRATINJAU FOTO (FIXED) ---
                     const imgElem = document.getElementById('previewFoto');
-
                     if (data.foto_path && data.foto_path !== "") {
-                        let path = data.foto_path;
-                        let finalPath = "../../frontend/assets/img/default-profile.png"; // Default Path Dosen
-
-                        // Ambil nama file terakhir dari path yang tersimpan di DB
-                        let fileName = path.split('/').pop();
-
-                        if (path.startsWith('http')) {
-                            finalPath = path;
-                        } else {
-                            // [FIX] Gunakan path relatif yang panjang dan KONSISTEN dengan profile.html
-                            finalPath = `../../frontend/assets/uploads/dosen/${fileName}`;
-                        }
-
-                        imgElem.src = finalPath;
+                        let fileName = data.foto_path.split('/').pop();
+                        imgElem.src = `../../frontend/assets/uploads/dosen/${fileName}`;
                     }
-                    // ------------------------------------------
-
-                } else {
-                    alert('Gagal memuat data user.');
-                    window.location.href = 'profile.html';
                 }
-            } catch (error) {
-                console.error('Error:', error);
-            }
+            } catch (error) { console.error('Error:', error); }
         }
 
-        // 2. Preview Foto Baru sebelum diupload
+        // --- 3. Preview Foto ---
         document.getElementById('foto').addEventListener('change', function (e) {
             const file = e.target.files[0];
             if (file) {
                 const reader = new FileReader();
-                reader.onload = function (e) {
-                    document.getElementById('previewFoto').src = e.target.result;
-                }
+                reader.onload = (e) => document.getElementById('previewFoto').src = e.target.result;
                 reader.readAsDataURL(file);
             }
         });
 
-        // 3. Proses Simpan (Update)
+        // --- 4. Simpan Data ---
         document.getElementById('formEditProfile').addEventListener('submit', async function (e) {
             e.preventDefault();
-
             const btn = document.getElementById('btnSimpan');
+            const originalText = btn.innerHTML;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
             btn.disabled = true;
-
-            const formData = new FormData(this);
 
             try {
                 const response = await fetch('../../backend/api/dosen/update_profile.php', {
                     method: 'POST',
-                    body: formData
+                    body: new FormData(this)
                 });
                 const result = await response.json();
-
                 if (result.status === 'success') {
-                    alert('Profil berhasil diperbarui!');
-                    window.location.href = 'profile.html';
+                    showToast('Profil berhasil diperbarui!', 'success');
+                    setTimeout(() => { window.location.href = 'profile.html'; }, 2000);
                 } else {
-                    alert('Gagal: ' + result.message);
+                    showToast('Gagal: ' + result.message, 'error');
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
                 }
             } catch (error) {
-                console.error('Error:', error);
-                alert('Terjadi kesalahan jaringan.');
-            } finally {
-                btn.innerHTML = '<i class="fas fa-save"></i> Simpan Perubahan';
+                showToast('Kesalahan jaringan.', 'error');
+                btn.innerHTML = originalText;
                 btn.disabled = false;
             }
         });
 
-        document.addEventListener('DOMContentLoaded', loadInitialData);
+        // --- 5. Modul Logout (Gaya Konten Admin) ---
+        const logoutModal = document.getElementById('logoutModal');
+        const logoutTrigger = document.getElementById('logoutLink');
+        const cancelLogoutBtn = document.getElementById('cancelLogoutBtn');
+        const confirmLogoutBtn = document.getElementById('confirmLogoutBtn');
 
-        // Logout Logic
-        document.getElementById('logoutLink').addEventListener('click', function (e) {
-            e.preventDefault();
-            if (confirm('Apakah Anda yakin ingin keluar dari sistem?')) {
-                const logoutUrl = '../../backend/api/auth/logout.php';
-                fetch(logoutUrl, { method: 'POST' })
-                    .then(response => { window.location.href = '../public/index.html'; })
-                    .catch(error => { window.location.href = '../public/index.html'; });
-            }
-        });
+        if (logoutTrigger) {
+            logoutTrigger.onclick = (e) => {
+                e.preventDefault();
+                logoutModal.style.display = 'flex';
+            };
+        }
+
+        if (cancelLogoutBtn) {
+            cancelLogoutBtn.onclick = () => {
+                logoutModal.style.display = 'none';
+            };
+        }
+
+        if (confirmLogoutBtn) {
+            confirmLogoutBtn.onclick = async () => {
+                confirmLogoutBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Keluar...';
+                confirmLogoutBtn.disabled = true;
+                try {
+                    await fetch('../../backend/api/auth/logout.php', { method: 'POST' });
+                    window.location.href = '../public/index.html';
+                } catch (error) {
+                    window.location.href = '../public/index.html';
+                }
+            };
+        }
+
+        window.onclick = (e) => {
+            if (e.target === logoutModal) logoutModal.style.display = 'none';
+        };
+
+        document.addEventListener('DOMContentLoaded', loadInitialData);
     </script>
 </body>
 

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profil Dosen</title>
+    <title>Profil Dosen | Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="../../frontend/assets/css/dashboarddns.css">
     <link rel="stylesheet" href="../assets/css/cssadmin.css">
@@ -14,82 +14,127 @@
 <body>
     <aside class="sidebar">
         <div class="logo-area">
-            <img src="../assets/images/LogoPolinema.png" alt="" style="width: 50px;">
-            <img src="../assets/images/logoJTI.png" alt="" style="width: 45px;">
-            <img src="../assets/images/LogoLab2.png" alt="Business Analytics Laboratory"
+            <img src="../assets/images/LogoPolinema.png" alt="Polinema" style="width: 50px;">
+            <img src="../assets/images/logoJTI.png" alt="JTI" style="width: 45px;">
+            <img src="../assets/images/LogoLab2.png" alt="Lab"
                 style="width: 70px; margin-bottom: -10px; margin-left: -10px;">
             <h3>Dashboard Dosen</h3>
         </div>
         <nav>
-            <a href="index.html" class=""><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-            <a href="../public/index.html"
-                style="border-top: 1px solid rgba(255,255,255,0.1); margin-top: 10px; padding-top: 15px;">
-                <i class="fas fa-external-link-alt"></i> Lihat Landing Page
-            </a>
+            <a href="index.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
             <a href="profile.html" class="active"><i class="fas fa-user-tie"></i> Profil & Akun</a>
             <a href="riwayat_peminjaman.html"><i class="fas fa-book-reader"></i> Riwayat Peminjaman</a>
             <a href="publikasi.html"><i class="fas fa-file-invoice"></i> Kelola Publikasi</a>
-
             <a href="#" id="logoutLink"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </nav>
     </aside>
-    <main class="main-content">
-        <div class="content-card">
-            <h2><i class="fas fa-address-card"></i> Profil Dosen</h2>
 
-            <div class="profile-header">
-                <img id="dosenFoto" src="../../frontend/assets/img/default-profile.png" alt="Foto Profil"
-                    style="width: 100px; height: 100px; object-fit: cover; border-radius: 50%; margin-bottom: 10px; display:none;">
+    <div class="main-content">
+        <header>
+            <div class="header-title">
+                <h2><i class="fas fa-address-card"></i> Profile Anda</h2>
+            </div>
+            <div class="header-actions-group">
+                <a href="edit_profile.html" class="btn btn-primary btn-add"><i class="fas fa-edit"></i> Edit Profile</a>
+            </div>
+        </header>
 
-                <h3 id="headerNama">Memuat Nama...</h3>
-                <p id="headerNidn" style="color: #777;">...</p>
+        <main>
+            <div class="profile-container">
+
+                <div class="profile-left">
+                    <div class="profile-image-wrapper">
+                        <img id="dosenFoto" src="../../frontend/assets/img/default-profile.png" alt="Foto Profil">
+                    </div>
+                    <div>
+                        <span class="status-badge-active"><i class="fas fa-check-circle"></i> Dosen Aktif</span>
+                    </div>
+
+                    <h3 id="headerNama" style="color: var(--dark-grey); margin: 20px 0 5px;">Memuat...</h3>
+                    <p id="headerNidn" style="color: var(--primary-blue); font-weight: 700;">-</p>
+
+                    <div class="expertise-section">
+                        <label>Fokus Keahlian</label>
+                        <div class="expertise-tags">
+                            <span class="tag">Teknologi Informasi</span>
+                            <span class="tag">Sistem Informasi</span>
+                            <span class="tag">Data Science</span>
+                        </div>
+                    </div>
+
+                    <div class="motto-box">
+                        <i class="fas fa-quote-left"></i>
+                        <p>"Membangun masa depan melalui inovasi dan pendidikan yang berkelanjutan."</p>
+                    </div>
+                </div>
+
+                <div class="profile-right">
+                    <div class="info-group-wrapper">
+                        <div class="group-title"><i class="fas fa-id-card"></i> Identitas & Kepegawaian</div>
+                        <div class="profile-details-grid">
+                            <div class="info-card"><label>NIDN / NPK</label>
+                                <p id="detailNidn">-</p>
+                            </div>
+                            <div class="info-card"><label>NIP / NIK</label>
+                                <p id="detailNip">-</p>
+                            </div>
+                            <div class="info-card" style="grid-column: span 2;">
+                                <label>Nama Lengkap & Gelar</label>
+                                <p id="detailNama" style="font-size: 18px; color: var(--primary-blue);">-</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-group-wrapper">
+                        <div class="group-title"><i class="fas fa-university"></i> Informasi Akademik</div>
+                        <div class="profile-details-grid">
+                            <div class="info-card"><label>Program Studi</label>
+                                <p id="detailProdi">-</p>
+                            </div>
+                            <div class="info-card"><label>Jabatan Fungsional</label>
+                                <p id="detailJabatan">-</p>
+                            </div>
+                            <div class="info-card"><label>Pendidikan Terakhir</label>
+                                <p id="detailPendidikan">-</p>
+                            </div>
+                            <div class="info-card"><label>Email Institusi</label>
+                                <p id="detailEmail">-</p>
+                            </div>
+                            <div class="info-card" style="grid-column: span 2;">
+                                <label>Sertifikasi Profesional</label>
+                                <p id="detailSertifikasi">-</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-group-wrapper">
+                        <div class="group-title"><i class="fas fa-share-alt"></i> Tautan Publikasi</div>
+                        <div id="detailLinks"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="logoutModal" class="modal logout-modal">
+        <div class="modal-content" style="text-align: left !important;">
+            <span class="close-btn" onclick="logoutModal.style.display='none';">&times;</span>
+
+            <h4><i class="fas fa-sign-out-alt"></i> Konfirmasi Logout</h4>
+
+            <p>Apakah Anda yakin ingin keluar dari sistem dashboard dosen?</p>
+
+            <div class="modal-buttons">
+                <button id="cancelLogoutBtn" class="btn btn-secondary">Batal</button>
+                <button id="confirmLogoutBtn" class="btn btn-danger">Ya, Logout</button>
             </div>
 
-            <div style="max-width: 600px; margin: 0 auto;">
-                <div class="profile-info-group">
-                    <label>NIDN</label>
-                    <p id="detailNidn">-</p>
-                </div>
-                <div class="profile-info-group">
-                    <label>NIP</label>
-                    <p id="detailNip">-</p>
-                </div>
-                <div class="profile-info-group">
-                    <label>Nama Lengkap</label>
-                    <p id="detailNama">-</p>
-                </div>
-                <div class="profile-info-group">
-                    <label>Email</label>
-                    <p id="detailEmail">-</p>
-                </div>
-                <div class="profile-info-group">
-                    <label>Jabatan</label>
-                    <p id="detailJabatan" style="font-weight: 700; color: var(--primary-blue);">-</p>
-                </div>
-                <div class="profile-info-group">
-                    <label>Prodi</label>
-                    <p id="detailProdi">-</p>
-                </div>
-                <div class="profile-info-group">
-                    <label>Pendidikan Terakhir</label>
-                    <p id="detailPendidikan">-</p>
-                </div>
-                <div class="profile-info-group">
-                    <label> Sertifikasi</label>
-                    <p id="detailSertifikasi">-</p>
-                </div>
-                <div class="profile-info-group">
-                    <label>Tautan Eksternal</label>
-                    <p id="detailLinks">-</p>
-                </div>
-            </div>
-
-
-            <a href="edit_profile.html" class="btn-edit-profile"><i class="fas fa-edit"></i> Edit Profil</a>
         </div>
-    </main>
+    </div>
+
 
     <script>
+        // --- 1. Load Data Profil ---
         async function loadProfile() {
             try {
                 const response = await fetch('../../backend/api/dosen/me.php');
@@ -97,79 +142,86 @@
 
                 if (result.status === 'success') {
                     const data = result.data;
+                    document.getElementById('headerNama').textContent = data.nama || '-';
+                    document.getElementById('headerNidn').textContent = `NIDN. ${data.nidn || '-'}`;
 
-                    // 1. Mengisi Teks
-                    document.getElementById('headerNama').textContent = data.nama;
-                    document.getElementById('headerNidn').textContent = data.nidn;
-                    document.getElementById('detailNidn').textContent = data.nidn || '-';
-                    document.getElementById('detailNip').textContent = data.nip || '-';
-                    document.getElementById('detailNama').textContent = data.nama || '-';
-                    document.getElementById('detailProdi').textContent = data.prodi || '-';
-                    document.getElementById('detailJabatan').textContent = data.jabatan || '-';
-                    document.getElementById('detailEmail').textContent = data.email || '-';
-                    document.getElementById('detailPendidikan').textContent = data.pendidikan || '-';
-                    document.getElementById('detailSertifikasi').textContent = data.sertifikasi || '-';
+                    const fields = {
+                        'detailNidn': data.nidn, 'detailNip': data.nip, 'detailNama': data.nama,
+                        'detailProdi': data.prodi, 'detailJabatan': data.jabatan, 'detailEmail': data.email,
+                        'detailPendidikan': data.pendidikan, 'detailSertifikasi': data.sertifikasi
+                    };
 
-                    // 2. Link Eksternal
-                    let links = [];
-                    if (data.sinta_url) links.push(`<a href="${data.sinta_url}" target="_blank">SINTA</a>`);
-                    if (data.scholar_url) links.push(`<a href="${data.scholar_url}" target="_blank">Google Scholar</a>`);
-                    if (data.researchgate_url) links.push(`<a href="${data.researchgate_url}" target="_blank">ResearchGate</a>`);
-                    if (data.scopus_url) links.push(`<a href="${data.scopus_url}" target="_blank">Scopus</a>`);
-                    document.getElementById('detailLinks').innerHTML = links.length > 0 ? links.join(' | ') : '-';
-
-                    // 3. PERBAIKAN PATH FOTO (Menggunakan Path Relatif yang Teruji)
-                    const imgElem = document.getElementById('dosenFoto');
-
-                    let finalFotoPath = "../../frontend/assets/img/default-profile.png"; // Default path
-
-                    if (data.foto_path && data.foto_path !== 'null' && data.foto_path !== '') {
-                        let path = data.foto_path;
-
-                        if (path.startsWith('http://') || path.startsWith('https://')) {
-                            finalFotoPath = path;
-                        } else {
-                            // Ambil nama file saja (hilangkan path lama dari database)
-                            if (path.includes('/')) {
-                                path = path.split('/').pop();
-                            }
-
-                            // Gunakan Path Relatif Paling Kuat (Sama dengan CSS)
-                            finalFotoPath = `../../frontend/assets/uploads/dosen/${path}`;
-                        }
+                    for (const [id, value] of Object.entries(fields)) {
+                        const elem = document.getElementById(id);
+                        if (elem) elem.textContent = value || '-';
                     }
 
-                    imgElem.src = finalFotoPath;
-                    imgElem.style.display = 'block';
+                    // Render Links
+                    const linkContainer = document.getElementById('detailLinks');
+                    let linksHtml = [];
+                    const linkConfigs = [
+                        { key: 'sinta_url', label: 'SINTA', icon: 'fa-graduation-cap', bg: '#e3f2fd', color: '#1976d2' },
+                        { key: 'scholar_url', label: 'Scholar', icon: 'fa-google', bg: '#f1f8e9', color: '#388e3c' },
+                        { key: 'researchgate_url', label: 'ResearchGate', icon: 'fa-researchgate', bg: '#f3e5f5', color: '#7b1fa2' },
+                        { key: 'scopus_url', label: 'Scopus', icon: 'fa-search', bg: '#fff3e0', color: '#e65100' }
+                    ];
 
-                    console.log("Loading Foto dari:", finalFotoPath);
+                    linkConfigs.forEach(conf => {
+                        if (data[conf.key]) {
+                            linksHtml.push(`<a href="${data[conf.key]}" target="_blank" class="badge-link" style="background:${conf.bg}; color:${conf.color}; border:1px solid ${conf.color}44;"><i class="fas ${conf.icon} mr-1"></i> ${conf.label}</a>`);
+                        }
+                    });
+                    linkContainer.innerHTML = linksHtml.length > 0 ? linksHtml.join('') : '<span style="color:#999 italic">Tidak ada tautan tersedia</span>';
 
+                    // Foto Profil
+                    const imgElem = document.getElementById('dosenFoto');
+                    if (data.foto_path && data.foto_path !== 'null' && data.foto_path !== '') {
+                        const fileName = data.foto_path.split('/').pop();
+                        imgElem.src = `../../frontend/assets/uploads/dosen/${fileName}`;
+                    }
                 } else {
-                    alert('Sesi Anda telah berakhir. Silakan login kembali.');
                     window.location.href = '../public/login.html';
                 }
-            } catch (error) {
-                console.error('Error memuat profil:', error);
-            }
+            } catch (error) { console.error('Error:', error); }
         }
 
-        document.addEventListener('DOMContentLoaded', loadProfile);
+        // --- 2. Modul Logout (Gaya Konten Admin) ---
+        const logoutModal = document.getElementById('logoutModal');
+        const logoutTrigger = document.getElementById('logoutLink');
+        const cancelLogoutBtn = document.getElementById('cancelLogoutBtn');
+        const confirmLogoutBtn = document.getElementById('confirmLogoutBtn');
 
-        // Logout Logic
-        document.getElementById('logoutLink').addEventListener('click', function (e) {
-            e.preventDefault();
-            if (confirm('Apakah Anda yakin ingin keluar dari sistem?')) {
-                const logoutUrl = '../../backend/api/auth/logout.php';
-                fetch(logoutUrl, { method: 'POST' })
-                    .then(response => {
-                        window.location.href = '../public/index.html';
-                    })
-                    .catch(error => {
-                        console.error('Logout error:', error);
-                        window.location.href = '../public/index.html';
-                    });
-            }
-        });
+        if (logoutTrigger) {
+            logoutTrigger.onclick = (e) => {
+                e.preventDefault();
+                logoutModal.style.display = 'flex';
+            };
+        }
+
+        if (cancelLogoutBtn) {
+            cancelLogoutBtn.onclick = () => {
+                logoutModal.style.display = 'none';
+            };
+        }
+
+        if (confirmLogoutBtn) {
+            confirmLogoutBtn.onclick = async () => {
+                confirmLogoutBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Keluar...';
+                confirmLogoutBtn.disabled = true;
+                try {
+                    await fetch('../../backend/api/auth/logout.php', { method: 'POST' });
+                    window.location.href = '../public/index.html';
+                } catch (error) {
+                    window.location.href = '../public/index.html';
+                }
+            };
+        }
+
+        window.onclick = (e) => {
+            if (e.target === logoutModal) logoutModal.style.display = 'none';
+        };
+
+        document.addEventListener('DOMContentLoaded', loadProfile);
     </script>
 </body>
 
