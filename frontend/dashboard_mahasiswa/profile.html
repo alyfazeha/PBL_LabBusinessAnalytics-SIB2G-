@@ -277,7 +277,7 @@
             try {
                 const response = await fetch(API_BASE_URL + 'mahasiswa/detail.php');
                 if (response.status === 401) {
-                    window.location.href = '../../public/index.html';
+                    window.location.href = '../public/index.html';
                     return;
                 }
                 const result = await response.json();
