@@ -172,6 +172,11 @@
                   <a href="../dashboard_dosen/index.html"><i class="fa fa-university"></i> Dashboard Dosen</a>
                 </div>
               </li>
+              <li class="scroll-to-section">
+                <a href="../dashboard_mahasiswa/index.html" id="mhsDashboardBtn" class="btn-admin-dashboard">
+                  <i class="fas fa-tachometer-alt"></i> Dashboard Mahasiswa
+                </a>
+              </li>
             </ul>
             <a class='menu-trigger'>
               <span>Menu</span>
@@ -744,6 +749,17 @@
       <i class="fas fa-times" style="font-size: 14px;"></i>
     </button>
   </div>
+  <div id="mhsToast" class="admin-toast">
+    <i class="fas fa-user-graduate"></i>
+    <div class="toast-content">
+      <h6>Mode Mahasiswa Aktif</h6>
+      <p>Anda masuk sebagai mahasiswa.</p>
+    </div>
+    <button type="button" onclick="this.parentElement.style.display='none'"
+      style="border:none; background:none; color:#a0aec0; cursor:pointer;">
+      <i class="fas fa-times" style="font-size: 14px;"></i>
+    </button>
+  </div>
 
   <script src="../vendor/jquery/jquery.min.js"></script>
   <script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -1108,17 +1124,61 @@
     }
 
     async function checkUserSessions() {
-      // Cek Admin (Sudah ada di kode Anda)
-      await checkAdminSession();
+      const adminBtn = document.getElementById('adminDashboardBtn');
+      const adminToast = document.getElementById('adminToast');
+      const mhsBtn = document.getElementById('mhsDashboardBtn');
+      const mhsToast = document.getElementById('mhsToast');
 
-      // Tambahkan Cek Dosen
-      const dosenBtn = document.getElementById('dosenDashboardBtn');
-      const isDosenActive = localStorage.getItem('dosen_status');
+      // Ambil elemen pembungkus tombol Login/Register
+      const loginWrapper = document.querySelector('.gradient-button a[href="login.html"]')?.parentElement?.parentElement;
 
-      if (isDosenActive === 'active') {
-        if (dosenBtn) dosenBtn.style.setProperty('display', 'inline-block', 'important');
+      try {
+        // 1. Cek Sesi Admin terlebih dahulu
+        const resAdmin = await fetch('../../backend/api/admin/dashboard_stats.php');
+        const adminData = await resAdmin.json();
+
+        if (adminData && adminData.success) {
+          if (adminBtn) adminBtn.style.setProperty('display', 'inline-block', 'important');
+          if (adminToast) {
+            adminToast.style.display = 'flex';
+            setTimeout(() => { adminToast.style.animation = 'slideOutUp 0.5s ease-in forwards'; }, 8000);
+          }
+          if (loginWrapper) loginWrapper.style.display = 'none';
+          return; // Selesai, jangan cek mahasiswa jika sudah admin
+        }
+
+        // 2. Cek Sesi Mahasiswa jika bukan admin
+        const resMhs = await fetch('../../backend/api/mahasiswa/detail.php');
+        const mhsData = await resMhs.json();
+
+        if (mhsData && mhsData.success) {
+          // Tampilkan tombol Dashboard Mahasiswa
+          if (mhsBtn) mhsBtn.style.setProperty('display', 'inline-block', 'important');
+
+          // Tampilkan Toast Mahasiswa
+          if (mhsToast) {
+            mhsToast.style.display = 'flex';
+            setTimeout(() => {
+              mhsToast.style.animation = 'slideOutUp 0.5s ease-in forwards';
+              setTimeout(() => { mhsToast.style.display = 'none'; }, 500);
+            }, 8000);
+          }
+
+          // Sembunyikan tombol Login/Register
+          if (loginWrapper) loginWrapper.style.display = 'none';
+        }
+
+      } catch (error) {
+        console.error("Session Check Error:", error);
       }
     }
+
+    // Ganti pemanggilan di DOMContentLoaded
+    document.addEventListener('DOMContentLoaded', () => {
+      initPublikasi();
+      fetchDosen();
+      checkUserSessions(); // Panggil fungsi gabungan ini
+    });
 
     function bersihkanTampilanAdmin() {
       const dashBtn = document.getElementById('adminDashboardBtn');
