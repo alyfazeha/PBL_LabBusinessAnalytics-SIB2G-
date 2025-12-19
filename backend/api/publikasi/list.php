@@ -19,7 +19,7 @@ require_once __DIR__ . "/../../config/database.php";
 require_once __DIR__ . "/../../models/Publikasi.php";
 require_once __DIR__ . "/../../config/auth.php";
 
-// require_role(['admin', 'dosen']); // Aktifkan jika auth sudah jalan
+require_role(['admin', 'dosen']); // Aktifkan jika auth sudah jalan
 
 try {
     $model = new Publikasi();

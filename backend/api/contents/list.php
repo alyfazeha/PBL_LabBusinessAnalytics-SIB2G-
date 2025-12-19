@@ -14,7 +14,7 @@ try {
     // Ganti 'koneksi.php' menjadi 'database.php'
     require_once __DIR__ . "/../../config/database.php"; 
     require_once __DIR__ . "/../../models/Content.php";
-    require_once __DIR__ . "/../../config/auth.php"; // Jika butuh auth
+    require_once __DIR__ . "/../../config/auth.php";
     // -------------------------
 
     // Cek Role (Jika perlu admin)

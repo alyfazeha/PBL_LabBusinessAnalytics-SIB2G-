@@ -42,8 +42,7 @@ class Dosen
             ':mata_kuliah' => $data['mata_kuliah'],
         ]);
     }
-
-    // --- BAGIAN INI DIMODIFIKASI SEDIKIT (AMAN) ---
+    
     // Ditambahkan JOIN ke research_focus agar Fitur Publikasi bisa filter dosen
     public function all()
     {
@@ -59,7 +58,6 @@ class Dosen
         return $this->db->query($sql)->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // --- BAGIAN INI TIDAK DIUBAH (SAMA PERSIS DENGAN KODE ASLI) ---
     public function find($nidn)
     {
         $sql = "SELECT d.*, u.username
@@ -72,8 +70,6 @@ class Dosen
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    // --- BAGIAN INI TIDAK DIUBAH (SAMA PERSIS DENGAN KODE ASLI) ---
-    // Kolom pendidikan, mata_kuliah, dll TETAP ADA
     public function update($nidn, $data)
     {
         $sql = "UPDATE dosen SET
@@ -84,7 +80,7 @@ class Dosen
                 researchgate_url = :researchgate_url,
                 scholar_url = :scholar_url,
                 sinta_url = :sinta_url,
-                scopus_url = :scopus_url,  -- WAJIB DITAMBAHKAN
+                scopus_url = :scopus_url,
                 nip = :nip,
                 prodi = :prodi,
                 pendidikan = :pendidikan,
@@ -102,7 +98,7 @@ class Dosen
             ':researchgate_url' => $data['researchgate_url'],
             ':scholar_url' => $data['scholar_url'],
             ':sinta_url' => $data['sinta_url'],
-            ':scopus_url' => $data['scopus_url'],  // WAJIB DITAMBAHKAN
+            ':scopus_url' => $data['scopus_url'], 
             ':nip' => $data['nip'],
             ':prodi' => $data['prodi'],
             ':pendidikan' => $data['pendidikan'],
@@ -111,10 +107,9 @@ class Dosen
             ':nidn' => $nidn
         ]);
     }
-    // --- BAGIAN INI DIMODIFIKASI SEDIKIT (AMAN) ---
     public function delete($nidn)
     {
-        // 1. Hapus dulu relasi di dosen_focus agar tidak error database
+        // 1. Hapus relasi di dosen_focus agar tidak error database
         $sqlFocus = "DELETE FROM dosen_focus WHERE nidn = :nidn";
         $stmtFocus = $this->db->prepare($sqlFocus);
         $stmtFocus->execute([':nidn' => $nidn]);

@@ -11,7 +11,7 @@ require_once __DIR__ . "/../../config/database.php";
 require_once __DIR__ . "/../../models/Content.php";
 require_once __DIR__ . "/../../config/auth.php";
 
-// require_role(['admin']); // Aktifkan jika sudah pakai login
+require_role(['admin']);
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
