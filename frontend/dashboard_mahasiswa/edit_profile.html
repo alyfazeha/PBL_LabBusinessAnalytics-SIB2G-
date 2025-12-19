@@ -4,244 +4,360 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Profil Mahasiswa</title>
+    <title>Edit Profil Mahasiswa | Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="../../frontend/assets/css/dashboardmhs.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="../../frontend/assets/css/dashboarddns.css">
+    <link rel="stylesheet" href="../assets/css/cssadmin.css">
+
     <style>
-        /* CSS Tambahan untuk Input Readonly agar user tahu itu tidak bisa diedit */
-        .input-readonly {
-            background-color: #e9ecef;
-            cursor: not-allowed;
-            color: #6c757d;
+        :root {
+            --primary-blue: #4A90E2;
+            --dark-text: #2d3748;
+            --light-text: #718096;
+            --bg-body: #f8f9fc;
+            --border-color: #edf2f7;
         }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-body);
+            margin: 0;
+            display: flex;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            padding: 35px;
+            width: calc(100% - 250px);
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f1f5f9;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-card {
+            background: white;
+            border-radius: 20px;
+            padding: 35px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+        }
+
+        .form-grid-2 {
+            display: flex;
+            gap: 40px;
+        }
+
+        .column-left,
+        .column-right {
+            flex: 1;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--dark-text);
+            margin-bottom: 8px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            font-size: 14px;
+            box-sizing: border-box;
+            transition: all 0.3s;
+        }
+
+        input:focus {
+            border-color: var(--primary-blue);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+        }
+
+        .input-readonly {
+            background-color: #f8fafc;
+            color: #718096;
+            cursor: not-allowed;
+        }
+
+        .form-actions {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #f1f5f9;
+            display: flex;
+            gap: 15px;
+        }
+
         .error-msg {
-            color: red;
-            font-size: 0.85em;
+            color: #e53e3e;
+            font-size: 12px;
             margin-top: 5px;
             display: none;
+        }
+
+        .sidebar nav a.active {
+            background-color: var(--primary-blue) !important;
+            color: white !important;
+        }
+
+        /* Toast Container */
+        #toastContainer {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
         }
     </style>
 </head>
 
 <body>
-    <aside class="mhs-sidebar">
-        <div class="mhs-logo-area">
-            <h2><i class="fas fa-graduation-cap"></i> MHS DASHBOARD</h2>
+    <div id="toastContainer"></div>
+
+    <aside class="sidebar">
+        <div class="logo-area">
+            <img src="../assets/images/LogoPolinema.png" alt="Polinema" style="width: 50px;">
+            <img src="../assets/images/logoJTI.png" alt="JTI" style="width: 45px;">
+            <img src="../assets/images/LogoLab2.png" alt="Lab"
+                style="width: 70px; margin-bottom: -10px; margin-left: -10px;">
+            <h3 >Dashboard Mahasiswa</h3>
         </div>
         <nav>
-            <hr style="border-top: 1px solid rgba(255,255,255,0.1); margin: 15px 0;">
-            <a href="index.html" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-            <a href="profile.html"><i class="fas fa-user-circle"></i> Profil</a>
-            <a href="peminjaman.html"><i class="fas fa-laptop-code"></i> Ajukan Peminjaman</a>
-            <a href="riwayat.html"><i class="fas fa-history"></i> Status & Riwayat</a>
-            <hr style="border-top: 1px solid rgba(255,255,255,0.1); margin: 15px 0;">
-            <a href="../public/index.html"><i class="fas fa-home"></i> Landing Page</a>
+            <a href="index.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="../public/index.html"
+                style="border-top: 1px solid rgba(255,255,255,0.1); margin-top: 10px; padding-top: 15px;">
+                <i class="fas fa-external-link-alt"></i> Lihat Landing Page
+            </a>
+            <a href="profile.html" class="active"><i class="fas fa-user-circle"></i> Profil & Akun</a>
+            <a href="peminjaman.html"><i class="fas fa-calendar-plus"></i> Pinjam Sarana</a>
+            <a href="riwayat.html"><i class="fas fa-history"></i> Riwayat Pinjam</a>
             <a href="#" id="logoutLink"><i class="fas fa-sign-out-alt"></i> Logout</a>
-            <hr style="border-top: 1px solid rgba(255,255,255,0.1); margin: 15px 0;">
         </nav>
     </aside>
 
-<main class="main-content">
-        <div class="content-card">
-            <div style="margin-bottom: 20px;">
-                <h2><i class="fas fa-user-edit"></i> Edit Profil</h2>
-                <p style="color:#666; font-size:0.9em;">Perbarui informasi data diri Anda di sini.</p>
+    <div class="main-content">
+        <header>
+            <div class="header-title">
+                <a href="profile.html" class="back-icon-in-header"><i class="fas fa-arrow-left"></i></a>
+                <h2>Edit Profile Anda</h2>
             </div>
+        </header>
 
-            <form id="editForm">
-                <div class="form-group">
-                    <label for="nim">NIM (Tidak dapat diubah)</label>
-                    <input type="text" id="nim" name="nim" class="input-readonly" readonly>
-                </div>
+        <main>
+            <div class="form-card">
+                <form id="editForm">
+                    <div class="form-grid-2">
+                        <div class="column-left">
+                            <h4 class="section-title" style="color: var(--primary-blue);">
+                                <i class="fas fa-university"></i> Informasi Akademik
+                            </h4>
 
-                <div class="form-group">
-                    <label for="nama">Nama Lengkap <span style="color:red">*</span></label>
-                    <input type="text" id="nama" name="nama" required>
-                    <div id="err-nama" class="error-msg">Nama tidak boleh kosong.</div>
-                </div>
+                            <div class="form-group">
+                                <label for="nim">NIM (Readonly)</label>
+                                <input type="text" id="nim" name="nim" class="input-readonly" readonly>
+                            </div>
 
-                <div class="form-group">
-                    <label for="prodi">Program Studi <span style="color:red">*</span></label>
-                    <select id="prodi" name="prodi" required>
-                        <option value="D-II PPLS">D-II PPLS</option>
-                        <option value="D-IV Teknik Informatika">D-IV Teknik Informatika</option>
-                        <option value="D-IV Sistem Informasi Bisnis">D-IV Sistem Informasi Bisnis</option>
-                        <option value="S2 Magister Terapan">S2 Magister Terapan</option>
-                    </select>
-                    <div id="err-prodi" class="error-msg">Prodi tidak boleh kosong.</div>
-                </div>
+                            <div class="form-group">
+                                <label for="nama">Nama Lengkap <span style="color:red">*</span></label>
+                                <input type="text" id="nama" name="nama" placeholder="Masukkan nama lengkap" required>
+                                <div id="err-nama" class="error-msg">Nama tidak boleh kosong.</div>
+                            </div>
 
-                <div class="form-group">
-                    <label for="tingkat">Tingkat/Semester</label>
-                    <select id="tingkat" name="tingkat" required>
-                        <option value="1">Tingkat 1</option>
-                        <option value="2">Tingkat 2</option>
-                        <option value="3">Tingkat 3</option>
-                        <option value="4">Tingkat 4</option>
-                        <option value="S2">S2</option>
-                    </select>
-                </div>
+                            <div class="form-group">
+                                <label for="prodi">Program Studi <span style="color:red">*</span></label>
+                                <select id="prodi" name="prodi" required>
+                                    <option value="">Pilih Program Studi</option>
+                                    <option value="D-IV Teknik Informatika">D-IV Teknik Informatika</option>
+                                    <option value="D-IV Sistem Informasi Bisnis">D-IV Sistem Informasi Bisnis</option>
+                                    <option value="D-II Pengembangan Perangkat Lunak Situs">D-II Pengembangan Perangkat Lunak Situs</option>
+                                </select>
+                                <div id="err-prodi" class="error-msg">Prodi harus dipilih.</div>
+                            </div>
 
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="email" placeholder="email@contoh.com">
-                    <div id="err-email" class="error-msg">Format email tidak valid.</div>
-                </div>
+                            <div class="form-group">
+                                <label for="tingkat">Tingkat</label>
+                                <select id="tingkat" name="tingkat" required>
+                                    <option value="1">Tingkat 1</option>
+                                    <option value="2">Tingkat 2</option>
+                                    <option value="3">Tingkat 3</option>
+                                    <option value="4">Tingkat 4</option>
+                                </select>
+                            </div>
+                        </div>
 
-                <div class="form-group">
-                    <label for="no_hp">No. Handphone</label>
-                    <input type="text" id="no_hp" name="no_hp" placeholder="08xxxxxxxxxx">
-                </div>
+                        <div class="column-right">
+                            <h4 class="section-title" style="color: var(--primary-blue);">
+                                <i class="fas fa-address-book"></i> Kontak & Akun
+                            </h4>
 
-                <div class="btn-group" style="margin-top: 30px;">
-                    <button type="submit" id="btnSave" class="btn-save" style="background: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">
-                        <i class="fas fa-save"></i> Simpan Perubahan
-                    </button>
-                    <a href="profile.html" class="btn-cancel" style="background: #dc3545; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; margin-left: 10px;">
-                        Batal
-                    </a>
-                </div>
-            </form>
+                            <div class="form-group">
+                                <label for="email">Email Mahasiswa</label>
+                                <input type="email" id="email" name="email" placeholder="contoh@polinema.ac.id">
+                                <div id="err-email" class="error-msg">Format email tidak valid.</div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="no_hp">Nomor WhatsApp</label>
+                                <input type="text" id="no_hp" name="no_hp" placeholder="08XXXXXXXXXX">
+                            </div>
+
+                            <div style="background: #f8fafc; border: 1.5px dashed #cbd5e0; padding: 20px; border-radius: 15px; margin-top: 25px;">
+                                <p style="font-size: 14px; color: #2d3748; margin-bottom: 8px; font-weight: 600;">
+                                    <i class="fas fa-info-circle" style="color: var(--primary-blue);"></i> Tips Profil
+                                </p>
+                                <p style="font-size: 13px; color: #718096; margin: 0; line-height: 1.6;">
+                                    Pastikan Nomor WhatsApp aktif untuk menerima notifikasi terkait status peminjaman sarana prasarana laboratorium.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" id="btnSave" class="btn btn-ijo">
+                            <i class="fas fa-save"></i> Simpan Perubahan
+                        </button>
+                        <a href="profile.html" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Batal
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <div id="logoutModal" class="modal logout-modal" style="display: none;">
+        <div class="modal-content" style="text-align: left !important;">
+            <span class="close-btn" id="closeModalIcon">&times;</span>
+            <h4><i class="fas fa-sign-out-alt"></i> Konfirmasi Logout</h4>
+            <p>Anda yakin ingin mengakhiri sesi dan keluar dari Dashboard Mahasiswa?</p>
+            <div class="modal-buttons">
+                <button id="cancelLogoutBtn" class="btn btn-secondary">Batal</button>
+                <button id="confirmLogoutBtn" class="btn btn-danger">Ya, Logout</button>
+            </div>
         </div>
-    </main>
+    </div>
 
     <script>
         const API_BASE_URL = '../../backend/api/';
+        const logoutModal = document.getElementById('logoutModal');
 
-        // 1. Load Data Lama untuk Pre-fill Form
+        // Fungsi Toast Notification
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast-notification toast-${type} show`;
+            toast.innerHTML = `
+                <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+                <span>${message}</span>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 500);
+            }, 3000);
+        }
+
         async function loadOldData() {
             try {
                 const response = await fetch(API_BASE_URL + 'mahasiswa/detail.php');
                 const result = await response.json();
-                
                 if (result.success && result.data) {
                     const d = result.data;
-                    // Isi value input form
                     document.getElementById('nim').value = d.nim;
                     document.getElementById('nama').value = d.nama;
                     document.getElementById('prodi').value = d.prodi;
-                    document.getElementById('tingkat').value = d.tingkat || '';
+                    document.getElementById('tingkat').value = d.tingkat || '1';
                     document.getElementById('email').value = d.email || '';
                     document.getElementById('no_hp').value = d.no_hp || '';
-                } else {
-                    alert('Gagal memuat data profil.');
                 }
-            } catch (error) {
-                console.error("Gagal load data:", error);
-            }
+            } catch (error) { console.error("Load error:", error); }
         }
 
-        // 2. Fungsi Validasi Sederhana
         function validateForm() {
             let isValid = true;
-            
-            // Reset Error
             document.querySelectorAll('.error-msg').forEach(el => el.style.display = 'none');
-
-            // Cek Nama
             const nama = document.getElementById('nama').value.trim();
-            if (!nama) {
-                document.getElementById('err-nama').style.display = 'block';
-                isValid = false;
-            }
-
-            // Cek Prodi
-            const prodi = document.getElementById('prodi').value.trim();
-            if (!prodi) {
-                document.getElementById('err-prodi').style.display = 'block';
-                isValid = false;
-            }
-
-            // Cek Format Email (Opsional jika diisi)
+            if (!nama) { document.getElementById('err-nama').style.display = 'block'; isValid = false; }
             const email = document.getElementById('email').value.trim();
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (email && !emailRegex.test(email)) {
-                document.getElementById('err-email').style.display = 'block';
-                isValid = false;
-            }
-
+            if (email && !emailRegex.test(email)) { document.getElementById('err-email').style.display = 'block'; isValid = false; }
             return isValid;
         }
 
-        // 3. Handle Submit
-        document.getElementById('editForm').addEventListener('submit', async function(e) {
+        document.getElementById('editForm').addEventListener('submit', async function (e) {
             e.preventDefault();
-            
-            if (!validateForm()) {
-                return; // Stop jika tidak valid
-            }
+            if (!validateForm()) return;
 
             const btn = document.getElementById('btnSave');
             const originalText = btn.innerHTML;
             btn.disabled = true;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
 
-            const formData = new FormData(this);
-
             try {
+                const formData = new FormData(this);
                 const response = await fetch(API_BASE_URL + 'mahasiswa/update_profile.php', {
                     method: 'POST',
                     body: formData
                 });
-
-                // Cek respon JSON
                 const result = await response.json();
-
                 if (result.success) {
-                    alert('Profil berhasil diperbarui!');
-                    window.location.href = 'profile.html'; // Redirect balik ke profil
+                    showToast('Profil berhasil diperbarui!', 'success');
+                    setTimeout(() => window.location.href = 'profile.html', 1500);
                 } else {
-                    alert('Gagal: ' + result.message);
+                    showToast('Gagal: ' + result.message, 'error');
                 }
-
             } catch (error) {
-                console.error("Error submit:", error);
-                alert('Terjadi kesalahan sistem saat menyimpan.');
+                showToast('Terjadi kesalahan sistem.', 'error');
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = originalText;
             }
         });
 
-        // Load data saat halaman dibuka
-        document.addEventListener('DOMContentLoaded', loadOldData);
+        // --- LOGIKA MODAL LOGOUT ---
+        document.getElementById('logoutLink').onclick = (e) => {
+            e.preventDefault();
+            logoutModal.style.display = 'flex';
+        };
 
-        document.getElementById('logoutLink').addEventListener('click', function (e) {
-            e.preventDefault(); // Mencegah navigasi default
+        const hideModal = () => logoutModal.style.display = 'none';
 
-            // 1. Konfirmasi kepada pengguna
-            const isConfirmed = confirm('Apakah Anda yakin ingin keluar dari sistem?');
+        document.getElementById('cancelLogoutBtn').onclick = hideModal;
+        document.getElementById('closeModalIcon').onclick = hideModal;
 
-            if (isConfirmed) {
-                const logoutUrl = '../../backend/api/auth/logout.php';
+        window.onclick = (event) => {
+            if (event.target == logoutModal) hideModal();
+        };
 
-                fetch(logoutUrl, {
-                    method: 'POST', // Gunakan POST karena logout.php Anda memproses session
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            alert(data.message);
-                            // 3. Redirect ke halaman login setelah berhasil logout
-                            // Asumsi halaman login ada di index.html atau login.html di root
-                            window.location.href = '../public/index.html'; // Sesuaikan path ini jika halaman login berbeda
-                        } else {
-                            alert('Logout Gagal: ' + data.message);
-                            // Jika gagal (misalnya tidak ada sesi), tetap arahkan ke halaman login
-                            window.location.href = '../public/index.html'; // Sesuaikan path ini jika halaman login berbeda
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error saat melakukan logout:', error);
-                        alert('Terjadi kesalahan jaringan atau server. Logout gagal.');
-                        // Sebagai fallback, tetap arahkan pengguna ke halaman login
-                            window.location.href = '../public/index.html'; // Sesuaikan path ini jika halaman login berbeda
-                    });
+        document.getElementById('confirmLogoutBtn').onclick = async () => {
+            try {
+                await fetch('../../backend/api/auth/logout.php', { method: 'POST' });
+                window.location.href = '../public/index.html';
+            } catch (err) {
+                window.location.href = '../public/index.html';
             }
-        });
+        };
+
+        document.addEventListener('DOMContentLoaded', loadOldData);
     </script>
 </body>
 
