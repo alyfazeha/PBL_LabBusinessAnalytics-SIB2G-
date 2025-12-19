@@ -76,7 +76,7 @@
         </div>
         <nav>
             <a href="index.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-            <a href="../../public/index.html"
+            <a href="../public/index.html"
                 style="border-top: 1px solid rgba(255,255,255,0.1); margin-top: 10px; padding-top: 15px;">
                 <i class="fas fa-external-link-alt"></i> Lihat Landing Page
             </a>
@@ -314,7 +314,7 @@
 
         document.getElementById('confirmLogoutBtn').onclick = () => {
             fetch('../../backend/api/auth/logout.php', { method: 'POST' })
-                .then(() => location.href = '../../public/index.html');
+                .then(() => location.href = '../public/index.html');
         };
 
         document.addEventListener('DOMContentLoaded', loadInitialData);
