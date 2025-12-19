@@ -333,9 +333,17 @@
             };
         }
 
-        document.getElementById('confirmLogoutBtn').onclick = () => {
-            fetch('../../backend/api/auth/logout.php', { method: 'POST' })
-                .then(() => window.location.href = '../public/index.html');
+        document.getElementById('confirmLogoutBtn').onclick = async () => {
+            try {
+                await fetch('../../backend/api/auth/logout.php', { method: 'POST' });
+
+                // Hapus penanda agar tombol dashboard di landing page hilang
+                localStorage.removeItem('dosen_status');
+
+                window.location.href = '../public/index.html';
+            } catch (error) {
+                console.error("Logout gagal", error);
+            }
         };
 
         document.addEventListener('DOMContentLoaded', loadDashboard);
