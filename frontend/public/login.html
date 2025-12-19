@@ -200,26 +200,20 @@
 
                     const result = await response.json();
 
-                    // Di dalam login.html bagian penanganan login
                     if (result.success) {
-                        showNotification(result.message, 'success');
+                        showNotification(result.message, 'success'); // Gunakan toast success
 
-                        // --- TAMBAHKAN KODE INI DI SINI ---
-                        if (result.role === 'dosen') {
-                            localStorage.setItem('dosen_status', 'logged_in');
-                        } else if (result.role === 'admin') {
-                            localStorage.setItem('admin_status', 'logged_in');
-                        }
-                        // ----------------------------------
-
-                        // Redirect sesuai role
+                        // Beri jeda 1.5 detik agar user bisa baca toast sebelum pindah halaman
                         setTimeout(() => {
-                            if (result.role === 'admin') {
-                                window.location.href = '../dashboard/admin.html';
-                            } else if (result.role === 'dosen') {
-                                window.location.href = '../dashboard_dosen/index.html';
+                            if (result.data && result.data.role) {
+                                switch (result.data.role) {
+                                    case 'admin': window.location.href = '../dashboard/admin.html'; break;
+                                    case 'mahasiswa': window.location.href = '../dashboard_mahasiswa/index.html'; break;
+                                    case 'dosen': window.location.href = '../dashboard_dosen/index.html'; break;
+                                    default: window.location.href = 'index.html';
+                                }
                             } else {
-                                window.location.href = '../dashboard_mahasiswa/index.html';
+                                window.location.href = 'index.html';
                             }
                         }, 1500);
                     }

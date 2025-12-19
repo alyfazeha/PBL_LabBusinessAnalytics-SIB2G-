@@ -11,9 +11,6 @@ require_once __DIR__ . "/../../config/auth.php";
 require_once __DIR__ . "/../../models/Content.php";
 
 require_role(['admin']); 
-// ... (sisa kode ke bawah aman)
-
-require_role(['admin']); 
 
 $model = new Content();
 

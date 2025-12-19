@@ -1124,56 +1124,53 @@
     }
 
     async function checkUserSessions() {
-      const loginWrapper = document.getElementById('loginWrapper');
       const adminBtn = document.getElementById('adminDashboardBtn');
-      const dnsBtn = document.getElementById('dosenDashboardBtn');
+      const adminToast = document.getElementById('adminToast');
       const mhsBtn = document.getElementById('mhsDashboardBtn');
+      const mhsToast = document.getElementById('mhsToast');
 
-      // Sembunyikan semua tombol dashboard dulu
-      const hideAllDashboards = () => {
-        if (adminBtn) adminBtn.style.setProperty('display', 'none', 'important');
-        if (dnsBtn) dnsBtn.style.setProperty('display', 'none', 'important');
-        if (mhsBtn) mhsBtn.style.setProperty('display', 'none', 'important');
-      };
-      hideAllDashboards();
+      // Ambil elemen pembungkus tombol Login/Register
+      const loginWrapper = document.querySelector('.gradient-button a[href="login.html"]')?.parentElement?.parentElement;
 
-      // --- 1. CEK ADMIN ---
       try {
-        const res = await fetch('../../backend/api/admin/dashboard_stats.php');
-        const data = await res.json();
-        // Jika status bukan error, berarti dia admin
-        if (data && data.status !== 'error') {
+        // 1. Cek Sesi Admin terlebih dahulu
+        const resAdmin = await fetch('../../backend/api/admin/dashboard_stats.php');
+        const adminData = await resAdmin.json();
+
+        if (adminData && adminData.success) {
           if (adminBtn) adminBtn.style.setProperty('display', 'inline-block', 'important');
+          if (adminToast) {
+            adminToast.style.display = 'flex';
+            setTimeout(() => { adminToast.style.animation = 'slideOutUp 0.5s ease-in forwards'; }, 8000);
+          }
           if (loginWrapper) loginWrapper.style.display = 'none';
-          return; // Berhenti jika sudah ketemu
+          return; // Selesai, jangan cek mahasiswa jika sudah admin
         }
-      } catch (e) { console.log("Bukan Admin"); }
 
-      // --- 2. CEK DOSEN ---
-      try {
-        const res = await fetch('../../backend/api/auth/check_session_dosen.php');
-        const data = await res.json();
-        // Cek 'success' (true) atau status bukan 'error'
-        if (data && (data.success === true || data.status === 'success')) {
-          if (dnsBtn) dnsBtn.style.setProperty('display', 'inline-block', 'important');
-          if (loginWrapper) loginWrapper.style.display = 'none';
-          return;
-        }
-      } catch (e) { console.log("Bukan Dosen"); }
+        // 2. Cek Sesi Mahasiswa jika bukan admin
+        const resMhs = await fetch('../../backend/api/mahasiswa/detail.php');
+        const mhsData = await resMhs.json();
 
-      // --- 3. CEK MAHASISWA ---
-      try {
-        const res = await fetch('../../backend/api/auth/check_session_mhs.php');
-        const data = await res.json();
-        if (data && (data.success === true || data.status === 'success')) {
+        if (mhsData && mhsData.success) {
+          // Tampilkan tombol Dashboard Mahasiswa
           if (mhsBtn) mhsBtn.style.setProperty('display', 'inline-block', 'important');
-          if (loginWrapper) loginWrapper.style.display = 'none';
-          return;
-        }
-      } catch (e) { console.log("Bukan Mahasiswa"); }
 
-      // --- 4. JIKA SEMUA GAGAL ---
-      if (loginWrapper) loginWrapper.style.display = 'block';
+          // Tampilkan Toast Mahasiswa
+          if (mhsToast) {
+            mhsToast.style.display = 'flex';
+            setTimeout(() => {
+              mhsToast.style.animation = 'slideOutUp 0.5s ease-in forwards';
+              setTimeout(() => { mhsToast.style.display = 'none'; }, 500);
+            }, 8000);
+          }
+
+          // Sembunyikan tombol Login/Register
+          if (loginWrapper) loginWrapper.style.display = 'none';
+        }
+
+      } catch (error) {
+        console.error("Session Check Error:", error);
+      }
     }
 
     // Ganti pemanggilan di DOMContentLoaded
